@@ -69,9 +69,36 @@ function FloatingDice({onRoll}){const[rolling,setRolling]=useState(false);const 
     </div></div></div>);
 }
 
-function FixedLabels(){const topOff=HEADER_H+32;const h=typeof window!=="undefined"?window.innerHeight-topOff-BAR_H-32:500;
-  return(<div style={{position:"fixed",right:10,top:topOff,height:h,zIndex:800,pointerEvents:"none",display:"flex",flexDirection:"column",justifyContent:"space-around",paddingTop:16,paddingBottom:16}}>
-    {FIELD_KEYS.map(l=><div key={l} style={{fontFamily:FONT,fontSize:"clamp(10px,1.6vw,14px)",fontWeight:700,color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase",textAlign:"right"}}>{l}</div>)}
+function FloatingLabels({cardKey}){
+  const[positions,setPositions]=useState(null);
+  const topOff=HEADER_H+32;const h=typeof window!=="undefined"?window.innerHeight-topOff-BAR_H-32:500;
+  useEffect(()=>{
+    // After card animation settles, measure field positions
+    const timer=setTimeout(()=>{
+      const ys=[];
+      FIELD_KEYS.forEach(k=>{
+        const el=document.querySelector(`[data-field="${k}"]`);
+        if(el){const r=el.getBoundingClientRect();ys.push(r.top+r.height/2);}
+        else ys.push(null);
+      });
+      if(ys.some(y=>y!==null))setPositions(ys);
+    },ANIM_MS+60);
+    // Reset to spread while animating
+    setPositions(null);
+    return ()=>clearTimeout(timer);
+  },[cardKey]);
+  // Fallback: evenly spaced
+  const fallback=FIELD_KEYS.map((_,i)=>topOff+16+(h-32)*((i+0.5)/FIELD_KEYS.length));
+  const pts=positions||fallback;
+  return(<div style={{position:"fixed",right:10,top:0,bottom:0,zIndex:800,pointerEvents:"none"}}>
+    {FIELD_KEYS.map((l,i)=><div key={l} style={{
+      position:"absolute",right:0,
+      top:pts[i]!=null?pts[i]:fallback[i],
+      transform:"translateY(-50%)",
+      fontFamily:FONT,fontSize:"clamp(10px,1.6vw,14px)",fontWeight:700,
+      color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase",textAlign:"right",
+      transition:positions?"top 0.5s cubic-bezier(0.25,1,0.5,1)":"none",
+    }}>{l}</div>)}
   </div>);
 }
 
@@ -86,12 +113,12 @@ function CardContent({ev,search,selected,showGreen,onClick}){
   }}>
     {showGreen&&<div style={{position:"absolute",inset:0,background:"rgba(74,246,38,0.12)",pointerEvents:"none",zIndex:0,transition:"background 0.1s"}}/>}
     <div style={{position:"absolute",top:8,left:12,fontFamily:FONT,fontSize:"clamp(52px,13vw,95px)",fontWeight:700,color:"rgba(0,0,0,0.08)",lineHeight:.85,letterSpacing:-3,pointerEvents:"none"}}>{ev.id}</div>
-    <div style={{fontFamily:FONT,fontSize:"clamp(17px,4vw,28px)",fontWeight:600,color:"#000",lineHeight:1.2,letterSpacing:"-.5px",zIndex:1}}>{hl(ev.n)}</div>
-    <div style={{fontFamily:FONT,fontSize:"clamp(12px,2.1vw,15px)",color:"#000",lineHeight:1.6}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
-    <div style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.55)",lineHeight:1.6,fontStyle:"italic"}}>{ev.pr.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
-    <div style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.38)",letterSpacing:0}}>{hl(ev.pl)}</div>
-    <div style={{fontFamily:FONT,fontSize:"clamp(10px,1.6vw,12px)",color:"rgba(0,0,0,0.25)",letterSpacing:0.3,textTransform:"lowercase"}}>{hl(ev.t)}</div>
-    <div style={{fontFamily:MONO,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.3)",letterSpacing:0}}>{ev.d}</div>
+    <div data-field="name" style={{fontFamily:FONT,fontSize:"clamp(17px,4vw,28px)",fontWeight:600,color:"#000",lineHeight:1.2,letterSpacing:"-.5px",zIndex:1}}>{hl(ev.n)}</div>
+    <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2.1vw,15px)",color:"#000",lineHeight:1.6}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
+    <div data-field="program" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.55)",lineHeight:1.6,fontStyle:"italic"}}>{ev.pr.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
+    <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.38)",letterSpacing:0}}>{hl(ev.pl)}</div>
+    <div data-field="tags" style={{fontFamily:FONT,fontSize:"clamp(10px,1.6vw,12px)",color:"rgba(0,0,0,0.25)",letterSpacing:0.3,textTransform:"lowercase"}}>{hl(ev.t)}</div>
+    <div data-field="date" style={{fontFamily:MONO,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.3)",letterSpacing:0}}>{ev.d}</div>
   </div>);
 }
 
@@ -217,7 +244,7 @@ function ListPage({events,onOpenEvent}){
       @keyframes exitUp{from{transform:translateY(0)}to{transform:translateY(-100%)}}
       @keyframes exitDown{from{transform:translateY(0)}to{transform:translateY(100%)}}
     `}</style>
-    <FixedLabels/>
+    <FloatingLabels cardKey={navKey.current}/>
     <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflow:"hidden",zIndex:500}}
       onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onWheel={onWheel}>
       {exiting&&<div key={`exit-${navKey.current}`} style={{position:"absolute",inset:0,animation:`exit${exiting.dir} ${ANIM_MS}ms cubic-bezier(0.4,0.0,0.2,0.9) both`}}>
