@@ -13,7 +13,7 @@ function useSelBlink(){const[flash,setFlash]=useState(false);const t=useRef(null
   const stop=useCallback(()=>{clearTimeout(t.current);setFlash(false)},[]);useEffect(()=>()=>clearTimeout(t.current),[]);return{flash,start,stop}}
 
 /* ── Frosted panels — menu & bar ── */
-const panelStyle={position:"fixed",left:0,right:0,zIndex:1000,background:"rgba(255,255,255,0.55)",backdropFilter:"blur(24px) saturate(130%)",WebkitBackdropFilter:"blur(24px) saturate(130%)",boxShadow:"0 1px 8px rgba(0,0,0,0.03)"};
+const panelStyle={position:"fixed",left:0,right:0,zIndex:1000,background:"rgba(255,255,255,0.35)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",boxShadow:"0 1px 10px rgba(0,0,0,0.04)"};
 
 /* ── Shared tap button — selector + scale on tap ── */
 function TapButton({children,onClick,style,href,target}){
@@ -508,15 +508,15 @@ function Home({setPage}){
 
 
 
-/* ── Single slideshow — JS-driven seamless loop ── */
+/* ── Single slideshow — JS-driven seamless slide ── */
 
 function Slideshow({imgs,width}){
   const ref=useRef(null);
   const[nearby,setNearby]=useState(false);
   const[loaded,setLoaded]=useState(false);
   const[actualW,setActualW]=useState(width||160);
-  const[cur,setCur]=useState(0);
-  const prevRef=useRef(0);
+  const stripRef=useRef(null);
+  const posRef=useRef(0);
   const timerRef=useRef(null);
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
 
@@ -529,7 +529,7 @@ function Slideshow({imgs,width}){
     return ()=>{obs.disconnect();ro.disconnect()};
   },[]);
 
-  // Preload first image, then mark loaded
+  // Preload first image
   useEffect(()=>{
     if(!nearby||imgs.length===0)return;
     const img=new Image();
@@ -537,19 +537,43 @@ function Slideshow({imgs,width}){
     img.src=imgs[0];
   },[nearby,imgs]);
 
-  // Cycle through images
+  const w=actualW;
+
+  // Slide animation loop
   useEffect(()=>{
     if(!nearby||!loaded||imgs.length<=1)return;
+    const el=stripRef.current;if(!el)return;
+    let pos=0;
+    const n=imgs.length;
+
     const tick=()=>{
       const delay=isMob?1500+Math.random()*2000:4000+Math.random()*6000;
       timerRef.current=setTimeout(()=>{
-        setCur(c=>{prevRef.current=c;return(c+1)%imgs.length});
-        tick();
+        pos++;
+        // Slide to next (including the duplicate at end)
+        el.style.transition="transform 0.7s cubic-bezier(0.4,0,0.2,1)";
+        el.style.transform=`translateX(-${pos*w}px)`;
+
+        if(pos>=n){
+          // After sliding to the duplicate first frame, snap back instantly
+          setTimeout(()=>{
+            el.style.transition="none";
+            el.style.transform="translateX(0)";
+            pos=0;
+            // Force reflow then re-enable transitions
+            el.offsetHeight;
+            tick();
+          },750);
+        }else{
+          tick();
+        }
       },delay);
     };
+    el.style.transition="none";
+    el.style.transform="translateX(0)";
     tick();
     return()=>clearTimeout(timerRef.current);
-  },[nearby,loaded,imgs.length,isMob]);
+  },[nearby,loaded,imgs.length,isMob,w]);
 
   if(imgs.length===0) return <div ref={ref} style={{width:"100%",height:"100%"}}/>;
   if(!nearby||!loaded) return <div ref={ref} style={{width:"100%",height:"100%",background:"#eee"}}/>;
@@ -557,19 +581,11 @@ function Slideshow({imgs,width}){
     <div style={{width:"100%",height:"100%",backgroundImage:`url(${imgs[0]})`,backgroundSize:"cover",backgroundPosition:"center"}}/>
   </div>);
 
-  const prev=prevRef.current;
-  return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden",position:"relative",background:"#f2f2f2"}}>
-    {imgs.map((u,i)=>{
-      const isCur=i===cur;
-      const isPrev=i===prev;
-      return <div key={i} style={{
-        position:"absolute",inset:0,
-        backgroundImage:`url(${u})`,backgroundSize:"cover",backgroundPosition:"center",
-        opacity:isCur||isPrev?1:0,
-        zIndex:isCur?2:isPrev?1:0,
-        transition:isCur?"opacity 0.8s ease":"none",
-      }}/>;
-    })}
+  return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden",background:"#f2f2f2"}}>
+    <div ref={stripRef} style={{display:"flex",height:"100%",willChange:"transform"}}>
+      {imgs.map((u,i)=><div key={i} style={{flexShrink:0,width:w,height:"100%",backgroundImage:`url(${u})`,backgroundSize:"cover",backgroundPosition:"center"}}/>)}
+      <div style={{flexShrink:0,width:w,height:"100%",backgroundImage:`url(${imgs[0]})`,backgroundSize:"cover",backgroundPosition:"center"}}/>
+    </div>
   </div>);
 }
 
