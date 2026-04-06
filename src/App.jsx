@@ -13,7 +13,7 @@ function useSelBlink(){const[flash,setFlash]=useState(false);const t=useRef(null
   const stop=useCallback(()=>{clearTimeout(t.current);setFlash(false)},[]);useEffect(()=>()=>clearTimeout(t.current),[]);return{flash,start,stop}}
 
 /* ── Frosted panels — menu & bar ── */
-const panelStyle={position:"fixed",left:0,right:0,zIndex:1000,background:"rgba(255,255,255,0.15)",backdropFilter:"blur(50px) saturate(180%)",WebkitBackdropFilter:"blur(50px) saturate(180%)",boxShadow:"0 2px 16px rgba(0,0,0,0.06)"};
+const panelStyle={position:"fixed",left:0,right:0,zIndex:1000,background:"rgba(255,255,255,0.55)",backdropFilter:"blur(24px) saturate(130%)",WebkitBackdropFilter:"blur(24px) saturate(130%)",boxShadow:"0 1px 8px rgba(0,0,0,0.03)"};
 
 /* ── Shared tap button — selector + scale on tap ── */
 function TapButton({children,onClick,style,href,target}){
