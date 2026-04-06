@@ -234,6 +234,17 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const setSearchSwitch=useCallback(v=>{setSearch(v);if(mode==="everything"&&v.trim().length>0){setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
   const jumpFrom=useCallback(t=>{setSearch(t);setMode("list");setIdx(0);setEnterDir("None")},[]);
 
+  const ev=filtered[idx];
+  // Restore & save desktop scroll position
+  useEffect(()=>{
+    if(!isDesk||mode==="everything")return;
+    if(scrollRef?.current)requestAnimationFrame(()=>window.scrollTo(0,scrollRef.current));
+    const onScroll=()=>{if(scrollRef)scrollRef.current=window.scrollY};
+    window.addEventListener("scroll",onScroll,{passive:true});
+    return()=>window.removeEventListener("scroll",onScroll);
+  },[isDesk,mode]);
+
+  // ── EVERYTHING mode ──
   if(mode==="everything"){const items=everything[evSec]||[];return(<>
     <div data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
       <div style={{height:HEADER_H}}/>
@@ -243,16 +254,6 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
       </div></div>
     </div>
     <BottomBar search={search} setSearch={setSearchSwitch} onTop={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:0,behavior:"smooth"})}} onBottom={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:el.scrollHeight,behavior:"smooth"})}} onToggleMode={()=>setMode("list")} modeLabel="list"/></>)}
-
-  const ev=filtered[idx];
-  // Restore & save desktop scroll position
-  useEffect(()=>{
-    if(!isDesk)return;
-    if(scrollRef?.current)requestAnimationFrame(()=>window.scrollTo(0,scrollRef.current));
-    const onScroll=()=>{if(scrollRef)scrollRef.current=window.scrollY};
-    window.addEventListener("scroll",onScroll,{passive:true});
-    return()=>window.removeEventListener("scroll",onScroll);
-  },[isDesk]);
 
   // ── DESKTOP: table rows ──
   if(isDesk){
