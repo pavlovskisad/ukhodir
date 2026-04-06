@@ -310,13 +310,18 @@ function PosterSlideIn({src,credit,alt}){
   const[visible,setVisible]=useState(false);
   useEffect(()=>{
     if(!ref.current)return;
-    const obs=new IntersectionObserver(([e])=>{if(e.isIntersecting)setVisible(true);},{threshold:0.1,rootMargin:"0px 0px -60px 0px"});
+    // Use the scroll container as root for intersection
+    const root=ref.current.closest('[data-scroll-container]');
+    const obs=new IntersectionObserver(([e])=>{if(e.isIntersecting)setVisible(true);},{threshold:0.05,rootMargin:"0px 0px -40px 0px",root:root||undefined});
     obs.observe(ref.current);
     return ()=>obs.disconnect();
   },[]);
   return (<div ref={ref} style={{marginTop:40,marginBottom:12}}>
-    <style>{`@keyframes posterIn{from{transform:translateY(80px);opacity:0}to{transform:translateY(0);opacity:1}}`}</style>
-    <div style={{transform:visible?"none":"translateY(80px)",opacity:visible?1:0,animation:visible?"posterIn 0.8s cubic-bezier(0.16,1,0.3,1) both":"none"}}>
+    <div style={{
+      transform:visible?"translateY(0) scale(1)":"translateY(60px) scale(0.97)",
+      opacity:visible?1:0,
+      transition:"transform 1.4s cubic-bezier(0.16,1,0.3,1), opacity 1.2s ease",
+    }}>
       <img src={src} alt={alt||""} style={{width:"100%",display:"block",maxHeight:"80vh",objectFit:"contain",background:"#f8f8f8"}} loading="lazy"/>
       {credit&&<div style={{fontFamily:MONO,fontSize:"clamp(10px,1.8vw,12px)",color:"rgba(0,0,0,0.25)",marginTop:8,letterSpacing:0.3}}>poster by {credit}</div>}
     </div>
