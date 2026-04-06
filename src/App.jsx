@@ -326,12 +326,12 @@ function EventDetail({ev,onBack}){
     requestAnimationFrame(()=>{
       const natural=el.scrollHeight;
       const vh=window.innerHeight;
-      el.style.minHeight="100vh";
-      setDisperse(natural<vh);
+      el.style.minHeight="100dvh";
+      setDisperse(natural<vh*0.85);
     });
   },[ev.id]);
   return(<div style={{background:"white",maxWidth:860,margin:"0 auto"}}>
-  <div ref={infoRef} style={{minHeight:"100vh",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between"}:{})}}>
+  <div ref={infoRef} style={{minHeight:"100dvh",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:"env(safe-area-inset-bottom, 40px)",...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between"}:{})}}>
     <div style={{fontFamily:FONT,fontSize:"clamp(50px,14vw,100px)",fontWeight:700,color:"rgba(0,0,0,0.09)",lineHeight:.85,letterSpacing:-3,marginBottom:8}}>{ev.id}</div>
     <div style={{fontFamily:FONT,fontSize:"clamp(22px,5vw,36px)",fontWeight:600,color:"#000",lineHeight:1.2,marginBottom:24,letterSpacing:"-0.5px"}}>{ev.n}</div>
     <div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,18px)",color:"#000",lineHeight:1.6,marginBottom:20}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div>
