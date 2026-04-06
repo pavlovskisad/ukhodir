@@ -524,17 +524,19 @@ function Slideshow({imgs,width}){
     if(!ref.current)return;
     const ro=new ResizeObserver(([e])=>{if(e.contentRect.width>0)setActualW(e.contentRect.width)});
     ro.observe(ref.current);
-    const obs=new IntersectionObserver(([e])=>setNearby(e.isIntersecting),{rootMargin:"800px"});
+    const obs=new IntersectionObserver(([e])=>setNearby(e.isIntersecting),{rootMargin:"1500px"});
     obs.observe(ref.current);
     return ()=>{obs.disconnect();ro.disconnect()};
   },[]);
 
-  // Preload first image
+  // Preload all images, show once first is ready
   useEffect(()=>{
     if(!nearby||imgs.length===0)return;
-    const img=new Image();
-    img.onload=()=>setLoaded(true);
-    img.src=imgs[0];
+    const first=new Image();
+    first.onload=()=>setLoaded(true);
+    first.src=imgs[0];
+    // Preload rest in background
+    for(let i=1;i<imgs.length;i++){const p=new Image();p.src=imgs[i];}
   },[nearby,imgs]);
 
   const w=actualW;
