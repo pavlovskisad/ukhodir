@@ -530,7 +530,7 @@ function Home({setPage}){
 
 /* ── Single slideshow — JS-driven seamless slide ── */
 
-function Slideshow({imgs,width}){
+function Slideshow({imgs,width,forceLoad}){
   const ref=useRef(null);
   const[nearby,setNearby]=useState(false);
   const[loaded,setLoaded]=useState(false);
@@ -549,21 +549,22 @@ function Slideshow({imgs,width}){
     return ()=>{obs.disconnect();ro.disconnect()};
   },[]);
 
+  const shouldLoad=nearby||forceLoad;
+
   // Preload all images, show once first is ready
   useEffect(()=>{
-    if(!nearby||imgs.length===0)return;
+    if(!shouldLoad||imgs.length===0)return;
     const first=new Image();
     first.onload=()=>setLoaded(true);
     first.src=imgs[0];
-    // Preload rest in background
     for(let i=1;i<imgs.length;i++){const p=new Image();p.src=imgs[i];}
-  },[nearby,imgs]);
+  },[shouldLoad,imgs]);
 
   const w=actualW;
 
   // Slide animation loop
   useEffect(()=>{
-    if(!nearby||!loaded||imgs.length<=1)return;
+    if(!shouldLoad||!loaded||imgs.length<=1)return;
     const el=stripRef.current;if(!el)return;
     let pos=0;
     const n=imgs.length;
@@ -595,10 +596,10 @@ function Slideshow({imgs,width}){
     el.style.transform="translateX(0)";
     tick();
     return()=>clearTimeout(timerRef.current);
-  },[nearby,loaded,imgs.length,isMob,w]);
+  },[shouldLoad,loaded,imgs.length,isMob,w]);
 
   if(imgs.length===0) return <div ref={ref} style={{width:"100%",height:"100%"}}/>;
-  if(!nearby||!loaded) return <div ref={ref} style={{width:"100%",height:"100%",background:"#eee"}}/>;
+  if(!shouldLoad||!loaded) return <div ref={ref} style={{width:"100%",height:"100%",background:"#eee"}}/>;
   if(imgs.length===1) return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden"}}>
     <div style={{width:"100%",height:"100%",backgroundImage:`url(${imgs[0]})`,backgroundSize:"cover",backgroundPosition:"center"}}/>
   </div>);
@@ -618,14 +619,28 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
   const cols=isMobile?1:4;
 
   const scrollContRef=useRef(null);
+  const BUFFER=45;
+  const[loadUpTo,setLoadUpTo]=useState(BUFFER);
+  const cardRefs=useRef([]);
 
-  // Restore scroll position on mount
+  // Restore scroll position on mount + rolling preload
   useEffect(()=>{
     const el=scrollContRef.current;if(!el)return;
     if(scrollRef?.current)el.scrollTop=scrollRef.current;
-    const onScroll=()=>{if(scrollRef)scrollRef.current=el.scrollTop};
-    el.addEventListener("scroll",onScroll,{passive:true});
-    return()=>el.removeEventListener("scroll",onScroll);
+    const updateLoad=()=>{
+      if(scrollRef)scrollRef.current=el.scrollTop;
+      // Find first card below viewport
+      const viewBottom=el.scrollTop+el.clientHeight;
+      let firstBelow=SLIDES.length;
+      for(let i=0;i<cardRefs.current.length;i++){
+        const card=cardRefs.current[i];
+        if(card&&card.offsetTop>viewBottom){firstBelow=i;break;}
+      }
+      setLoadUpTo(Math.min(SLIDES.length,firstBelow+BUFFER));
+    };
+    updateLoad();
+    el.addEventListener("scroll",updateLoad,{passive:true});
+    return()=>el.removeEventListener("scroll",updateLoad);
   },[]);
 
   useEffect(()=>{
@@ -657,8 +672,8 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
     padding:`${HEADER_H+32}px ${isMobile?12:20}px 12px`,
   }}>
     {!isMobile&&<style>{`.ukho-card-slide{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-slide{transform:scale(0.95)}.ukho-card-label{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-label{transform:scale(1.05)}`}</style>}
-    {SLIDES.map(slide=>(
-      <div key={slide.id} className={isMobile?undefined:"ukho-card-wrap"} onClick={()=>handleTap(slide)} style={{
+    {SLIDES.map((slide,idx)=>(
+      <div key={slide.id} ref={el=>cardRefs.current[idx]=el} className={isMobile?undefined:"ukho-card-wrap"} onClick={()=>handleTap(slide)} style={{
         cursor:"pointer",position:"relative",
         background:"#f2f2f2",
         aspectRatio:"4/3",
@@ -666,7 +681,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
       }}>
         <div className={isMobile?undefined:"ukho-card-slide"} style={{width:"100%",height:"100%"}}>
         {slide.imgs.length>0 ? (
-          <Slideshow imgs={slide.imgs} width={colW}/>
+          <Slideshow imgs={slide.imgs} width={colW} forceLoad={idx<loadUpTo}/>
         ) : null}
         </div>
         {/* Number overlay — top left like original */}
