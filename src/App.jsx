@@ -25,11 +25,19 @@ function TapButton({children,onClick,style,href,target}){
   </Tag>);
 }
 
+function scrollPageToTop(){
+  // Find the fixed scroll container used by cardindex/list/events
+  const el=document.querySelector('[data-scroll-container]');
+  if(el)el.scrollTo({top:0,behavior:"smooth"});
+  else window.scrollTo({top:0,behavior:"smooth"});
+}
+
 function Menu({page,setPage}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
   const bs={position:"relative",fontFamily:FONT,fontWeight:600,fontSize:isMob?"clamp(18px,4vw,26px)":"clamp(24px,2.5vw,34px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"5px 0",letterSpacing:"-0.3px",textTransform:"lowercase",zIndex:1,textDecoration:"underline",textUnderlineOffset:"3px"};
   return (<div id="ukho-menu" style={{...panelStyle,top:0}}>
+    <div onClick={scrollPageToTop} style={{position:"absolute",top:0,left:0,right:0,height:12,cursor:"pointer",zIndex:10}}/>
     <div style={{padding:"7px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(22px,5vw,30px)":"clamp(28px,3vw,40px)",fontWeight:700}} onClick={()=>setPage("home")}>/dir</TapButton></div>
     <div style={{display:"flex",justifyContent:"space-between",padding:"3px 14px 7px"}}>{pages.map(p=><TapButton key={p} style={{...bs,fontWeight:page===p?700:600,color:page===p?"rgba(0,0,0,0.3)":BLUE,textDecoration:page===p?"none":"underline"}} onClick={()=>setPage(p)}>/{p}</TapButton>)}</div>
   </div>);
@@ -342,7 +350,7 @@ function EventDetail({ev,onBack}){
     el.addEventListener("scroll",onScroll,{passive:true});
     return()=>el.removeEventListener("scroll",onScroll);
   },[]);
-  return(<div ref={scrollRef} style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white"}}>
+  return(<div ref={scrollRef} data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white"}}>
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
     <div style={{fontFamily:FONT,fontSize:"clamp(50px,14vw,100px)",fontWeight:700,color:"rgba(0,0,0,0.09)",lineHeight:.85,letterSpacing:-3,marginBottom:8}}>{ev.id}</div>
@@ -458,7 +466,7 @@ function Home({setPage}){
   const tw2=useTypewriter(upcomingText,22,4500);
   const LS={letterSpacing:"-0.5px"};
 
-  return (<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch"}}>
+  return (<div data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch"}}>
     <HomeCanvas/>
     <div style={{position:"relative",zIndex:1,maxWidth:800,margin:"0 auto",padding:"clamp(60px,12vw,120px) clamp(16px,5vw,40px) 80px"}}>
 
@@ -671,7 +679,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
     if(ev)onOpenEvent(ev);
   };
 
-  return (<div ref={scrollContRef} style={{
+  return (<div ref={scrollContRef} data-scroll-container style={{
     position:"fixed",top:0,left:0,right:0,bottom:0,
     overflowY:"auto",WebkitOverflowScrolling:"touch",
     background:"white",
