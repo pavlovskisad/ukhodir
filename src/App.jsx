@@ -936,7 +936,7 @@ function AnalogOverlay(){
     setTimeout(buildTex,100);
     function drawParallax(dt){scrollVel*=0.88;const sp=Math.abs(scrollVel),to=Math.min(1,sp*0.012);parallaxOp+=(to-parallaxOp)*(dt*6);parallaxY+=scrollVel*dt*0.28;if(texCache)parallaxY=parallaxY%texCache.height;if(parallaxOp<0.004||!texCache)return;ctx.save();ctx.globalAlpha=parallaxOp*0.55;const tw=texCache.width,th=texCache.height,sy=((parallaxY%th)+th)%th-th;for(let y=sy;y<H+th;y+=th)for(let x=0;x<W+tw;x+=tw)ctx.drawImage(texCache,x,y);ctx.globalAlpha=parallaxOp*0.10;ctx.fillStyle='rgba(0,150,40,1)';ctx.fillRect(0,0,W,H);ctx.restore();}
     let last=performance.now();
-    function loop(){rafId=requestAnimationFrame(loop);const now=performance.now(),dt=Math.min(0.05,(now-last)/1000);last=now;ctx.clearRect(0,0,W,H);if(!vignetteCache)buildVignette();ctx.drawImage(vignetteCache,0,0,W,H);updateSpec(dt);drawSpec();if(++grainTick>=3){grainTick=0;drawGrain();}drawParallax(dt);drawScans(dt);drawGlitch(dt);}
+    function loop(){rafId=requestAnimationFrame(loop);const now=performance.now(),dt=Math.min(0.05,(now-last)/1000);last=now;ctx.clearRect(0,0,W,H);if(!vignetteCache)buildVignette();ctx.drawImage(vignetteCache,0,0,W,H);updateSpec(dt);drawSpec();if(++grainTick>=3){grainTick=0;drawGrain();}drawScans(dt);drawGlitch(dt);}
     const vis=()=>{if(document.hidden){cancelAnimationFrame(rafId);rafId=null;}else{last=performance.now();loop();}};
     document.addEventListener('visibilitychange',vis);loop();
     return ()=>{cancelAnimationFrame(rafId);window.removeEventListener('resize',resize);window.removeEventListener('scroll',onScroll);document.removeEventListener('scroll',onScroll);document.removeEventListener('visibilitychange',vis);};
