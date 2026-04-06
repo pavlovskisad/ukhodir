@@ -522,7 +522,7 @@ function Slideshow({imgs,width}){
     // Measure actual rendered width
     const ro=new ResizeObserver(([e])=>{if(e.contentRect.width>0)setActualW(e.contentRect.width)});
     ro.observe(ref.current);
-    const obs=new IntersectionObserver(([e])=>setVisible(e.isIntersecting),{rootMargin:"300px"});
+    const obs=new IntersectionObserver(([e])=>{if(e.isIntersecting){setVisible(true);obs.disconnect()}},{rootMargin:"800px"});
     obs.observe(ref.current);
     return ()=>{obs.disconnect();ro.disconnect()};
   },[]);
