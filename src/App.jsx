@@ -547,7 +547,7 @@ function Home({setPage}){
 
 /* ── Single slideshow — JS-driven seamless slide ── */
 
-function Slideshow({imgs,width,forceLoad}){
+function Slideshow({imgs,width,forceLoad,fit}){
   const ref=useRef(null);
   const[nearby,setNearby]=useState(false);
   const[loaded,setLoaded]=useState(false);
@@ -617,17 +617,20 @@ function Slideshow({imgs,width,forceLoad}){
 
   if(imgs.length===0) return <div ref={ref} style={{width:"100%",height:"100%"}}/>;
   if(!shouldLoad||!loaded) return <div ref={ref} style={{width:"100%",height:"100%",background:"#eee"}}/>;
+  const bgSize=fit?"contain":"cover";
   if(imgs.length===1) return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden"}}>
-    <div style={{width:"100%",height:"100%",backgroundImage:`url(${imgs[0]})`,backgroundSize:"cover",backgroundPosition:"center"}}/>
+    <div style={{width:"100%",height:"100%",backgroundImage:`url(${imgs[0]})`,backgroundSize:bgSize,backgroundPosition:"center",backgroundRepeat:"no-repeat"}}/>
   </div>);
 
   return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden",background:"white"}}>
     <div ref={stripRef} style={{display:"flex",height:"100%",willChange:"transform"}}>
-      {imgs.map((u,i)=><div key={i} style={{flexShrink:0,width:w,height:"100%",backgroundImage:`url(${u})`,backgroundSize:"cover",backgroundPosition:"center"}}/>)}
-      <div style={{flexShrink:0,width:w,height:"100%",backgroundImage:`url(${imgs[0]})`,backgroundSize:"cover",backgroundPosition:"center"}}/>
+      {imgs.map((u,i)=><div key={i} style={{flexShrink:0,width:w,height:"100%",backgroundImage:`url(${u})`,backgroundSize:bgSize,backgroundPosition:"center",backgroundRepeat:"no-repeat"}}/>)}
+      <div style={{flexShrink:0,width:w,height:"100%",backgroundImage:`url(${imgs[0]})`,backgroundSize:bgSize,backgroundPosition:"center",backgroundRepeat:"no-repeat"}}/>
     </div>
   </div>);
 }
+
+const FIT_IDS=new Set([1,22,31,35,37,38,39,42,43,54,71,81,84,102,105,143,146,162,163,173,180]);
 
 /* ── CardIndex page ── */
 function CardIndexPage({onOpenEvent,events,scrollRef}){
@@ -707,7 +710,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
       }}>
         <div className={isMobile?undefined:"ukho-card-slide"} style={{width:"100%",height:"100%",position:"relative"}}>
         {slide.imgs.length>0 ? (
-          <Slideshow imgs={slide.imgs} width={colW} forceLoad={idx>=loadRange[0]&&idx<loadRange[1]}/>
+          <Slideshow imgs={slide.imgs} width={colW} forceLoad={idx>=loadRange[0]&&idx<loadRange[1]} fit={FIT_IDS.has(slide.id)}/>
         ) : <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",padding:"12px 16px"}}>
           <div style={{fontFamily:FONT,fontSize:isMobile?"clamp(13px,3.5vw,18px)":"clamp(11px,1.2vw,15px)",fontWeight:600,color:"rgba(0,0,0,0.4)",textAlign:"center",lineHeight:1.3,letterSpacing:"-0.3px"}}>{(events.find(e=>e.id===slide.id)||{}).n||""}</div>
         </div>}
