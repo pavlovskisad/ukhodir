@@ -28,9 +28,9 @@ function TapButton({children,onClick,style,href,target}){
 function Menu({page,setPage}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
-  const bs={position:"relative",fontFamily:FONT,fontWeight:600,fontSize:isMob?"clamp(14px,3vw,20px)":"clamp(20px,2vw,28px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"5px 0",letterSpacing:"-0.3px",textTransform:"lowercase",zIndex:1,textDecoration:"underline",textUnderlineOffset:"3px"};
+  const bs={position:"relative",fontFamily:FONT,fontWeight:600,fontSize:isMob?"clamp(18px,4vw,26px)":"clamp(24px,2.5vw,34px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"5px 0",letterSpacing:"-0.3px",textTransform:"lowercase",zIndex:1,textDecoration:"underline",textUnderlineOffset:"3px"};
   return (<div id="ukho-menu" style={{...panelStyle,top:0}}>
-    <div style={{padding:"7px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(17px,3.5vw,24px)":"clamp(24px,2.5vw,34px)",fontWeight:700}} onClick={()=>setPage("home")}>/dir</TapButton></div>
+    <div style={{padding:"7px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(22px,5vw,30px)":"clamp(28px,3vw,40px)",fontWeight:700}} onClick={()=>setPage("home")}>/dir</TapButton></div>
     <div style={{display:"flex",justifyContent:"space-between",padding:"3px 14px 7px"}}>{pages.map(p=><TapButton key={p} style={{...bs,fontWeight:page===p?700:600,color:page===p?"rgba(0,0,0,0.3)":BLUE,textDecoration:page===p?"none":"underline"}} onClick={()=>setPage(p)}>/{p}</TapButton>)}</div>
   </div>);
 }
@@ -57,7 +57,7 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
 
 /* ── Dice ── */
 function FloatingDice({onRoll}){const[rolling,setRolling]=useState(false);const drag=useRef({active:false,moved:false,sx:0,sy:0,ex:0,ey:0});const[pos,setPos]=useState({x:null,y:null});
-  useEffect(()=>{if(pos.x===null)setPos({x:window.innerWidth-66,y:window.innerHeight-BAR_H-70})},[]);
+  useEffect(()=>{if(pos.x===null)setPos({x:window.innerWidth-66,y:window.innerHeight-BAR_H-140})},[]);
   const onDown=(cx,cy)=>{drag.current={active:true,moved:false,sx:cx,sy:cy,ex:pos.x,ey:pos.y}};const onMove=(cx,cy)=>{if(!drag.current.active)return;const dx=cx-drag.current.sx,dy=cy-drag.current.sy;if(Math.abs(dx)>3||Math.abs(dy)>3)drag.current.moved=true;if(drag.current.moved)setPos({x:drag.current.ex+dx,y:drag.current.ey+dy})};const onUp=()=>{if(!drag.current.active)return;const w=drag.current.moved;drag.current.active=false;if(!w&&!rolling){setRolling(true);setTimeout(()=>{setRolling(false);onRoll?.()},600)}};
   useEffect(()=>{const mm=e=>onMove(e.clientX,e.clientY),mu=()=>onUp(),tm=e=>onMove(e.touches[0].clientX,e.touches[0].clientY),tu=()=>onUp();window.addEventListener("mousemove",mm);window.addEventListener("mouseup",mu);window.addEventListener("touchmove",tm,{passive:true});window.addEventListener("touchend",tu);return()=>{window.removeEventListener("mousemove",mm);window.removeEventListener("mouseup",mu);window.removeEventListener("touchmove",tm);window.removeEventListener("touchend",tu)}});
   if(pos.x===null)return null;const S=36,R=S/2;
@@ -531,6 +531,7 @@ function CardIndexPage({onOpenEvent,events}){
         }}>{slide.id}</div>
       </div>
     ))}
+    <FloatingDice onRoll={()=>{const slide=SLIDES[Math.floor(Math.random()*SLIDES.length)];const ev=events.find(e=>e.id===slide.id);if(ev)onOpenEvent(ev);}}/>
   </div>);
 }
 
