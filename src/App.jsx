@@ -315,15 +315,36 @@ function PosterSlideIn({src,credit,alt}){
   </div>);
 }
 
-function EventDetail({ev,onBack}){return(<div style={{minHeight:"100vh",background:"white",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:120,maxWidth:860,margin:"0 auto"}}>
-  <div style={{fontFamily:FONT,fontSize:"clamp(50px,14vw,100px)",fontWeight:700,color:"rgba(0,0,0,0.09)",lineHeight:.85,letterSpacing:-3,marginBottom:8}}>{ev.id}</div>
-  <div style={{fontFamily:FONT,fontSize:"clamp(22px,5vw,36px)",fontWeight:600,color:"#000",lineHeight:1.2,marginBottom:24,letterSpacing:"-0.5px"}}>{ev.n}</div>
-  <div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,18px)",color:"#000",lineHeight:1.6,marginBottom:20}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div>
-  <div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,18px)",color:"rgba(0,0,0,0.6)",lineHeight:1.6,fontStyle:"italic",marginBottom:20}}>{ev.pr.map((p,i)=><div key={i}>{p}</div>)}</div>
-  <div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,16px)",color:"rgba(0,0,0,0.4)",marginBottom:8}}>{ev.pl}</div>
-  <div style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.3)",letterSpacing:0.3,textTransform:"lowercase",marginBottom:8}}>{ev.t}</div>
-  <div style={{fontFamily:MONO,fontSize:"clamp(13px,2.2vw,16px)",color:"rgba(0,0,0,0.35)"}}>{ev.d}</div>
-  {ev.poster&&<PosterSlideIn src={ev.poster} credit={ev.pc} alt={ev.n}/>}
+function EventDetail({ev,onBack}){
+  const infoRef=useRef(null);
+  const[infoStyle,setInfoStyle]=useState({});
+  useEffect(()=>{
+    window.scrollTo(0,0);
+    // After render, check if info fits in one screen — if so, spread it out
+    requestAnimationFrame(()=>{
+      const el=infoRef.current;if(!el)return;
+      const vh=window.innerHeight;
+      const contentH=el.scrollHeight;
+      if(contentH<vh){
+        // Content is shorter than viewport — use space-between to disperse
+        setInfoStyle({minHeight:"100vh",display:"flex",flexDirection:"column",justifyContent:"space-between"});
+      }else{
+        setInfoStyle({});
+      }
+    });
+  },[ev.id]);
+  return(<div style={{background:"white",maxWidth:860,margin:"0 auto"}}>
+  <div ref={infoRef} style={{minHeight:"100vh",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...infoStyle}}>
+    <div style={{fontFamily:FONT,fontSize:"clamp(50px,14vw,100px)",fontWeight:700,color:"rgba(0,0,0,0.09)",lineHeight:.85,letterSpacing:-3,marginBottom:8}}>{ev.id}</div>
+    <div style={{fontFamily:FONT,fontSize:"clamp(22px,5vw,36px)",fontWeight:600,color:"#000",lineHeight:1.2,marginBottom:24,letterSpacing:"-0.5px"}}>{ev.n}</div>
+    <div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,18px)",color:"#000",lineHeight:1.6,marginBottom:20}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div>
+    <div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,18px)",color:"rgba(0,0,0,0.6)",lineHeight:1.6,fontStyle:"italic",marginBottom:20}}>{ev.pr.map((p,i)=><div key={i}>{p}</div>)}</div>
+    <div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,16px)",color:"rgba(0,0,0,0.4)",marginBottom:8}}>{ev.pl}</div>
+    <div style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.3)",letterSpacing:0.3,textTransform:"lowercase",marginBottom:8}}>{ev.t}</div>
+    <div style={{fontFamily:MONO,fontSize:"clamp(13px,2.2vw,16px)",color:"rgba(0,0,0,0.35)"}}>{ev.d}</div>
+  </div>
+  {ev.poster&&<div style={{padding:"0 clamp(16px,4vw,40px)",paddingBottom:120}}><PosterSlideIn src={ev.poster} credit={ev.pc} alt={ev.n}/></div>}
+  {!ev.poster&&<div style={{height:80}}/>}
   <div style={{position:"fixed",bottom:20,right:20}}>
     <TapButton onClick={onBack} style={{fontFamily:FONT,fontSize:"clamp(30px,6vw,46px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"underline",cursor:"pointer",padding:"6px 10px",lineHeight:1}}>back</TapButton>
   </div></div>)}
@@ -552,7 +573,8 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
 
   // Restore scroll position on mount
   useEffect(()=>{
-    if(scrollRef?.current)window.scrollTo(0,scrollRef.current);
+    if(scrollRef?.current)requestAnimationFrame(()=>window.scrollTo(0,scrollRef.current));
+    else window.scrollTo(0,0);
     const onScroll=()=>{if(scrollRef)scrollRef.current=window.scrollY};
     window.addEventListener("scroll",onScroll,{passive:true});
     return()=>window.removeEventListener("scroll",onScroll);
@@ -827,7 +849,7 @@ function AnalogOverlay(){
 export default function App(){const[page,setPage]=useState("home");const[openEvent,setOpenEvent]=useState(null);const[prevPage,setPrevPage]=useState(null);
   const cardScrollRef=useRef(0);
   const listIdxRef=useRef(0);const listSearchRef=useRef("");const listYearRef=useRef("all");const listModeRef=useRef("list");const listScrollRef=useRef(0);
-  const handleOpenEvent=(ev)=>{setPrevPage(page);setOpenEvent(ev);window.history.pushState({event:ev.id},"")};
+  const handleOpenEvent=(ev)=>{setPrevPage(page);setOpenEvent(ev);window.history.pushState({event:ev.id},"");window.scrollTo(0,0)};
   const handleBack=useCallback(()=>{setOpenEvent(null);if(prevPage)setPage(prevPage)},[prevPage]);
   // Browser back button support
   useEffect(()=>{const onPop=()=>{if(openEvent){setOpenEvent(null);if(prevPage)setPage(prevPage)}};window.addEventListener("popstate",onPop);return()=>window.removeEventListener("popstate",onPop)},[openEvent,prevPage]);
