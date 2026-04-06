@@ -501,7 +501,7 @@ function Home({setPage}){
 
       {/* Goethe Institut logo */}
       {tw1.done&&<div style={{margin:"0 0 48px",opacity:0.7}}>
-        <img src="https://raw.githubusercontent.com/pavlovskisad/ukhodir/main/public/goethe.png" alt="Goethe-Institut" style={{height:"clamp(30px,6vw,50px)",display:"block"}}/>
+        <img src="https://raw.githubusercontent.com/pavlovskisad/ukhodir/main/goethe.PNG" alt="Goethe-Institut" style={{height:"clamp(30px,6vw,50px)",display:"block"}}/>
       </div>}
 
       {/* Upcoming */}
