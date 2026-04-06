@@ -619,7 +619,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
   const cols=isMobile?1:4;
 
   const scrollContRef=useRef(null);
-  const AHEAD=20,BEHIND=10;
+  const AHEAD=isMobile?20:40,BEHIND=isMobile?10:20;
   const[loadRange,setLoadRange]=useState([0,AHEAD]);
   const cardRefs=useRef([]);
   const rafRef=useRef(null);
