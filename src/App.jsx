@@ -705,13 +705,13 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
         overflow:"hidden",
         ...(!isMobile&&{marginBottom:-1}),
       }}>
-        {!isMobile&&<div className="ukho-card-sel"/>}
-        <div className={isMobile?undefined:"ukho-card-slide"} style={{width:"100%",height:"100%"}}>
+        <div className={isMobile?undefined:"ukho-card-slide"} style={{width:"100%",height:"100%",position:"relative"}}>
         {slide.imgs.length>0 ? (
           <Slideshow imgs={slide.imgs} width={colW} forceLoad={idx>=loadRange[0]&&idx<loadRange[1]}/>
         ) : <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",padding:"12px 16px"}}>
-          <div style={{fontFamily:FONT,fontSize:isMobile?"clamp(13px,3.5vw,18px)":"clamp(11px,1.2vw,15px)",fontWeight:500,color:"rgba(0,0,0,0.18)",textAlign:"center",lineHeight:1.3,letterSpacing:"-0.3px"}}>{(events.find(e=>e.id===slide.id)||{}).n||""}</div>
+          <div style={{fontFamily:FONT,fontSize:isMobile?"clamp(13px,3.5vw,18px)":"clamp(11px,1.2vw,15px)",fontWeight:600,color:"rgba(0,0,0,0.4)",textAlign:"center",lineHeight:1.3,letterSpacing:"-0.3px"}}>{(events.find(e=>e.id===slide.id)||{}).n||""}</div>
         </div>}
+        {!isMobile&&<div className="ukho-card-sel"/>}
         </div>
         {/* Number overlay — top left like original */}
         <div className={isMobile?undefined:"ukho-card-label"} style={{
