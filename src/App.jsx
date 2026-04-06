@@ -312,7 +312,7 @@ function PosterSlideIn({src,credit,alt}){
     if(!ref.current)return;
     // Use the scroll container as root for intersection
     const root=ref.current.closest('[data-scroll-container]');
-    const obs=new IntersectionObserver(([e])=>{if(e.isIntersecting)setVisible(true);},{threshold:0.05,rootMargin:"0px 0px -40px 0px",root:root||undefined});
+    const obs=new IntersectionObserver(([e])=>setVisible(e.isIntersecting),{threshold:0.05,rootMargin:"0px 0px -40px 0px",root:root||undefined});
     obs.observe(ref.current);
     return ()=>obs.disconnect();
   },[]);
@@ -917,14 +917,20 @@ function AnalogOverlay(){
     function updateSpec(dt){specTimer-=dt;if(specTimer<=0){specTX=0.1+Math.random()*0.8;specTY=0.05+Math.random()*0.5;specTimer=10+Math.random()*18;}specX+=(specTX-specX)*dt*0.04;specY+=(specTY-specY)*dt*0.04;}
     function drawSpec(){const sx=specX*W,sy=specY*H,r=Math.min(W,H)*(0.15+Math.sin(specX*2)*0.04);const g=ctx.createRadialGradient(sx,sy,0,sx,sy,r);g.addColorStop(0,'rgba(210,228,255,0.032)');g.addColorStop(0.5,'rgba(200,220,255,0.01)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
     let grainTick=0;
-    function drawGrain(){const c=Math.floor(W*H*0.0004/(DPR*DPR));for(let i=0;i<c;i++){const x=Math.random()*W,y=Math.random()*H,r=Math.random();ctx.fillStyle=r<0.12?`rgba(0,150,40,${(0.02+Math.random()*0.03).toFixed(3)})`:r<0.22?`rgba(0,0,190,${(0.018+Math.random()*0.03).toFixed(3)})`:`rgba(200,200,200,${(0.012+Math.random()*0.025).toFixed(3)})`;ctx.fillRect(x,y,1,1);}}
+    function drawGrain(){const c=Math.floor(W*H*0.0006/(DPR*DPR));for(let i=0;i<c;i++){const x=Math.random()*W,y=Math.random()*H,r=Math.random();ctx.fillStyle=r<0.12?`rgba(0,150,40,${(0.03+Math.random()*0.04).toFixed(3)})`:r<0.22?`rgba(0,0,190,${(0.025+Math.random()*0.04).toFixed(3)})`:`rgba(200,200,200,${(0.02+Math.random()*0.035).toFixed(3)})`;ctx.fillRect(x,y,1,1);}}
     const scans=[];let scanTimer=4+Math.random()*6;
     function drawScans(dt){scanTimer-=dt;if(scanTimer<=0){if(Math.random()<0.38){const dir=Math.random()<0.5?1:-1,r=Math.random();scans.push({pos:dir>0?-0.02:1.02,speed:dir*(0.04+Math.random()*0.13),width:3+Math.random()*24,opacity:0.006+Math.random()*0.011,col:r<0.3?'b':r<0.55?'g':'c',ab:Math.random()*2.5+0.5});}scanTimer=5+Math.random()*11;}
       for(let i=scans.length-1;i>=0;i--){const s=scans[i];s.pos+=s.speed*dt;if(s.pos<-0.08||s.pos>1.08){scans.splice(i,1);continue;}const ef=Math.min(1,Math.min(Math.abs(s.pos),Math.abs(1-s.pos))*18),a=s.opacity*ef;if(a<0.001)continue;const y=s.pos*H,hl=s.width/2;const cl=s.col==='b'?`rgba(0,0,190,${a.toFixed(4)})`:s.col==='g'?`rgba(0,150,40,${a.toFixed(4)})`:`rgba(180,200,255,${a.toFixed(4)})`;let g=ctx.createLinearGradient(0,y-hl,0,y+hl);g.addColorStop(0,'transparent');g.addColorStop(0.5,cl);g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,y-hl,W,s.width);const aF=a*0.45;g=ctx.createLinearGradient(0,y-hl-s.ab,0,y+hl-s.ab);g.addColorStop(0,'transparent');g.addColorStop(0.5,`rgba(180,20,20,${aF.toFixed(4)})`);g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,y-hl-s.ab,W,s.width);}}
     let gl=null,glT=16+Math.random()*20;
     function drawGlitch(dt){glT-=dt;if(glT<=0&&!gl){gl={dur:0.05+Math.random()*0.13,el:0,y:Math.random()*H,h:1+Math.random()*3,col:Math.random()<0.5?'g':'b',sh:(Math.random()<0.5?1:-1)*(2+Math.random()*9),y2:Math.random()*H,bx:Math.random()*W*0.8,bw:20+Math.random()*120,bh:1+Math.random()*4};glT=16+Math.random()*22;}if(!gl)return;gl.el+=dt;const p=gl.el/gl.dur;if(p>=1){gl=null;return;}const env=p<0.5?p*2:(1-p)*2,a=env*0.10;const c1=gl.col==='g'?`rgba(0,150,40,${a.toFixed(3)})`:`rgba(0,0,190,${a.toFixed(3)})`;const c2=gl.col==='g'?`rgba(0,0,190,${(a*0.5).toFixed(3)})`:`rgba(0,150,40,${(a*0.5).toFixed(3)})`;ctx.fillStyle=c1;ctx.fillRect(gl.bx+gl.sh,gl.y,gl.bw,gl.bh);ctx.fillStyle=c2;ctx.fillRect(gl.bx-gl.sh*0.5,gl.y+gl.bh+1,gl.bw*0.6,1);}
     let scrollVel=0,parallaxY=0,parallaxOp=0,lastSY=0;
-    const onScroll=()=>{const sy=window.scrollY||0;scrollVel=Math.max(Math.abs(sy-lastSY),Math.abs(scrollVel*0.5))*Math.sign(sy-lastSY)*60;lastSY=sy;};
+    const onScroll=()=>{
+      // Check fixed scroll containers first, fall back to window
+      const sc=document.querySelector('[data-scroll-container]');
+      const sy=sc?sc.scrollTop:(window.scrollY||0);
+      scrollVel=Math.max(Math.abs(sy-lastSY),Math.abs(scrollVel*0.5))*Math.sign(sy-lastSY)*60;lastSY=sy;
+    };
+    // Listen on both window and capture phase to catch scroll containers
     window.addEventListener('scroll',onScroll,{passive:true});document.addEventListener('scroll',onScroll,{passive:true,capture:true});
     function buildTex(){const tw=400,th=400,tc=document.createElement('canvas');tc.width=tw;tc.height=th;const tx=tc.getContext('2d');tx.strokeStyle='rgba(0,0,0,1)';for(let i=-th;i<tw+th;i+=9){tx.beginPath();tx.moveTo(i,0);tx.lineTo(i+th,th);tx.lineWidth=0.4;tx.globalAlpha=0.06+Math.random()*0.08;tx.stroke();}texCache=tc;}
     setTimeout(buildTex,100);
