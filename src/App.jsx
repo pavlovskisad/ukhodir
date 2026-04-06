@@ -438,7 +438,7 @@ function Home({setPage}){
   const tw2=useTypewriter(upcomingText,22,4500);
   const LS={letterSpacing:"-0.5px"};
 
-  return (<div style={{minHeight:"100vh",position:"relative"}}>
+  return (<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch"}}>
     <HomeCanvas/>
     <div style={{position:"relative",zIndex:1,maxWidth:800,margin:"0 auto",padding:"clamp(60px,12vw,120px) clamp(16px,5vw,40px) 80px"}}>
 
