@@ -125,11 +125,15 @@ function CardContent({ev,search,selected,showGreen,onClick}){
 function hlMatch(text,q){const i=text.toLowerCase().indexOf(q);if(i===-1)return text;return <span>{text.slice(0,i)}<span style={{background:"rgba(74,246,38,0.3)",padding:"0 1px"}}>{text.slice(i,i+q.length)}</span>{text.slice(i+q.length)}</span>}
 
 /* ── List Page — dual card transitions ── */
-function ListPage({events,onOpenEvent}){
+function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef}){
   const reversed=useMemo(()=>[...events].reverse(),[events]);
-  const[search,setSearch]=useState("");const[idx,setIdx]=useState(0);const[mode,setMode]=useState("list");
+  const[search,_setSearch]=useState(searchRef?.current||"");const[idx,_setIdx]=useState(idxRef?.current||0);const[mode,_setMode]=useState(modeRef?.current||"list");
+  const setSearch=v=>{_setSearch(v);if(searchRef)searchRef.current=v};
+  const setIdx=v=>{_setIdx(v);if(idxRef)idxRef.current=v};
+  const setMode=v=>{_setMode(v);if(modeRef)modeRef.current=v};
   const[selected,setSelected]=useState(false);const selBlink=useSelBlink();
-  const[yearFilter,setYearFilter]=useState("all");
+  const[yearFilter,_setYearFilter]=useState(yearRef?.current||"all");
+  const setYearFilter=v=>{_setYearFilter(v);if(yearRef)yearRef.current=v};
   const[exiting,setExiting]=useState(null);
   const[enterDir,setEnterDir]=useState("None");
   const touchRef=useRef({y:0,t:0});const animating=useRef(null);const navKey=useRef(0);
@@ -207,6 +211,15 @@ function ListPage({events,onOpenEvent}){
     <BottomBar search={search} setSearch={setSearchSwitch} onTop={()=>{}} onBottom={()=>{}} onToggleMode={()=>setMode("list")} modeLabel="list"/></div>)}
 
   const ev=filtered[idx];
+  // Restore & save desktop scroll position
+  useEffect(()=>{
+    if(!isDesk)return;
+    if(scrollRef?.current)requestAnimationFrame(()=>window.scrollTo(0,scrollRef.current));
+    const onScroll=()=>{if(scrollRef)scrollRef.current=window.scrollY};
+    window.addEventListener("scroll",onScroll,{passive:true});
+    return()=>window.removeEventListener("scroll",onScroll);
+  },[isDesk]);
+
   // ── DESKTOP: table rows ──
   if(isDesk){
     const COLS="40px 2fr 2fr 2fr 1.2fr 1fr 0.8fr";
@@ -509,10 +522,18 @@ function Slideshow({imgs,width}){
 }
 
 /* ── CardIndex page ── */
-function CardIndexPage({onOpenEvent,events}){
+function CardIndexPage({onOpenEvent,events,scrollRef}){
   const[colW,setColW]=useState(160);
   const isMobile=typeof window!=="undefined"&&window.innerWidth<=768;
   const cols=isMobile?1:4;
+
+  // Restore scroll position on mount
+  useEffect(()=>{
+    if(scrollRef?.current)window.scrollTo(0,scrollRef.current);
+    const onScroll=()=>{if(scrollRef)scrollRef.current=window.scrollY};
+    window.addEventListener("scroll",onScroll,{passive:true});
+    return()=>window.removeEventListener("scroll",onScroll);
+  },[]);
 
   useEffect(()=>{
     const calc=()=>{
@@ -780,14 +801,20 @@ function AnalogOverlay(){
   return <canvas ref={canvasRef} style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',pointerEvents:'none',zIndex:99998}}/>;
 }
 
-export default function App(){const[page,setPage]=useState("home");const[openEvent,setOpenEvent]=useState(null);
-  if(openEvent) return (<div style={{minHeight:"100vh",background:"white",overflow:"hidden"}}><EventDetail ev={openEvent} onBack={()=>setOpenEvent(null)}/><AnalogOverlay/></div>);
+export default function App(){const[page,setPage]=useState("home");const[openEvent,setOpenEvent]=useState(null);const[prevPage,setPrevPage]=useState(null);
+  const cardScrollRef=useRef(0);
+  const listIdxRef=useRef(0);const listSearchRef=useRef("");const listYearRef=useRef("all");const listModeRef=useRef("list");const listScrollRef=useRef(0);
+  const handleOpenEvent=(ev)=>{setPrevPage(page);setOpenEvent(ev);window.history.pushState({event:ev.id},"")};
+  const handleBack=useCallback(()=>{setOpenEvent(null);if(prevPage)setPage(prevPage)},[prevPage]);
+  // Browser back button support
+  useEffect(()=>{const onPop=()=>{if(openEvent){setOpenEvent(null);if(prevPage)setPage(prevPage)}};window.addEventListener("popstate",onPop);return()=>window.removeEventListener("popstate",onPop)},[openEvent,prevPage]);
+  if(openEvent) return (<div style={{minHeight:"100vh",background:"white",overflow:"hidden"}}><EventDetail ev={openEvent} onBack={handleBack}/><AnalogOverlay/></div>);
   return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden"}}>
     {page!=="home"&&<Menu page={page} setPage={setPage}/>}
     {page==="home"&&<Home setPage={setPage}/>}
-    {page==="list"&&<ListPage events={EVENTS} onOpenEvent={setOpenEvent}/>}
-    {page==="cardindex"&&<CardIndexPage events={EVENTS} onOpenEvent={setOpenEvent}/>}
-    {page==="riddles"&&<RiddlesPage events={EVENTS} onOpenEvent={setOpenEvent}/>}
+    {page==="list"&&<ListPage events={EVENTS} onOpenEvent={handleOpenEvent} idxRef={listIdxRef} searchRef={listSearchRef} yearRef={listYearRef} modeRef={listModeRef} scrollRef={listScrollRef}/>}
+    {page==="cardindex"&&<CardIndexPage events={EVENTS} onOpenEvent={handleOpenEvent} scrollRef={cardScrollRef}/>}
+    {page==="riddles"&&<RiddlesPage events={EVENTS} onOpenEvent={handleOpenEvent}/>}
     {page==="portals"&&<Placeholder title="portals"/>}
     <AnalogOverlay/>
   </div>)}
