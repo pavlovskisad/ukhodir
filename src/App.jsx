@@ -508,45 +508,38 @@ function Home({setPage}){
 
 
 
-/* ── Single slideshow — CSS translateX strip, same as optimizer ── */
-let _ssId=0;
+/* ── Single slideshow — JS-driven seamless loop ── */
 
 function Slideshow({imgs,width}){
   const ref=useRef(null);
   const[visible,setVisible]=useState(false);
   const[actualW,setActualW]=useState(width||160);
-  const h=Math.round(actualW*0.75);
+  const[cur,setCur]=useState(0);
+  const timerRef=useRef(null);
+  const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
 
   useEffect(()=>{
     if(!ref.current)return;
-    // Measure actual rendered width
     const ro=new ResizeObserver(([e])=>{if(e.contentRect.width>0)setActualW(e.contentRect.width)});
     ro.observe(ref.current);
-    const obs=new IntersectionObserver(([e])=>{if(e.isIntersecting){setVisible(true);obs.disconnect()}},{rootMargin:"800px"});
+    const obs=new IntersectionObserver(([e])=>setVisible(e.isIntersecting),{rootMargin:"800px"});
     obs.observe(ref.current);
     return ()=>{obs.disconnect();ro.disconnect()};
   },[]);
 
-  const w=actualW;
-  const anim=useMemo(()=>{
-    if(imgs.length<=1||!w) return null;
-    const id=`ss${_ssId++}`;
-    const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
-    const delay=isMob?1.5+Math.random()*2:4+Math.random()*6;
-    const trans=0.5;
-    const n=imgs.length+1;
-    const total=n*(delay+trans);
-    const pct=100/n;
-    let kf=`@keyframes ${id}{`;
-    for(let i=0;i<n;i++){
-      const s=i*pct;
-      const te=(i+1)*pct-(trans/total)*100;
-      kf+=`${s}%{transform:translateX(-${i*w}px)}`;
-      kf+=`${Math.max(s,te-.01)}%{transform:translateX(-${i*w}px)}`;
-    }
-    kf+=`99.999%{transform:translateX(-${imgs.length*w}px)}100%{transform:translateX(0)}}`;
-    return {id,kf,dur:total};
-  },[imgs.length,w]);
+  // Cycle through images
+  useEffect(()=>{
+    if(!visible||imgs.length<=1)return;
+    const tick=()=>{
+      const delay=isMob?1500+Math.random()*2000:4000+Math.random()*6000;
+      timerRef.current=setTimeout(()=>{
+        setCur(c=>(c+1)%imgs.length);
+        tick();
+      },delay);
+    };
+    tick();
+    return()=>clearTimeout(timerRef.current);
+  },[visible,imgs.length,isMob]);
 
   if(imgs.length===0) return <div ref={ref} style={{width:"100%",height:"100%"}}/>;
   if(!visible) return <div ref={ref} style={{width:"100%",height:"100%",background:"#eee"}}/>;
@@ -554,12 +547,13 @@ function Slideshow({imgs,width}){
     <div style={{width:"100%",height:"100%",backgroundImage:`url(${imgs[0]})`,backgroundSize:"cover",backgroundPosition:"center"}}/>
   </div>);
 
-  return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden",background:"#fff"}}>
-    {anim&&<style>{anim.kf}</style>}
-    <div style={{display:"flex",height:"100%",animation:anim?`${anim.id} ${anim.dur}s infinite linear`:undefined}}>
-      {imgs.map((u,i)=><div key={i} style={{flexShrink:0,width:w,height:"100%",backgroundImage:`url(${u})`,backgroundSize:"cover",backgroundPosition:"center"}}/>)}
-      <div style={{flexShrink:0,width:w,height:"100%",backgroundImage:`url(${imgs[0]})`,backgroundSize:"cover",backgroundPosition:"center"}}/>
-    </div>
+  return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden",position:"relative",background:"#f2f2f2"}}>
+    {imgs.map((u,i)=><div key={i} style={{
+      position:"absolute",inset:0,
+      backgroundImage:`url(${u})`,backgroundSize:"cover",backgroundPosition:"center",
+      opacity:i===cur?1:0,
+      transition:"opacity 0.6s ease",
+    }}/>)}
   </div>);
 }
 
