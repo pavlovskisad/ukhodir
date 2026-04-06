@@ -703,6 +703,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
         background:"#f2f2f2",
         aspectRatio:"4/3",
         overflow:"hidden",
+        ...(!isMobile&&{marginBottom:-1}),
       }}>
         <div className={isMobile?undefined:"ukho-card-slide"} style={{width:"100%",height:"100%"}}>
         {slide.imgs.length>0 ? (
