@@ -105,20 +105,42 @@ function FloatingLabels({cardKey}){
 /* ── Card — just the content, no animation here ── */
 function CardContent({ev,search,selected,showGreen,onClick}){
   const q=search.trim().toLowerCase();const hl=t=>!q?t:hlMatch(t,q);const topOff=HEADER_H+32;const cardH=typeof window!=="undefined"?window.innerHeight-topOff-BAR_H-32:500;
-  return(<div onClick={onClick} style={{
+  const outerRef=useRef(null);const innerRef=useRef(null);
+  const[shrink,setShrink]=useState(1);
+  useEffect(()=>{
+    const outer=outerRef.current,inner=innerRef.current;
+    if(!outer||!inner)return;
+    // Reset to measure at full size
+    inner.style.transform="scale(1)";inner.style.transformOrigin="top left";
+    requestAnimationFrame(()=>{
+      const avail=outer.clientHeight;
+      const need=inner.scrollHeight;
+      const s=need>avail?Math.max(0.65,avail/need):1;
+      setShrink(s);
+    });
+  },[ev.id]);
+  return(<div ref={outerRef} onClick={onClick} style={{
     position:"absolute",top:topOff,left:0,right:0,height:cardH,
-    padding:"clamp(12px,3vw,28px) 14px clamp(16px,4vw,36px)",paddingRight:"clamp(56px,13vw,120px)",
-    display:"flex",flexDirection:"column",justifyContent:"space-between",
     transform:selected?"scale(0.95)":"scale(1)",transition:"transform 0.15s ease",cursor:"pointer",
+    overflow:"hidden",
   }}>
     {showGreen&&<div style={{position:"absolute",inset:0,background:"rgba(74,246,38,0.12)",pointerEvents:"none",zIndex:0,transition:"background 0.1s"}}/>}
-    <div style={{position:"absolute",top:8,left:12,fontFamily:FONT,fontSize:"clamp(52px,13vw,95px)",fontWeight:700,color:"rgba(0,0,0,0.08)",lineHeight:.85,letterSpacing:-3,pointerEvents:"none"}}>{ev.id}</div>
-    <div data-field="name" style={{fontFamily:FONT,fontSize:"clamp(17px,4vw,28px)",fontWeight:600,color:"#000",lineHeight:1.2,letterSpacing:"-.5px",zIndex:1}}>{hl(ev.n)}</div>
-    <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2.1vw,15px)",color:"#000",lineHeight:1.6}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
-    <div data-field="program" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.55)",lineHeight:1.6,fontStyle:"italic"}}>{ev.pr.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
-    <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.38)",letterSpacing:0}}>{hl(ev.pl)}</div>
-    <div data-field="tags" style={{fontFamily:FONT,fontSize:"clamp(10px,1.6vw,12px)",color:"rgba(0,0,0,0.25)",letterSpacing:0.3,textTransform:"lowercase"}}>{hl(ev.t)}</div>
-    <div data-field="date" style={{fontFamily:MONO,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.3)",letterSpacing:0}}>{ev.d}</div>
+    <div style={{position:"absolute",top:8,left:12,fontFamily:FONT,fontSize:"clamp(52px,13vw,95px)",fontWeight:700,color:"rgba(0,0,0,0.08)",lineHeight:.85,letterSpacing:-3,pointerEvents:"none",transform:`scale(${shrink})`,transformOrigin:"top left",transition:"transform 0.2s ease"}}>{ev.id}</div>
+    <div ref={innerRef} style={{
+      padding:"clamp(12px,3vw,28px) 14px clamp(16px,4vw,36px)",paddingRight:"clamp(56px,13vw,120px)",
+      display:"flex",flexDirection:"column",justifyContent:"space-between",
+      minHeight:`${100/shrink}%`,
+      transform:`scale(${shrink})`,transformOrigin:"top left",
+      width:`${100/shrink}%`,
+      transition:"transform 0.2s ease",
+    }}>
+      <div data-field="name" style={{fontFamily:FONT,fontSize:"clamp(17px,4vw,28px)",fontWeight:600,color:"#000",lineHeight:1.2,letterSpacing:"-.5px",zIndex:1}}>{hl(ev.n)}</div>
+      <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2.1vw,15px)",color:"#000",lineHeight:1.6}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
+      <div data-field="program" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.55)",lineHeight:1.6,fontStyle:"italic"}}>{ev.pr.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
+      <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.38)",letterSpacing:0}}>{hl(ev.pl)}</div>
+      <div data-field="tags" style={{fontFamily:FONT,fontSize:"clamp(10px,1.6vw,12px)",color:"rgba(0,0,0,0.25)",letterSpacing:0.3,textTransform:"lowercase"}}>{hl(ev.t)}</div>
+      <div data-field="date" style={{fontFamily:MONO,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.3)",letterSpacing:0}}>{ev.d}</div>
+    </div>
   </div>);
 }
 
