@@ -512,9 +512,11 @@ function Home({setPage}){
 
 function Slideshow({imgs,width}){
   const ref=useRef(null);
-  const[visible,setVisible]=useState(false);
+  const[nearby,setNearby]=useState(false);
+  const[loaded,setLoaded]=useState(false);
   const[actualW,setActualW]=useState(width||160);
   const[cur,setCur]=useState(0);
+  const prevRef=useRef(0);
   const timerRef=useRef(null);
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
 
@@ -522,38 +524,52 @@ function Slideshow({imgs,width}){
     if(!ref.current)return;
     const ro=new ResizeObserver(([e])=>{if(e.contentRect.width>0)setActualW(e.contentRect.width)});
     ro.observe(ref.current);
-    const obs=new IntersectionObserver(([e])=>setVisible(e.isIntersecting),{rootMargin:"800px"});
+    const obs=new IntersectionObserver(([e])=>setNearby(e.isIntersecting),{rootMargin:"800px"});
     obs.observe(ref.current);
     return ()=>{obs.disconnect();ro.disconnect()};
   },[]);
 
+  // Preload first image, then mark loaded
+  useEffect(()=>{
+    if(!nearby||imgs.length===0)return;
+    const img=new Image();
+    img.onload=()=>setLoaded(true);
+    img.src=imgs[0];
+  },[nearby,imgs]);
+
   // Cycle through images
   useEffect(()=>{
-    if(!visible||imgs.length<=1)return;
+    if(!nearby||!loaded||imgs.length<=1)return;
     const tick=()=>{
       const delay=isMob?1500+Math.random()*2000:4000+Math.random()*6000;
       timerRef.current=setTimeout(()=>{
-        setCur(c=>(c+1)%imgs.length);
+        setCur(c=>{prevRef.current=c;return(c+1)%imgs.length});
         tick();
       },delay);
     };
     tick();
     return()=>clearTimeout(timerRef.current);
-  },[visible,imgs.length,isMob]);
+  },[nearby,loaded,imgs.length,isMob]);
 
   if(imgs.length===0) return <div ref={ref} style={{width:"100%",height:"100%"}}/>;
-  if(!visible) return <div ref={ref} style={{width:"100%",height:"100%",background:"#eee"}}/>;
+  if(!nearby||!loaded) return <div ref={ref} style={{width:"100%",height:"100%",background:"#eee"}}/>;
   if(imgs.length===1) return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden"}}>
     <div style={{width:"100%",height:"100%",backgroundImage:`url(${imgs[0]})`,backgroundSize:"cover",backgroundPosition:"center"}}/>
   </div>);
 
+  const prev=prevRef.current;
   return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden",position:"relative",background:"#f2f2f2"}}>
-    {imgs.map((u,i)=><div key={i} style={{
-      position:"absolute",inset:0,
-      backgroundImage:`url(${u})`,backgroundSize:"cover",backgroundPosition:"center",
-      opacity:i===cur?1:0,
-      transition:"opacity 0.6s ease",
-    }}/>)}
+    {imgs.map((u,i)=>{
+      const isCur=i===cur;
+      const isPrev=i===prev;
+      return <div key={i} style={{
+        position:"absolute",inset:0,
+        backgroundImage:`url(${u})`,backgroundSize:"cover",backgroundPosition:"center",
+        opacity:isCur||isPrev?1:0,
+        zIndex:isCur?2:isPrev?1:0,
+        transition:isCur?"opacity 0.8s ease":"none",
+      }}/>;
+    })}
   </div>);
 }
 
