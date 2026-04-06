@@ -317,24 +317,21 @@ function PosterSlideIn({src,credit,alt}){
 
 function EventDetail({ev,onBack}){
   const infoRef=useRef(null);
-  const[infoStyle,setInfoStyle]=useState({});
+  const[disperse,setDisperse]=useState(false);
   useEffect(()=>{
     window.scrollTo(0,0);
-    // After render, check if info fits in one screen — if so, spread it out
+    const el=infoRef.current;if(!el)return;
+    // Temporarily remove min-height to measure natural content height
+    el.style.minHeight="0";
     requestAnimationFrame(()=>{
-      const el=infoRef.current;if(!el)return;
+      const natural=el.scrollHeight;
       const vh=window.innerHeight;
-      const contentH=el.scrollHeight;
-      if(contentH<vh){
-        // Content is shorter than viewport — use space-between to disperse
-        setInfoStyle({minHeight:"100vh",display:"flex",flexDirection:"column",justifyContent:"space-between"});
-      }else{
-        setInfoStyle({});
-      }
+      el.style.minHeight="100vh";
+      setDisperse(natural<vh);
     });
   },[ev.id]);
   return(<div style={{background:"white",maxWidth:860,margin:"0 auto"}}>
-  <div ref={infoRef} style={{minHeight:"100vh",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...infoStyle}}>
+  <div ref={infoRef} style={{minHeight:"100vh",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between"}:{})}}>
     <div style={{fontFamily:FONT,fontSize:"clamp(50px,14vw,100px)",fontWeight:700,color:"rgba(0,0,0,0.09)",lineHeight:.85,letterSpacing:-3,marginBottom:8}}>{ev.id}</div>
     <div style={{fontFamily:FONT,fontSize:"clamp(22px,5vw,36px)",fontWeight:600,color:"#000",lineHeight:1.2,marginBottom:24,letterSpacing:"-0.5px"}}>{ev.n}</div>
     <div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,18px)",color:"#000",lineHeight:1.6,marginBottom:20}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div>
