@@ -673,15 +673,11 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
 
   useEffect(()=>{
     const calc=()=>{
-      const w=Math.min(window.innerWidth,1200);
-      const gap=isMobile?6:12;
-      const pad=isMobile?8:20;
-      const raw=Math.floor((w-pad*2-gap*(cols-1))/cols);
-      setColW(isMobile?Math.floor(raw*0.85):raw);
+      setColW(Math.floor(window.innerWidth/cols));
     };
     calc();window.addEventListener("resize",calc);
     return ()=>window.removeEventListener("resize",calc);
-  },[cols,isMobile]);
+  },[cols]);
 
   const handleTap=(slide)=>{
     const ev=events.find(e=>e.id===slide.id);
@@ -694,10 +690,9 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
     background:"white",
   }}><div style={{
     display:"grid",
-    gridTemplateColumns:isMobile?`repeat(${cols}, 85%)`:`repeat(${cols}, 1fr)`,
-    justifyContent:isMobile?"center":undefined,
-    gap:isMobile?24:12,
-    padding:`${HEADER_H+32}px ${isMobile?12:20}px 12px`,
+    gridTemplateColumns:`repeat(${cols}, 1fr)`,
+    gap:0,
+    paddingTop:HEADER_H,
   }}>
     {!isMobile&&<style>{`.ukho-card-slide{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-slide{transform:scale(0.95)}.ukho-card-label{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-label{transform:scale(1.05)}`}</style>}
     {SLIDES.map((slide,idx)=>(
