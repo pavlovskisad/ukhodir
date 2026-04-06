@@ -673,11 +673,12 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
 
   useEffect(()=>{
     const calc=()=>{
-      setColW(Math.floor(window.innerWidth/cols));
+      const w=window.innerWidth;
+      setColW(isMobile?Math.floor(w*0.85):Math.floor(w/cols));
     };
     calc();window.addEventListener("resize",calc);
     return ()=>window.removeEventListener("resize",calc);
-  },[cols]);
+  },[cols,isMobile]);
 
   const handleTap=(slide)=>{
     const ev=events.find(e=>e.id===slide.id);
@@ -690,9 +691,10 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
     background:"white",
   }}><div style={{
     display:"grid",
-    gridTemplateColumns:`repeat(${cols}, 1fr)`,
-    gap:0,
-    paddingTop:HEADER_H,
+    gridTemplateColumns:isMobile?`repeat(${cols}, 85%)`:`repeat(${cols}, 1fr)`,
+    justifyContent:isMobile?"center":undefined,
+    gap:isMobile?24:0,
+    padding:isMobile?`${HEADER_H+32}px 12px 12px`:`${HEADER_H}px 0 0`,
   }}>
     {!isMobile&&<style>{`.ukho-card-slide{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-slide{transform:scale(0.95)}.ukho-card-label{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-label{transform:scale(1.05)}`}</style>}
     {SLIDES.map((slide,idx)=>(
