@@ -621,7 +621,7 @@ function Slideshow({imgs,width,forceLoad}){
     <div style={{width:"100%",height:"100%",backgroundImage:`url(${imgs[0]})`,backgroundSize:"cover",backgroundPosition:"center"}}/>
   </div>);
 
-  return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden",background:"#f2f2f2"}}>
+  return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden",background:"white"}}>
     <div ref={stripRef} style={{display:"flex",height:"100%",willChange:"transform"}}>
       {imgs.map((u,i)=><div key={i} style={{flexShrink:0,width:w,height:"100%",backgroundImage:`url(${u})`,backgroundSize:"cover",backgroundPosition:"center"}}/>)}
       <div style={{flexShrink:0,width:w,height:"100%",backgroundImage:`url(${imgs[0]})`,backgroundSize:"cover",backgroundPosition:"center"}}/>
@@ -696,11 +696,11 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
     gap:isMobile?24:0,
     padding:isMobile?`${HEADER_H+32}px 12px 12px`:`${HEADER_H}px 0 0`,
   }}>
-    {!isMobile&&<style>{`.ukho-card-slide{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-slide{transform:scale(0.95)}.ukho-card-label{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-label{transform:scale(1.05)}.ukho-card-sel{position:absolute;inset:0;background:${GREEN};opacity:0;transition:opacity 0.15s ease;pointer-events:none;z-index:3}.ukho-card-wrap:hover .ukho-card-sel{opacity:0.35}`}</style>}
+    {!isMobile&&<style>{`.ukho-card-slide{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-slide{transform:scale(0.95)}.ukho-card-label{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-label{transform:scale(1.05)}.ukho-card-sel{position:absolute;inset:0;background:${GREEN};opacity:0;transition:opacity 0.15s ease;pointer-events:none;z-index:3}.ukho-card-wrap:hover .ukho-card-sel{opacity:0.2}`}</style>}
     {SLIDES.map((slide,idx)=>(
       <div key={slide.id} ref={el=>cardRefs.current[idx]=el} className={isMobile?undefined:"ukho-card-wrap"} onClick={()=>handleTap(slide)} style={{
         cursor:"pointer",position:"relative",
-        background:"#f2f2f2",
+        background:"white",
         aspectRatio:"4/3",
         overflow:"hidden",
         ...(!isMobile&&{marginBottom:-1}),
