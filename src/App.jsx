@@ -850,7 +850,8 @@ export default function App(){const[page,setPage]=useState("home");const[openEve
   const handleBack=useCallback(()=>{setOpenEvent(null);if(prevPage)setPage(prevPage)},[prevPage]);
   // Browser back button support
   useEffect(()=>{const onPop=()=>{if(openEvent){setOpenEvent(null);if(prevPage)setPage(prevPage)}};window.addEventListener("popstate",onPop);return()=>window.removeEventListener("popstate",onPop)},[openEvent,prevPage]);
-  if(openEvent) return (<div style={{minHeight:"100vh",background:"white",overflow:"hidden"}}><EventDetail ev={openEvent} onBack={handleBack}/><AnalogOverlay/></div>);
+  const handleRollEvent=useCallback(()=>{const other=EVENTS.filter(e=>e.id!==openEvent?.id);const ev=other[Math.floor(Math.random()*other.length)];if(ev){setOpenEvent(ev);window.scrollTo(0,0);window.history.pushState({event:ev.id},"")}},[openEvent]);
+  if(openEvent) return (<div style={{minHeight:"100vh",background:"white",overflow:"hidden"}}><EventDetail ev={openEvent} onBack={handleBack}/><FloatingDice onRoll={handleRollEvent}/><AnalogOverlay/></div>);
   return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden"}}>
     {page!=="home"&&<Menu page={page} setPage={setPage}/>}
     {page==="home"&&<Home setPage={setPage}/>}
