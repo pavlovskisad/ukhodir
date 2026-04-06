@@ -499,9 +499,9 @@ function Home({setPage}){
         {!tw1.done&&<span style={{display:"inline-block",width:6,height:13,background:GREEN,animation:"hCur 0.7s step-end infinite",verticalAlign:"middle",marginLeft:2}}/>}
       </div>
 
-      {/* Goethe Institut logo placeholder */}
+      {/* Goethe Institut logo */}
       {tw1.done&&<div style={{margin:"0 0 48px",opacity:0.7}}>
-        <div style={{fontFamily:MONO,fontSize:11,letterSpacing:0.5,color:"rgba(0,0,0,0.5)",textTransform:"uppercase"}}>Goethe-Institut</div>
+        <img src="https://raw.githubusercontent.com/pavlovskisad/ukhodir/main/public/goethe.png" alt="Goethe-Institut" style={{height:"clamp(30px,6vw,50px)",display:"block"}}/>
       </div>}
 
       {/* Upcoming */}
