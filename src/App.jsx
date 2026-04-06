@@ -326,7 +326,7 @@ function PosterSlideIn({src,credit,alt}){
       opacity:visible?1:0,
       transition:"transform 1.4s cubic-bezier(0.16,1,0.3,1), opacity 1.2s ease",
     }}>
-      <img src={src} alt={alt||""} style={{width:"100%",display:"block",maxHeight:"80vh",objectFit:"contain",background:"#f8f8f8"}} loading="lazy"/>
+      <img src={src} alt={alt||""} style={{width:"100%",display:"block",maxHeight:"80vh",objectFit:"contain",background:"white"}} loading="lazy"/>
       {credit&&<div style={{fontFamily:MONO,fontSize:"clamp(10px,1.8vw,12px)",color:"rgba(0,0,0,0.25)",marginTop:8,letterSpacing:0.3}}>poster by {credit}</div>}
     </div>
   </div>);
