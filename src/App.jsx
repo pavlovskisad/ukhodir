@@ -357,7 +357,7 @@ function EventDetail({ev,onBack}){
   {!ev.poster&&<div style={{height:80}}/>}
   {showHint&&<>
     <style>{`@keyframes hintBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}`}</style>
-    <div style={{position:"fixed",bottom:60,left:"50%",transform:"translateX(-50%)",
+    <div style={{position:"fixed",bottom:16,left:"50%",transform:"translateX(-50%)",
       opacity:0.15,animation:"hintBob 2.5s ease-in-out infinite",
       transition:"opacity 0.6s ease",pointerEvents:"none",zIndex:900,
       fontFamily:FONT,fontSize:18,color:"#000",letterSpacing:2,
