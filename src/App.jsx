@@ -620,27 +620,38 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
 
   const scrollContRef=useRef(null);
   const BUFFER=45;
-  const[loadUpTo,setLoadUpTo]=useState(BUFFER);
+  const[loadRange,setLoadRange]=useState([0,BUFFER]);
   const cardRefs=useRef([]);
+  const rafRef=useRef(null);
 
-  // Restore scroll position on mount + rolling preload
+  // Restore scroll position on mount + rolling preload window
   useEffect(()=>{
     const el=scrollContRef.current;if(!el)return;
     if(scrollRef?.current)el.scrollTop=scrollRef.current;
     const updateLoad=()=>{
-      if(scrollRef)scrollRef.current=el.scrollTop;
-      // Find first card below viewport
-      const viewBottom=el.scrollTop+el.clientHeight;
-      let firstBelow=SLIDES.length;
-      for(let i=0;i<cardRefs.current.length;i++){
-        const card=cardRefs.current[i];
-        if(card&&card.offsetTop>viewBottom){firstBelow=i;break;}
-      }
-      setLoadUpTo(Math.min(SLIDES.length,firstBelow+BUFFER));
+      if(rafRef.current)return;
+      rafRef.current=requestAnimationFrame(()=>{
+        rafRef.current=null;
+        if(scrollRef)scrollRef.current=el.scrollTop;
+        const viewTop=el.scrollTop;
+        const viewBottom=viewTop+el.clientHeight;
+        let firstVis=0,lastVis=SLIDES.length-1;
+        for(let i=0;i<cardRefs.current.length;i++){
+          const card=cardRefs.current[i];
+          if(card&&card.offsetTop+card.offsetHeight>viewTop){firstVis=i;break;}
+        }
+        for(let i=firstVis;i<cardRefs.current.length;i++){
+          const card=cardRefs.current[i];
+          if(card&&card.offsetTop>viewBottom){lastVis=i-1;break;}
+        }
+        const from=Math.max(0,firstVis-BUFFER);
+        const to=Math.min(SLIDES.length,lastVis+BUFFER+1);
+        setLoadRange([from,to]);
+      });
     };
     updateLoad();
     el.addEventListener("scroll",updateLoad,{passive:true});
-    return()=>el.removeEventListener("scroll",updateLoad);
+    return()=>{el.removeEventListener("scroll",updateLoad);if(rafRef.current)cancelAnimationFrame(rafRef.current)};
   },[]);
 
   useEffect(()=>{
@@ -681,7 +692,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
       }}>
         <div className={isMobile?undefined:"ukho-card-slide"} style={{width:"100%",height:"100%"}}>
         {slide.imgs.length>0 ? (
-          <Slideshow imgs={slide.imgs} width={colW} forceLoad={idx<loadUpTo}/>
+          <Slideshow imgs={slide.imgs} width={colW} forceLoad={idx>=loadRange[0]&&idx<loadRange[1]}/>
         ) : null}
         </div>
         {/* Number overlay — top left like original */}
