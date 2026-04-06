@@ -319,17 +319,29 @@ function EventDetail({ev,onBack}){
   const scrollRef=useRef(null);
   const infoRef=useRef(null);
   const[disperse,setDisperse]=useState(false);
+  const[showHint,setShowHint]=useState(false);
   useEffect(()=>{
     if(scrollRef.current)scrollRef.current.scrollTop=0;
+    setShowHint(false);
     const el=infoRef.current;if(!el)return;
     el.style.minHeight="0";
     requestAnimationFrame(()=>{
       const natural=el.scrollHeight;
       const vh=window.innerHeight;
       el.style.minHeight="100%";
-      setDisperse(natural<vh*0.85);
+      const short=natural<vh*0.85;
+      setDisperse(short);
+      // Show hint if there's a poster or content overflows
+      if(ev.poster||!short)setShowHint(true);
     });
   },[ev.id]);
+  // Fade hint on scroll
+  useEffect(()=>{
+    const el=scrollRef.current;if(!el)return;
+    const onScroll=()=>{if(el.scrollTop>30)setShowHint(false)};
+    el.addEventListener("scroll",onScroll,{passive:true});
+    return()=>el.removeEventListener("scroll",onScroll);
+  },[]);
   return(<div ref={scrollRef} style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white"}}>
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
@@ -343,6 +355,14 @@ function EventDetail({ev,onBack}){
   </div>
   {ev.poster&&<div style={{padding:"0 clamp(16px,4vw,40px)",paddingBottom:120}}><PosterSlideIn src={ev.poster} credit={ev.pc} alt={ev.n}/></div>}
   {!ev.poster&&<div style={{height:80}}/>}
+  {showHint&&<>
+    <style>{`@keyframes hintBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}`}</style>
+    <div style={{position:"fixed",bottom:60,left:"50%",transform:"translateX(-50%)",
+      opacity:0.15,animation:"hintBob 2.5s ease-in-out infinite",
+      transition:"opacity 0.6s ease",pointerEvents:"none",zIndex:900,
+      fontFamily:FONT,fontSize:18,color:"#000",letterSpacing:2,
+    }}>▼</div>
+  </>}
   <div style={{position:"fixed",bottom:20,right:20}}>
     <TapButton onClick={onBack} style={{fontFamily:FONT,fontSize:"clamp(30px,6vw,46px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"underline",cursor:"pointer",padding:"6px 10px",lineHeight:1}}>back</TapButton>
   </div></div></div>)}
