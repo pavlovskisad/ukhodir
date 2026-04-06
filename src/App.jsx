@@ -697,6 +697,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
     gridTemplateColumns:isMobile?`repeat(${cols}, 85%)`:`repeat(${cols}, 1fr)`,
     justifyContent:isMobile?"center":undefined,
     gap:isMobile?24:0,
+    rowGap:isMobile?24:"2.5vw",
     padding:isMobile?`${HEADER_H+32}px 12px 12px`:`130px 0 0`,
   }}>
     {!isMobile&&<style>{`.ukho-card-slide{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-slide{transform:scale(0.95)}.ukho-card-label{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-label{transform:scale(1.05)}.ukho-card-sel{position:absolute;inset:0;background:${GREEN};opacity:0;transition:opacity 0.15s ease;pointer-events:none;z-index:3}.ukho-card-wrap:hover .ukho-card-sel{opacity:0.2}`}</style>}
@@ -706,7 +707,6 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
         background:"white",
         aspectRatio:"4/3",
         overflow:"hidden",
-        ...(!isMobile&&{marginBottom:-1}),
       }}>
         <div className={isMobile?undefined:"ukho-card-slide"} style={{width:"100%",height:"100%",position:"relative"}}>
         {slide.imgs.length>0 ? (
