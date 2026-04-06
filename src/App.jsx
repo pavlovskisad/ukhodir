@@ -619,8 +619,8 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
   const cols=isMobile?1:4;
 
   const scrollContRef=useRef(null);
-  const BUFFER=45;
-  const[loadRange,setLoadRange]=useState([0,BUFFER]);
+  const AHEAD=20,BEHIND=10;
+  const[loadRange,setLoadRange]=useState([0,AHEAD]);
   const cardRefs=useRef([]);
   const rafRef=useRef(null);
 
@@ -644,8 +644,8 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
           const card=cardRefs.current[i];
           if(card&&card.offsetTop>viewBottom){lastVis=i-1;break;}
         }
-        const from=Math.max(0,firstVis-BUFFER);
-        const to=Math.min(SLIDES.length,lastVis+BUFFER+1);
+        const from=Math.max(0,firstVis-BEHIND);
+        const to=Math.min(SLIDES.length,lastVis+AHEAD+1);
         setLoadRange([from,to]);
       });
     };
