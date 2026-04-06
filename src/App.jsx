@@ -69,17 +69,17 @@ function FloatingDice({onRoll}){const[rolling,setRolling]=useState(false);const 
     </div></div></div>);
 }
 
-function FixedLabels(){const h=typeof window!=="undefined"?window.innerHeight-HEADER_H-BAR_H-32:500;
-  return(<div style={{position:"fixed",right:10,top:HEADER_H,height:h,zIndex:800,pointerEvents:"none",display:"flex",flexDirection:"column",justifyContent:"space-around",paddingTop:16,paddingBottom:16}}>
+function FixedLabels(){const topOff=HEADER_H+32;const h=typeof window!=="undefined"?window.innerHeight-topOff-BAR_H-32:500;
+  return(<div style={{position:"fixed",right:10,top:topOff,height:h,zIndex:800,pointerEvents:"none",display:"flex",flexDirection:"column",justifyContent:"space-around",paddingTop:16,paddingBottom:16}}>
     {FIELD_KEYS.map(l=><div key={l} style={{fontFamily:FONT,fontSize:"clamp(10px,1.6vw,14px)",fontWeight:700,color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase",textAlign:"right"}}>{l}</div>)}
   </div>);
 }
 
 /* ── Card — just the content, no animation here ── */
 function CardContent({ev,search,selected,showGreen,onClick}){
-  const q=search.trim().toLowerCase();const hl=t=>!q?t:hlMatch(t,q);const cardH=typeof window!=="undefined"?window.innerHeight-HEADER_H-BAR_H-32:500;
+  const q=search.trim().toLowerCase();const hl=t=>!q?t:hlMatch(t,q);const topOff=HEADER_H+32;const cardH=typeof window!=="undefined"?window.innerHeight-topOff-BAR_H-32:500;
   return(<div onClick={onClick} style={{
-    position:"absolute",top:HEADER_H,left:0,right:0,height:cardH,
+    position:"absolute",top:topOff,left:0,right:0,height:cardH,
     padding:"clamp(12px,3vw,28px) 14px clamp(16px,4vw,36px)",paddingRight:"clamp(56px,13vw,120px)",
     display:"flex",flexDirection:"column",justifyContent:"space-between",
     transform:selected?"scale(0.95)":"scale(1)",transition:"transform 0.15s ease",cursor:"pointer",
@@ -126,7 +126,7 @@ function ListPage({events,onOpenEvent}){
     if(document.getElementById(id))return;
     const s=document.createElement('style');
     s.id=id;
-    s.textContent=`.ukho-row{position:relative;display:grid;grid-template-columns:40px 2fr 2fr 2fr 1.2fr 1fr 0.8fr;gap:8px;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,0.03);cursor:pointer;transition:transform 0.12s ease;align-items:start}.ukho-row:hover{transform:scale(0.985)}.ukho-row .ukho-sel{position:absolute;inset:0;background:#4af626;opacity:0;transition:opacity 0.12s;pointer-events:none}.ukho-row:hover .ukho-sel{opacity:0.1}`;
+    s.textContent=`.ukho-row{position:relative;display:grid;grid-template-columns:40px 2fr 2fr 2fr 1.2fr 1fr 0.8fr;gap:8px;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,0.03);cursor:pointer;transition:transform 0.12s ease;align-items:start}.ukho-row:hover{transform:scale(0.985)}.ukho-row .ukho-sel{position:absolute;inset:0;background:#4af626;opacity:0;transition:opacity 0.12s;pointer-events:none}.ukho-row:hover .ukho-sel{opacity:0.1}.ukho-row .ukho-slide{transition:transform 0.2s ease}.ukho-row:hover .ukho-slide{transform:scale(0.95)}.ukho-row .ukho-label{transition:transform 0.2s ease;transform-origin:left center}.ukho-row:hover .ukho-label{transform:scale(1.05)}`;
     document.head.appendChild(s);
     return ()=>{const el=document.getElementById(id);if(el)el.remove();};
   },[isDesk]);
@@ -449,7 +449,8 @@ function Slideshow({imgs,width}){
   const anim=useMemo(()=>{
     if(imgs.length<=1||!w) return null;
     const id=`ss${_ssId++}`;
-    const delay=2+Math.random()*4;
+    const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
+    const delay=isMob?1.5+Math.random()*2:4+Math.random()*6;
     const trans=0.5;
     const n=imgs.length+1;
     const total=n*(delay+trans);
@@ -508,26 +509,30 @@ function CardIndexPage({onOpenEvent,events}){
     display:"grid",
     gridTemplateColumns:isMobile?`repeat(${cols}, 85%)`:`repeat(${cols}, 1fr)`,
     justifyContent:isMobile?"center":undefined,
-    gap:isMobile?10:12,
-    padding:`${HEADER_H+8}px ${isMobile?12:20}px 12px`,
+    gap:isMobile?24:12,
+    padding:`${HEADER_H+32}px ${isMobile?12:20}px 12px`,
   }}>
+    {!isMobile&&<style>{`.ukho-card-slide{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-slide{transform:scale(0.95)}.ukho-card-label{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-label{transform:scale(1.05)}`}</style>}
     {SLIDES.map(slide=>(
-      <div key={slide.id} onClick={()=>handleTap(slide)} style={{
+      <div key={slide.id} className={isMobile?undefined:"ukho-card-wrap"} onClick={()=>handleTap(slide)} style={{
         cursor:"pointer",position:"relative",
         background:"#f2f2f2",
         aspectRatio:"4/3",
         overflow:"hidden",
       }}>
+        <div className={isMobile?undefined:"ukho-card-slide"} style={{width:"100%",height:"100%"}}>
         {slide.imgs.length>0 ? (
           <Slideshow imgs={slide.imgs} width={colW}/>
         ) : null}
+        </div>
         {/* Number overlay — top left like original */}
-        <div style={{
+        <div className={isMobile?undefined:"ukho-card-label"} style={{
           position:"absolute",top:6,left:8,
           fontFamily:FONT,fontSize:isMobile?"clamp(22px,6vw,36px)":"clamp(18px,2vw,28px)",
           fontWeight:700,color:slide.imgs.length>0?"rgba(255,255,255,0.7)":"rgba(0,0,0,0.1)",
           textShadow:slide.imgs.length>0?"0 1px 6px rgba(0,0,0,0.4)":"none",
           pointerEvents:"none",letterSpacing:-1,lineHeight:1,zIndex:2,
+          transformOrigin:"top left",
         }}>{slide.id}</div>
       </div>
     ))}
