@@ -316,22 +316,23 @@ function PosterSlideIn({src,credit,alt}){
 }
 
 function EventDetail({ev,onBack}){
+  const scrollRef=useRef(null);
   const infoRef=useRef(null);
   const[disperse,setDisperse]=useState(false);
   useEffect(()=>{
-    window.scrollTo(0,0);
+    if(scrollRef.current)scrollRef.current.scrollTop=0;
     const el=infoRef.current;if(!el)return;
-    // Temporarily remove min-height to measure natural content height
     el.style.minHeight="0";
     requestAnimationFrame(()=>{
       const natural=el.scrollHeight;
       const vh=window.innerHeight;
-      el.style.minHeight="100dvh";
+      el.style.minHeight="100%";
       setDisperse(natural<vh*0.85);
     });
   },[ev.id]);
-  return(<div style={{background:"white",maxWidth:860,margin:"0 auto"}}>
-  <div ref={infoRef} style={{minHeight:"100dvh",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:"env(safe-area-inset-bottom, 40px)",...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between"}:{})}}>
+  return(<div ref={scrollRef} style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white"}}>
+  <div style={{maxWidth:860,margin:"0 auto"}}>
+  <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
     <div style={{fontFamily:FONT,fontSize:"clamp(50px,14vw,100px)",fontWeight:700,color:"rgba(0,0,0,0.09)",lineHeight:.85,letterSpacing:-3,marginBottom:8}}>{ev.id}</div>
     <div style={{fontFamily:FONT,fontSize:"clamp(22px,5vw,36px)",fontWeight:600,color:"#000",lineHeight:1.2,marginBottom:24,letterSpacing:"-0.5px"}}>{ev.n}</div>
     <div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,18px)",color:"#000",lineHeight:1.6,marginBottom:20}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div>
@@ -344,7 +345,7 @@ function EventDetail({ev,onBack}){
   {!ev.poster&&<div style={{height:80}}/>}
   <div style={{position:"fixed",bottom:20,right:20}}>
     <TapButton onClick={onBack} style={{fontFamily:FONT,fontSize:"clamp(30px,6vw,46px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"underline",cursor:"pointer",padding:"6px 10px",lineHeight:1}}>back</TapButton>
-  </div></div>)}
+  </div></div></div>)}
 
 /* ── Home canvas background ── */
 function HomeCanvas(){
@@ -568,13 +569,15 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
   const isMobile=typeof window!=="undefined"&&window.innerWidth<=768;
   const cols=isMobile?1:4;
 
+  const scrollContRef=useRef(null);
+
   // Restore scroll position on mount
   useEffect(()=>{
-    if(scrollRef?.current)requestAnimationFrame(()=>window.scrollTo(0,scrollRef.current));
-    else window.scrollTo(0,0);
-    const onScroll=()=>{if(scrollRef)scrollRef.current=window.scrollY};
-    window.addEventListener("scroll",onScroll,{passive:true});
-    return()=>window.removeEventListener("scroll",onScroll);
+    const el=scrollContRef.current;if(!el)return;
+    if(scrollRef?.current)el.scrollTop=scrollRef.current;
+    const onScroll=()=>{if(scrollRef)scrollRef.current=el.scrollTop};
+    el.addEventListener("scroll",onScroll,{passive:true});
+    return()=>el.removeEventListener("scroll",onScroll);
   },[]);
 
   useEffect(()=>{
@@ -594,8 +597,11 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
     if(ev)onOpenEvent(ev);
   };
 
-  return (<div style={{
-    paddingTop:HEADER_H+8,paddingBottom:12,minHeight:"100vh",background:"white",
+  return (<div ref={scrollContRef} style={{
+    position:"fixed",top:0,left:0,right:0,bottom:0,
+    overflowY:"auto",WebkitOverflowScrolling:"touch",
+    background:"white",
+  }}><div style={{
     display:"grid",
     gridTemplateColumns:isMobile?`repeat(${cols}, 85%)`:`repeat(${cols}, 1fr)`,
     justifyContent:isMobile?"center":undefined,
@@ -627,7 +633,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
       </div>
     ))}
     <FloatingDice onRoll={()=>{const slide=SLIDES[Math.floor(Math.random()*SLIDES.length)];const ev=events.find(e=>e.id===slide.id);if(ev)onOpenEvent(ev);}}/>
-  </div>);
+  </div></div>);
 }
 
 function Placeholder({title}){const dark=title==="portals";return <div style={{paddingTop:HEADER_H+40,minHeight:"100vh",background:dark?"#000":"white",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:FONT,fontSize:22,color:dark?"rgba(255,255,255,0.15)":"rgba(0,0,0,0.1)",letterSpacing:1}}>{dark?"coming soon":title}</div>}
@@ -851,7 +857,7 @@ export default function App(){const[page,setPage]=useState("home");const[openEve
   // Browser back button support
   useEffect(()=>{const onPop=()=>{if(openEvent){setOpenEvent(null);if(prevPage)setPage(prevPage)}};window.addEventListener("popstate",onPop);return()=>window.removeEventListener("popstate",onPop)},[openEvent,prevPage]);
   const handleRollEvent=useCallback(()=>{const other=EVENTS.filter(e=>e.id!==openEvent?.id);const ev=other[Math.floor(Math.random()*other.length)];if(ev){setOpenEvent(ev);window.scrollTo(0,0);window.history.pushState({event:ev.id},"")}},[openEvent]);
-  if(openEvent) return (<div style={{minHeight:"100vh",background:"white",overflow:"hidden"}}><EventDetail ev={openEvent} onBack={handleBack}/><FloatingDice onRoll={handleRollEvent}/><AnalogOverlay/></div>);
+  if(openEvent) return (<><EventDetail ev={openEvent} onBack={handleBack}/><FloatingDice onRoll={handleRollEvent}/><AnalogOverlay/></>);
   return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden"}}>
     {page!=="home"&&<Menu page={page} setPage={setPage}/>}
     {page==="home"&&<Home setPage={setPage}/>}
