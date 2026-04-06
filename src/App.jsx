@@ -176,7 +176,8 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     return list;
   },[reversed,search,yearFilter]);
 
-  useEffect(()=>{setIdx(0);setSelected(false);selBlink.stop();setExiting(null);setEnterDir("None")},[search,yearFilter]);
+  const mountedRef=useRef(false);
+  useEffect(()=>{if(!mountedRef.current){mountedRef.current=true;return;}setIdx(0);setSelected(false);selBlink.stop();setExiting(null);setEnterDir("None")},[search,yearFilter]);
 
   const go=useCallback((ni,dir)=>{
     if(ni<0||ni>=filtered.length)return;
