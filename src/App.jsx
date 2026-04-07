@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { EVENTS, SLIDES } from './data.js';
+import { EVENTS, SLIDES, MEDIA } from './data.js';
 
 const FONT="'Satoshi',sans-serif";const MONO="'Geist Mono',monospace";
 const GREEN="#4af626";const BLUE="#0000ff";const HEADER_H=80;const BAR_H=48;
@@ -387,7 +387,7 @@ function EventDetail({ev,onBack}){
       const short=natural<vh*0.85;
       setDisperse(short);
       // Show hint if there's a poster or content overflows
-      const hasMedia=(SLIDES.find(s=>s.id===ev.id)?.imgs||[]).length>0;
+      const hasMedia=(MEDIA.find(s=>s.id===ev.id)?.imgs||[]).length>0;
       if(ev.poster||hasMedia||!short)setShowHint(true);
     });
   },[ev.id]);
@@ -410,7 +410,7 @@ function EventDetail({ev,onBack}){
     <div style={{fontFamily:MONO,fontSize:"clamp(13px,2.2vw,16px)",color:"rgba(0,0,0,0.35)"}}>{ev.d}</div>
   </div>
   {ev.poster&&<div style={{padding:"0 clamp(16px,4vw,40px)",paddingBottom:40}}><PosterSlideIn src={ev.poster} credit={ev.pc} alt={ev.n}/></div>}
-  {(()=>{const slide=SLIDES.find(s=>s.id===ev.id);const imgs=slide?.imgs||[];if(!imgs.length)return ev.poster?null:<div style={{height:80}}/>;return(
+  {(()=>{const slide=MEDIA.find(s=>s.id===ev.id);const imgs=slide?.imgs||[];if(!imgs.length)return ev.poster?null:<div style={{height:80}}/>;return(
     <div style={{padding:"0 clamp(16px,4vw,40px)",paddingBottom:120}}>
       <div style={{position:"relative",marginBottom:24}}>
         <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:700,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-2px",pointerEvents:"none"}}>MEDIA</div>
