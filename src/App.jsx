@@ -817,7 +817,25 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
   </div></div>);
 }
 
-function Placeholder({title}){const dark=title==="portals";return <div style={{paddingTop:HEADER_H+40,minHeight:"100vh",background:dark?"#000":"white",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:FONT,fontSize:22,color:dark?"rgba(255,255,255,0.15)":"rgba(0,0,0,0.1)",letterSpacing:1}}>{dark?"coming soon":title}</div>}
+function PortalsPage(){
+  return(<div style={{minHeight:"100vh",background:"#000",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",paddingTop:HEADER_H+20}}>
+    <div style={{width:"min(80vw,500px)",height:"min(80vw,500px)",position:"relative"}}>
+      <model-viewer
+        src="/kopalyny.usdz"
+        auto-rotate
+        auto-rotate-delay="0"
+        rotation-per-second="12deg"
+        camera-controls
+        touch-action="pan-y"
+        interaction-prompt="none"
+        style={{width:"100%",height:"100%",background:"transparent","--poster-color":"transparent"}}
+      />
+    </div>
+    <div style={{fontFamily:FONT,fontSize:22,color:"rgba(255,255,255,0.15)",letterSpacing:1,marginTop:24}}>coming soon</div>
+  </div>);
+}
+
+function Placeholder({title}){return <div style={{paddingTop:HEADER_H+40,minHeight:"100vh",background:"white",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:FONT,fontSize:22,color:"rgba(0,0,0,0.1)",letterSpacing:1}}>{title}</div>}
 
 /* ── Riddles ── */
 const RIDDLES=[
@@ -1052,6 +1070,6 @@ export default function App(){const[page,setPage]=useState("home");const[openEve
     {page==="list"&&<ListPage events={EVENTS} onOpenEvent={handleOpenEvent} idxRef={listIdxRef} searchRef={listSearchRef} yearRef={listYearRef} modeRef={listModeRef} scrollRef={listScrollRef}/>}
     {page==="cardindex"&&<CardIndexPage events={EVENTS} onOpenEvent={handleOpenEvent} scrollRef={cardScrollRef}/>}
     {page==="riddles"&&<RiddlesPage events={EVENTS} onOpenEvent={handleOpenEvent}/>}
-    {page==="portals"&&<Placeholder title="portals"/>}
+    {page==="portals"&&<PortalsPage/>}
     <AnalogOverlay/>
   </div>)}
