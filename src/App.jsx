@@ -66,7 +66,7 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
 
 /* ── Dice ── */
 function FloatingDice({onRoll}){const[rolling,setRolling]=useState(false);const drag=useRef({active:false,moved:false,sx:0,sy:0,ex:0,ey:0});const[pos,setPos]=useState({x:null,y:null});
-  useEffect(()=>{if(pos.x===null)setPos({x:window.innerWidth-66,y:window.innerHeight-BAR_H-140})},[]);
+  useEffect(()=>{if(pos.x===null){const dk=window.innerWidth>768;setPos({x:window.innerWidth-(dk?120:66),y:window.innerHeight-BAR_H-(dk?200:140)})}},[]);
   const onDown=(cx,cy)=>{drag.current={active:true,moved:false,sx:cx,sy:cy,ex:pos.x,ey:pos.y}};const onMove=(cx,cy)=>{if(!drag.current.active)return;const dx=cx-drag.current.sx,dy=cy-drag.current.sy;if(Math.abs(dx)>3||Math.abs(dy)>3)drag.current.moved=true;if(drag.current.moved)setPos({x:drag.current.ex+dx,y:drag.current.ey+dy})};const onUp=()=>{if(!drag.current.active)return;const w=drag.current.moved;drag.current.active=false;if(!w&&!rolling){setRolling(true);setTimeout(()=>{setRolling(false);onRoll?.()},600)}};
   useEffect(()=>{const mm=e=>onMove(e.clientX,e.clientY),mu=()=>onUp(),tm=e=>onMove(e.touches[0].clientX,e.touches[0].clientY),tu=()=>onUp();window.addEventListener("mousemove",mm);window.addEventListener("mouseup",mu);window.addEventListener("touchmove",tm,{passive:true});window.addEventListener("touchend",tu);return()=>{window.removeEventListener("mousemove",mm);window.removeEventListener("mouseup",mu);window.removeEventListener("touchmove",tm);window.removeEventListener("touchend",tu)}});
   if(pos.x===null)return null;const deskDice=typeof window!=="undefined"&&window.innerWidth>768;const S=36,R=S/2;
@@ -941,7 +941,7 @@ function RiddlesPage({onOpenEvent,events}){
       </div>
     </div>
     {/* Bottom buttons */}
-    <div style={{flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-evenly",padding:`12px 0 ${140}px`}}>
+    <div style={{flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-evenly",maxWidth:600,margin:"0 auto",width:"100%",padding:`12px clamp(16px,5vw,40px) ${140}px`}}>
         <style>{`
           @keyframes rcBlink{0%,100%{opacity:1}50%{opacity:0}}
           @keyframes rdFloat{0%{transform:rotateX(15deg) rotateY(0) translateY(0)}25%{transform:rotateX(20deg) rotateY(90deg) translateY(-4px)}50%{transform:rotateX(10deg) rotateY(180deg) translateY(1px)}75%{transform:rotateX(18deg) rotateY(270deg) translateY(4px)}100%{transform:rotateX(15deg) rotateY(360deg) translateY(0)}}
