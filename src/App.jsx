@@ -360,7 +360,7 @@ function PhotoViewer({imgs,startIdx,onClose}){
     onClick={onClose}
     onTouchStart={e=>{e.preventDefault();touchRef.current.x=e.touches[0].clientX}}
     onTouchEnd={e=>{const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}}}>
-    <div onClick={e=>e.stopPropagation()} style={{position:"relative",width:"67vw",height:"67vh",display:"flex",alignItems:"center",justifyContent:"center",transform:open?"scale(1)":"scale(0.85)",opacity:open?1:0,transition:"transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease"}}
+    <div onClick={e=>e.stopPropagation()} style={{position:"relative",width:window.innerWidth>768?"67vw":"96vw",height:window.innerWidth>768?"67vh":"96vh",display:"flex",alignItems:"center",justifyContent:"center",transform:open?"scale(1)":"scale(0.85)",opacity:open?1:0,transition:"transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease"}}
       onTouchStart={e=>{e.stopPropagation();touchRef.current.x=e.touches[0].clientX}}
       onTouchEnd={e=>{e.stopPropagation();const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}}}>
       <img src={imgs[idx]} alt="" className="ukho-viewer-img" style={{transition:"opacity 0.2s",userSelect:"none",WebkitUserSelect:"none",pointerEvents:"none"}}/>
@@ -428,7 +428,8 @@ function EventDetail({ev,onBack}){
   },[]);
   return(<div ref={scrollRef} data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white"}}>
   <style>{`
-    .ukho-viewer-img{width:67vw;height:67vh;object-fit:contain}
+    .ukho-viewer-img{width:96vw;height:96vh;object-fit:contain}
+    @media(min-width:769px){.ukho-viewer-img{width:67vw;height:67vh}}
   `}</style>
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
