@@ -348,6 +348,28 @@ function PosterSlideIn({src,credit,alt}){
   </div>);
 }
 
+/* ── Single photo slide-in for event detail ── */
+function PhotoSlideIn({src,delay}){
+  const ref=useRef(null);
+  const[visible,setVisible]=useState(false);
+  useEffect(()=>{
+    if(!ref.current)return;
+    const root=ref.current.closest('[data-scroll-container]');
+    const obs=new IntersectionObserver(([e])=>setVisible(e.isIntersecting),{threshold:0.05,rootMargin:"0px 0px -30px 0px",root:root||undefined});
+    obs.observe(ref.current);
+    return ()=>obs.disconnect();
+  },[]);
+  return (<div ref={ref} style={{marginBottom:12}}>
+    <div style={{
+      transform:visible?"translateY(0) scale(1)":"translateY(50px) scale(0.97)",
+      opacity:visible?1:0,
+      transition:`transform ${delay}s cubic-bezier(0.16,1,0.3,1), opacity ${delay*0.85}s ease`,
+    }}>
+      <img src={src} alt="" style={{width:"100%",display:"block",background:"white"}} loading="lazy"/>
+    </div>
+  </div>);
+}
+
 function EventDetail({ev,onBack}){
   const scrollRef=useRef(null);
   const infoRef=useRef(null);
@@ -365,7 +387,8 @@ function EventDetail({ev,onBack}){
       const short=natural<vh*0.85;
       setDisperse(short);
       // Show hint if there's a poster or content overflows
-      if(ev.poster||!short)setShowHint(true);
+      const hasMedia=(SLIDES.find(s=>s.id===ev.id)?.imgs||[]).length>0;
+      if(ev.poster||hasMedia||!short)setShowHint(true);
     });
   },[ev.id]);
   // Fade hint on scroll
@@ -386,8 +409,15 @@ function EventDetail({ev,onBack}){
     <div style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.3)",letterSpacing:0.3,textTransform:"lowercase",marginBottom:8}}>{ev.t}</div>
     <div style={{fontFamily:MONO,fontSize:"clamp(13px,2.2vw,16px)",color:"rgba(0,0,0,0.35)"}}>{ev.d}</div>
   </div>
-  {ev.poster&&<div style={{padding:"0 clamp(16px,4vw,40px)",paddingBottom:120}}><PosterSlideIn src={ev.poster} credit={ev.pc} alt={ev.n}/></div>}
-  {!ev.poster&&<div style={{height:80}}/>}
+  {ev.poster&&<div style={{padding:"0 clamp(16px,4vw,40px)",paddingBottom:40}}><PosterSlideIn src={ev.poster} credit={ev.pc} alt={ev.n}/></div>}
+  {(()=>{const slide=SLIDES.find(s=>s.id===ev.id);const imgs=slide?.imgs||[];if(!imgs.length)return ev.poster?null:<div style={{height:80}}/>;return(
+    <div style={{padding:"0 clamp(16px,4vw,40px)",paddingBottom:120}}>
+      <div style={{position:"relative",marginBottom:24}}>
+        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:700,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-2px",pointerEvents:"none"}}>MEDIA</div>
+      </div>
+      {imgs.map((src,i)=><PhotoSlideIn key={i} src={src} delay={i===0?1.8:1.2}/>)}
+    </div>);
+  })()}
   {showHint&&<>
     <style>{`@keyframes hintBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}`}</style>
     <div style={{position:"fixed",bottom:16,left:"50%",transform:"translateX(-50%)",
