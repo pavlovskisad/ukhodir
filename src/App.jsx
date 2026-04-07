@@ -355,7 +355,7 @@ function PhotoSlideIn({src,delay,index}){
   useEffect(()=>{
     if(!ref.current)return;
     const root=ref.current.closest('[data-scroll-container]');
-    const obs=new IntersectionObserver(([e])=>setVisible(e.isIntersecting),{threshold:0.05,rootMargin:"0px 0px -30px 0px",root:root||undefined});
+    const obs=new IntersectionObserver(([e])=>setVisible(e.isIntersecting),{threshold:0.01,rootMargin:"-15% 0px -8% 0px",root:root||undefined});
     obs.observe(ref.current);
     return ()=>obs.disconnect();
   },[]);
@@ -518,7 +518,7 @@ function useTypewriter(text,speed=30,startDelay=0){
 }
 
 function Home({setPage}){
-  const stagesText="stage 1 — catalogue (live now)\nstage 2 — library (jun 2026)\nstage 3 — wiki (dec 2026)\n\n✳ archive created with support from";
+  const stagesText="stage 1 — catalogue and essential library (live now)\nstage 2 — full library (jun 2026)\nstage 3 — wiki (dec 2026)\n\n✳ archive created with support from";
   const upcomingText="Cherven vinyl release Kyiv dispatch\nValentin Silvestrov digital + vinyl release Kyiv dispatch\nUkho @ Iskra\nFestival of new music @ Pavilion of culture";
   const tw1=useTypewriter(stagesText,25,2000);
   const tw2=useTypewriter(upcomingText,22,4500);
