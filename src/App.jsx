@@ -821,7 +821,7 @@ function PortalsPage(){
   return(<div style={{minHeight:"100vh",background:"#000",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",paddingTop:HEADER_H+20}}>
     <div style={{width:"min(80vw,500px)",height:"min(80vw,500px)",position:"relative"}}>
       <model-viewer
-        src="/kopalyny.usdz"
+        src="/kopalyny.glb"
         auto-rotate
         auto-rotate-delay="0"
         rotation-per-second="12deg"
