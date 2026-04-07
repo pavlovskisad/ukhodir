@@ -68,9 +68,9 @@ function FloatingDice({onRoll}){const[rolling,setRolling]=useState(false);const 
   useEffect(()=>{if(pos.x===null)setPos({x:window.innerWidth-66,y:window.innerHeight-BAR_H-140})},[]);
   const onDown=(cx,cy)=>{drag.current={active:true,moved:false,sx:cx,sy:cy,ex:pos.x,ey:pos.y}};const onMove=(cx,cy)=>{if(!drag.current.active)return;const dx=cx-drag.current.sx,dy=cy-drag.current.sy;if(Math.abs(dx)>3||Math.abs(dy)>3)drag.current.moved=true;if(drag.current.moved)setPos({x:drag.current.ex+dx,y:drag.current.ey+dy})};const onUp=()=>{if(!drag.current.active)return;const w=drag.current.moved;drag.current.active=false;if(!w&&!rolling){setRolling(true);setTimeout(()=>{setRolling(false);onRoll?.()},600)}};
   useEffect(()=>{const mm=e=>onMove(e.clientX,e.clientY),mu=()=>onUp(),tm=e=>onMove(e.touches[0].clientX,e.touches[0].clientY),tu=()=>onUp();window.addEventListener("mousemove",mm);window.addEventListener("mouseup",mu);window.addEventListener("touchmove",tm,{passive:true});window.addEventListener("touchend",tu);return()=>{window.removeEventListener("mousemove",mm);window.removeEventListener("mouseup",mu);window.removeEventListener("touchmove",tm);window.removeEventListener("touchend",tu)}});
-  if(pos.x===null)return null;const S=36,R=S/2;
+  if(pos.x===null)return null;const deskDice=typeof window!=="undefined"&&window.innerWidth>768;const S=36,R=S/2;
   const ds=(t,l)=>({position:"absolute",width:5,height:5,borderRadius:"50%",background:"rgba(0,255,65,0.6)",boxShadow:"0 0 4px rgba(0,255,65,0.3)",top:t,left:l,transform:"translate(-50%,-50%)"});const fs=tr=>({position:"absolute",width:S,height:S,border:"1.5px solid rgba(0,255,65,0.35)",background:"rgba(0,255,65,0.05)",transform:tr});
-  return(<div onMouseDown={e=>{e.preventDefault();onDown(e.clientX,e.clientY)}} onTouchStart={e=>onDown(e.touches[0].clientX,e.touches[0].clientY)} style={{position:"fixed",left:pos.x,top:pos.y,zIndex:99999,cursor:"grab",userSelect:"none",WebkitUserSelect:"none",touchAction:"none",padding:10}}>
+  return(<div onMouseDown={e=>{e.preventDefault();onDown(e.clientX,e.clientY)}} onTouchStart={e=>onDown(e.touches[0].clientX,e.touches[0].clientY)} style={{position:"fixed",left:pos.x,top:pos.y,zIndex:99999,cursor:"grab",userSelect:"none",WebkitUserSelect:"none",touchAction:"none",padding:10,transform:deskDice?"scale(2)":"none",transformOrigin:"center"}}>
     <style>{`@keyframes dF{0%{transform:rotateX(15deg) rotateY(0) translateY(0)}25%{transform:rotateX(20deg) rotateY(90deg) translateY(-4px)}50%{transform:rotateX(10deg) rotateY(180deg) translateY(1px)}75%{transform:rotateX(18deg) rotateY(270deg) translateY(4px)}100%{transform:rotateX(15deg) rotateY(360deg) translateY(0)}}@keyframes dR{0%{transform:rotateX(0) rotateY(0) rotateZ(0)}100%{transform:rotateX(720deg) rotateY(540deg) rotateZ(360deg)}}`}</style>
     <div style={{perspective:200}}><div style={{width:S,height:S,position:"relative",transformStyle:"preserve-3d",animation:rolling?"dR 0.6s ease-out":"dF 8s ease-in-out infinite"}}>
       <div style={fs(`translateZ(${R}px)`)}><div style={ds("50%","50%")}/></div><div style={fs(`rotateY(180deg) translateZ(${R}px)`)}><div style={ds("20%","20%")}/><div style={ds("80%","80%")}/></div><div style={fs(`rotateY(90deg) translateZ(${R}px)`)}><div style={ds("20%","20%")}/><div style={ds("50%","50%")}/><div style={ds("80%","80%")}/></div><div style={fs(`rotateY(-90deg) translateZ(${R}px)`)}><div style={ds("25%","25%")}/><div style={ds("25%","75%")}/><div style={ds("75%","25%")}/><div style={ds("75%","75%")}/></div><div style={fs(`rotateX(90deg) translateZ(${R}px)`)}><div style={ds("22%","22%")}/><div style={ds("22%","78%")}/><div style={ds("50%","50%")}/><div style={ds("78%","22%")}/><div style={ds("78%","78%")}/></div><div style={fs(`rotateX(-90deg) translateZ(${R}px)`)}><div style={ds("22%","28%")}/><div style={ds("22%","72%")}/><div style={ds("50%","28%")}/><div style={ds("50%","72%")}/><div style={ds("78%","28%")}/><div style={ds("78%","72%")}/></div>
@@ -919,9 +919,10 @@ function RiddlesPage({onOpenEvent,events}){
     },500);
   }
 
-  const S=36,R=S/2;
-  const ds=(t,l)=>({position:"absolute",width:5,height:5,borderRadius:"50%",background:"rgba(0,255,65,0.6)",boxShadow:"0 0 4px rgba(0,255,65,0.3)",top:t,left:l,transform:"translate(-50%,-50%)"});
-  const fs=tr=>({position:"absolute",width:S,height:S,border:"1.5px solid rgba(0,255,65,0.35)",background:"rgba(0,255,65,0.05)",transform:tr});
+  const isDesk=typeof window!=="undefined"&&window.innerWidth>768;
+  const S=isDesk?72:36,R=S/2;
+  const ds=(t,l)=>({position:"absolute",width:isDesk?10:5,height:isDesk?10:5,borderRadius:"50%",background:"rgba(0,255,65,0.6)",boxShadow:`0 0 ${isDesk?8:4}px rgba(0,255,65,0.3)`,top:t,left:l,transform:"translate(-50%,-50%)"});
+  const fs=tr=>({position:"absolute",width:S,height:S,border:`${isDesk?2.5:1.5}px solid rgba(0,255,65,0.35)`,background:"rgba(0,255,65,0.05)",transform:tr});
 
   return (<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"white",display:"flex",flexDirection:"column"}}>
     {/* Riddle text — fills from menu to buttons */}
@@ -933,8 +934,8 @@ function RiddlesPage({onOpenEvent,events}){
         </div>
       </div>
     </div>
-    {/* Bottom buttons — fixed at dice level */}
-    <div style={{flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",gap:24,padding:`12px 0 ${140}px`}}>
+    {/* Bottom buttons */}
+    <div style={{flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-evenly",padding:`12px 0 ${140}px`}}>
         <style>{`
           @keyframes rcBlink{0%,100%{opacity:1}50%{opacity:0}}
           @keyframes rdFloat{0%{transform:rotateX(15deg) rotateY(0) translateY(0)}25%{transform:rotateX(20deg) rotateY(90deg) translateY(-4px)}50%{transform:rotateX(10deg) rotateY(180deg) translateY(1px)}75%{transform:rotateX(18deg) rotateY(270deg) translateY(4px)}100%{transform:rotateX(15deg) rotateY(360deg) translateY(0)}}
@@ -955,7 +956,7 @@ function RiddlesPage({onOpenEvent,events}){
         </div>
         <div style={{width:1,height:14,background:"rgba(255,255,255,0.12)"}}/>
         {/* Door */}
-        <div onClick={enterEvent} style={{cursor:"pointer",perspective:200,padding:4}}>
+        <div onClick={enterEvent} style={{cursor:"pointer",perspective:200,padding:4,transform:isDesk?"scale(2)":"none",transformOrigin:"center"}}>
           <div style={{width:36,height:42,position:"relative",transformStyle:"preserve-3d",animation:entering?"doorEnter 0.6s ease-out":"doorFloat 8s ease-in-out infinite",pointerEvents:"none"}}>
             <div style={{position:"absolute",width:32,height:40,top:1,left:2,border:"1.5px solid rgba(0,255,65,0.4)",background:"rgba(0,255,65,0.03)",transform:"translateZ(-5px)"}}/>
             <div style={{position:"absolute",width:18,height:38,top:2,right:0,transformOrigin:"right center",transform:"rotateY(-50deg) translateZ(3px)",background:"rgba(0,255,65,0.08)",border:"1.5px solid rgba(0,255,65,0.5)"}}>
