@@ -111,18 +111,22 @@ function FloatingLabels({cardKey}){
   </div>);
 }
 
+/* ── Stable viewport height (ignores mobile keyboard) ── */
+const stableVH={v:typeof window!=="undefined"?window.innerHeight:800};
+if(typeof window!=="undefined")window.addEventListener("resize",()=>{if(window.innerHeight>stableVH.v)stableVH.v=window.innerHeight},{passive:true});
+
 /* ── Card — just the content, no animation here ── */
 function CardContent({ev,search,selected,showGreen,onClick}){
-  const q=search.trim().toLowerCase();const hl=t=>!q?t:hlMatch(t,q);const topOff=HEADER_H+32;const cardH=typeof window!=="undefined"?window.innerHeight-topOff-BAR_H-32:500;
+  const q=search.trim().toLowerCase();const hl=t=>!q?t:hlMatch(t,q);const topOff=HEADER_H+32;const cardH=stableVH.v-topOff-BAR_H-32;
   const outerRef=useRef(null);const innerRef=useRef(null);
   const[shrink,setShrink]=useState(1);
   useEffect(()=>{
     const outer=outerRef.current,inner=innerRef.current;
     if(!outer||!inner)return;
-    // Reset to measure at full size
+    // Use stable height for measurement, not current (keyboard-affected) height
+    const avail=cardH;
     inner.style.transform="scale(1)";inner.style.transformOrigin="top left";
     requestAnimationFrame(()=>{
-      const avail=outer.clientHeight;
       const need=inner.scrollHeight;
       const s=need>avail?Math.max(0.65,avail/need):1;
       setShrink(s);
