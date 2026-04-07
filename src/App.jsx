@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { USDLoader } from "three/addons/loaders/USDLoader.js";
 import { EVENTS, SLIDES, MEDIA } from './data.js';
 
 const FONT="'Satoshi',sans-serif";const MONO="'Geist Mono',monospace";
@@ -818,19 +821,44 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
 }
 
 function PortalsPage(){
+  const mountRef=useRef(null);
+  useEffect(()=>{
+    const el=mountRef.current;if(!el)return;
+    const w=el.clientWidth,h=el.clientHeight;
+    const scene=new THREE.Scene();
+    const camera=new THREE.PerspectiveCamera(45,w/h,0.01,1000);
+    camera.position.set(0,0.5,2.5);
+    const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+    renderer.setSize(w,h);renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    renderer.setClearColor(0x000000,0);
+    el.appendChild(renderer.domElement);
+    const amb=new THREE.AmbientLight(0xffffff,1.5);scene.add(amb);
+    const dir=new THREE.DirectionalLight(0xffffff,2);dir.position.set(2,4,3);scene.add(dir);
+    const dir2=new THREE.DirectionalLight(0xffffff,1);dir2.position.set(-2,-1,-2);scene.add(dir2);
+    const controls=new OrbitControls(camera,renderer.domElement);
+    controls.enableDamping=true;controls.dampingFactor=0.08;
+    controls.enableZoom=true;controls.enablePan=false;
+    controls.autoRotate=true;controls.autoRotateSpeed=2;
+    controls.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY};
+    const loader=new USDLoader();
+    loader.load("/kopalyny.usdz",(group)=>{
+      const box=new THREE.Box3().setFromObject(group);
+      const center=box.getCenter(new THREE.Vector3());
+      const size=box.getSize(new THREE.Vector3());
+      const maxDim=Math.max(size.x,size.y,size.z);
+      group.position.sub(center);
+      if(maxDim>0)group.scale.multiplyScalar(1.5/maxDim);
+      scene.add(group);
+    },undefined,(err)=>console.error("USDZ load error:",err));
+    let raf;
+    const animate=()=>{raf=requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)};
+    animate();
+    const onResize=()=>{const ww=el.clientWidth,hh=el.clientHeight;camera.aspect=ww/hh;camera.updateProjectionMatrix();renderer.setSize(ww,hh)};
+    window.addEventListener("resize",onResize);
+    return()=>{window.removeEventListener("resize",onResize);cancelAnimationFrame(raf);renderer.dispose();controls.dispose();if(el.contains(renderer.domElement))el.removeChild(renderer.domElement)};
+  },[]);
   return(<div style={{minHeight:"100vh",background:"#000",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",paddingTop:HEADER_H+20}}>
-    <div style={{width:"min(80vw,500px)",height:"min(80vw,500px)",position:"relative"}}>
-      <model-viewer
-        src="/kopalyny.glb"
-        auto-rotate
-        auto-rotate-delay="0"
-        rotation-per-second="12deg"
-        camera-controls
-        touch-action="pan-y"
-        interaction-prompt="none"
-        style={{width:"100%",height:"100%",background:"transparent","--poster-color":"transparent"}}
-      />
-    </div>
+    <div ref={mountRef} style={{width:"min(80vw,500px)",height:"min(80vw,500px)",position:"relative"}}/>
     <div style={{fontFamily:FONT,fontSize:22,color:"rgba(255,255,255,0.15)",letterSpacing:1,marginTop:24}}>coming soon</div>
   </div>);
 }
