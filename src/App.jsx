@@ -360,10 +360,10 @@ function PhotoViewer({imgs,startIdx,onClose}){
     onClick={onClose}
     onTouchStart={e=>{e.preventDefault();touchRef.current.x=e.touches[0].clientX}}
     onTouchEnd={e=>{const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}}}>
-    <div onClick={e=>e.stopPropagation()} style={{position:"relative",maxWidth:window.innerWidth>768?"75vw":"94vw",maxHeight:window.innerWidth>768?"56.25vw":"90vh",display:"flex",alignItems:"center",justifyContent:"center"}}
+    <div onClick={e=>e.stopPropagation()} style={{position:"relative",display:"flex",alignItems:"center",justifyContent:"center"}}
       onTouchStart={e=>{e.stopPropagation();touchRef.current.x=e.touches[0].clientX}}
       onTouchEnd={e=>{e.stopPropagation();const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}}}>
-      <img src={imgs[idx]} alt="" style={{maxWidth:window.innerWidth>768?"75vw":"94vw",maxHeight:window.innerWidth>768?"56.25vw":"90vh",objectFit:"contain",transition:"opacity 0.2s",userSelect:"none",WebkitUserSelect:"none",pointerEvents:"none"}}/>
+      <img src={imgs[idx]} alt="" className="ukho-viewer-img" style={{transition:"opacity 0.2s",userSelect:"none",WebkitUserSelect:"none",pointerEvents:"none"}}/>
     </div>
     <button onClick={onClose} style={{position:"fixed",top:16,right:16,background:"none",border:"none",color:"rgba(255,255,255,0.6)",fontSize:40,cursor:"pointer",padding:"8px 14px",lineHeight:1,zIndex:1}}>×</button>
     <div style={{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",fontFamily:MONO,fontSize:12,color:"rgba(255,255,255,0.4)",letterSpacing:1}}>{idx+1} / {imgs.length}</div>
@@ -392,7 +392,7 @@ function PhotoSlideIn({src,delay,index,onOpen}){
       opacity:visible?1:0.15,
       transition:`transform ${delay}s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease`,
     }}>
-      <img src={src} alt="" onClick={()=>onOpen?.()} style={{maxWidth:window.innerWidth>768?"50vw":"100%",maxHeight:window.innerWidth>768?"37.5vw":undefined,objectFit:"contain",display:"block",background:"white",cursor:"pointer"}} loading="lazy"/>
+      <img src={src} alt="" onClick={()=>onOpen?.()} className="ukho-media-img" style={{display:"block",background:"white",cursor:"pointer"}} loading="lazy"/>
     </div>
   </div>);
 }
@@ -427,6 +427,12 @@ function EventDetail({ev,onBack}){
     return()=>el.removeEventListener("scroll",onScroll);
   },[]);
   return(<div ref={scrollRef} data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white"}}>
+  <style>{`
+    .ukho-media-img{width:100%}
+    @media(min-width:769px){.ukho-media-img{width:50vw;max-height:37.5vw;object-fit:contain}}
+    .ukho-viewer-img{max-width:94vw;max-height:90vh;object-fit:contain}
+    @media(min-width:769px){.ukho-viewer-img{max-width:75vw;max-height:56.25vw}}
+  `}</style>
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
     <div style={{fontFamily:FONT,fontSize:"clamp(50px,14vw,100px)",fontWeight:700,color:"rgba(0,0,0,0.09)",lineHeight:.85,letterSpacing:-3,marginBottom:8}}>{ev.id}</div>
