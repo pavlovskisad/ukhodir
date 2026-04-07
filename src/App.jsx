@@ -206,16 +206,18 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     return list;
   },[reversed,search,yearFilter]);
 
+  const prevEvRef=useRef(null);
   const mountedRef=useRef(false);
   useEffect(()=>{if(!mountedRef.current){mountedRef.current=true;return;}
     // When clearing search, try to stay on the same event
-    const curEv=filtered[idx];
-    if(!search.trim()&&curEv){
+    if(!search.trim()&&prevEvRef.current){
       const newList=yearFilter!=="all"?reversed.filter(e=>e.d.includes(yearFilter)):reversed;
-      const newIdx=newList.findIndex(e=>e.id===curEv.id);
-      setIdx(newIdx>=0?newIdx:0);
-    }else{setIdx(0);}
-    setSelected(false);selBlink.stop();setExiting(null);setEnterDir("None")},[search,yearFilter]);
+      const newIdx=newList.findIndex(e=>e.id===prevEvRef.current.id);
+      if(newIdx>=0){setIdx(newIdx);setEnterDir("None");return;}
+    }
+    setIdx(0);setSelected(false);selBlink.stop();setExiting(null);setEnterDir("None");navKey.current++},[search,yearFilter]);
+  // Track current event for search-clear restore
+  useEffect(()=>{if(filtered[idx])prevEvRef.current=filtered[idx]},[filtered,idx]);
 
   const go=useCallback((ni,dir)=>{
     if(ni<0||ni>=filtered.length)return;
@@ -239,7 +241,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const handleCardTap=()=>{
     const ev=filtered[idx];if(!ev)return;
     setTapped(true);
-    setTimeout(()=>{setTapped(false);onOpenEvent?.(ev)},280);
+    setTimeout(()=>{setTapped(false);onOpenEvent?.(ev)},400);
   };
 
   const everything=useMemo(()=>({names:[...new Set(reversed.map(e=>e.n))].sort(),performers:[...new Set(reversed.flatMap(e=>e.pe).filter(p=>p&&p.length>1))].sort(),programs:[...new Set(reversed.flatMap(e=>e.pr).filter(Boolean))].sort(),places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.map(e=>e.t))].sort()}),[reversed]);
@@ -311,9 +313,10 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
       {exiting&&<div key={`exit-${navKey.current}`} style={{position:"absolute",inset:0,animation:`exit${exiting.dir} ${ANIM_MS}ms cubic-bezier(0.4,0.0,0.2,0.9) both`}}>
         <CardContent ev={exiting.ev} search={search} selected={false} showGreen={false}/>
       </div>}
-      {ev?<div key={`enter-${navKey.current}`} style={{position:"absolute",inset:0,animation:enterDir!=="None"?`enter${enterDir} ${ANIM_MS}ms cubic-bezier(0.4,0.0,0.2,0.9) both`:undefined,transform:tapped?"scale(0.88)":"scale(1)",transition:"transform 0.3s cubic-bezier(0.4,0,0.2,1)"}}>
+      {ev?<div key={`enter-${navKey.current}`} style={{position:"absolute",inset:0,animation:enterDir!=="None"?`enter${enterDir} ${ANIM_MS}ms cubic-bezier(0.4,0.0,0.2,0.9) both`:undefined}}>
+        <div style={{width:"100%",height:"100%",transform:tapped?"scale(0.90)":"scale(1)",transition:"transform 0.35s cubic-bezier(0.4,0,0.2,1)"}}>
         <CardContent ev={ev} search={search} selected={false} showGreen={tapped} onClick={handleCardTap}/>
-      </div>:
+      </div></div>:
         <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",fontFamily:FONT,fontSize:16,color:"rgba(0,0,0,0.12)"}}>no events match "{search}"</div>}
     </div>
     <BottomBar search={search} setSearch={setSearch} onTop={()=>{setEnterDir("Down");setIdx(0)}} onBottom={()=>{setEnterDir("Up");setIdx(filtered.length-1)}} onToggleMode={()=>setMode("everything")} modeLabel="everything" onPrev={()=>{const n=idx<=0?filtered.length-1:idx-1;go(n,"Down")}} onNext={()=>{const n=idx>=filtered.length-1?0:idx+1;go(n,"Up")}} matchIdx={idx} matchCount={filtered.length} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter}/>
