@@ -348,8 +348,29 @@ function PosterSlideIn({src,credit,alt}){
   </div>);
 }
 
+/* ── Fullscreen photo viewer with swipe ── */
+function PhotoViewer({imgs,startIdx,onClose}){
+  const[idx,setIdx]=useState(startIdx);
+  const touchRef=useRef({x:0});
+  const go=d=>{const n=idx+d;if(n>=0&&n<imgs.length)setIdx(n)};
+  useEffect(()=>{const h=e=>{if(e.key==="Escape")onClose();if(e.key==="ArrowLeft")go(-1);if(e.key==="ArrowRight")go(1)};window.addEventListener("keydown",h);return()=>window.removeEventListener("keydown",h)});
+  return(<div style={{position:"fixed",inset:0,zIndex:100000,background:"rgba(0,0,0,0.95)",display:"flex",alignItems:"center",justifyContent:"center",touchAction:"pan-y"}}
+    onClick={onClose}
+    onTouchStart={e=>touchRef.current.x=e.touches[0].clientX}
+    onTouchEnd={e=>{const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1);e.stopPropagation()}}}>
+    <div onClick={e=>e.stopPropagation()} style={{position:"relative",maxWidth:"94vw",maxHeight:"90vh",display:"flex",alignItems:"center",justifyContent:"center"}}
+      onTouchStart={e=>touchRef.current.x=e.touches[0].clientX}
+      onTouchEnd={e=>{const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}}}>
+      <img src={imgs[idx]} alt="" style={{maxWidth:"94vw",maxHeight:"90vh",objectFit:"contain",transition:"opacity 0.2s",userSelect:"none",WebkitUserSelect:"none"}}/>
+    </div>
+    <div style={{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",fontFamily:MONO,fontSize:12,color:"rgba(255,255,255,0.4)",letterSpacing:1}}>{idx+1} / {imgs.length}</div>
+    {idx>0&&<button onClick={e=>{e.stopPropagation();go(-1)}} style={{position:"fixed",left:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:"rgba(255,255,255,0.5)",fontSize:36,cursor:"pointer",padding:12}}>‹</button>}
+    {idx<imgs.length-1&&<button onClick={e=>{e.stopPropagation();go(1)}} style={{position:"fixed",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:"rgba(255,255,255,0.5)",fontSize:36,cursor:"pointer",padding:12}}>›</button>}
+  </div>);
+}
+
 /* ── Single photo slide-in for event detail ── */
-function PhotoSlideIn({src,delay,index}){
+function PhotoSlideIn({src,delay,index,onOpen}){
   const ref=useRef(null);
   const[visible,setVisible]=useState(false);
   useEffect(()=>{
@@ -368,7 +389,7 @@ function PhotoSlideIn({src,delay,index}){
       opacity:visible?1:0.15,
       transition:`transform ${delay}s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease`,
     }}>
-      <img src={src} alt="" style={{width:"100%",display:"block",background:"white"}} loading="lazy"/>
+      <img src={src} alt="" onClick={()=>onOpen?.()} style={{width:"100%",display:"block",background:"white",cursor:"pointer"}} loading="lazy"/>
     </div>
   </div>);
 }
@@ -378,6 +399,7 @@ function EventDetail({ev,onBack}){
   const infoRef=useRef(null);
   const[disperse,setDisperse]=useState(false);
   const[showHint,setShowHint]=useState(false);
+  const[viewerIdx,setViewerIdx]=useState(null);
   useEffect(()=>{
     if(scrollRef.current)scrollRef.current.scrollTop=0;
     setShowHint(false);
@@ -418,9 +440,10 @@ function EventDetail({ev,onBack}){
       <div style={{position:"relative",marginBottom:24}}>
         <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:700,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-2px",pointerEvents:"none"}}>MEDIA</div>
       </div>
-      {imgs.map((src,i)=><PhotoSlideIn key={i} src={src} delay={i===0?1.8:1.2} index={i}/>)}
+      {imgs.map((src,i)=><PhotoSlideIn key={i} src={src} delay={i===0?1.8:1.2} index={i} onOpen={()=>setViewerIdx(i)}/>)}
     </div>);
   })()}
+  {viewerIdx!==null&&(()=>{const imgs=(MEDIA.find(s=>s.id===ev.id)?.imgs)||[];return <PhotoViewer imgs={imgs} startIdx={viewerIdx} onClose={()=>setViewerIdx(null)}/>;})()}
   {showHint&&<>
     <style>{`@keyframes hintBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}`}</style>
     <div style={{position:"fixed",bottom:16,left:"50%",transform:"translateX(-50%)",
