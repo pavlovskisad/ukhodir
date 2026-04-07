@@ -44,20 +44,21 @@ function Menu({page,setPage}){
 }
 
 function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPrev,onNext,matchIdx,matchCount,years,yearFilter,setYearFilter}){
-  const bs={width:30,height:30,border:"1px solid rgba(0,0,0,0.08)",background:"rgba(255,255,255,0.4)",cursor:"pointer",fontFamily:MONO,fontSize:12,display:"flex",alignItems:"center",justifyContent:"center",padding:0,color:"#000"};
+  const dk=typeof window!=="undefined"&&window.innerWidth>768;
+  const bs={width:dk?42:30,height:dk?42:30,border:"1px solid rgba(0,0,0,0.08)",background:"rgba(255,255,255,0.4)",cursor:"pointer",fontFamily:MONO,fontSize:dk?16:12,display:"flex",alignItems:"center",justifyContent:"center",padding:0,color:"#000"};
   const hm=search.trim()&&matchCount>1;
-  return (<div style={{...panelStyle,bottom:0,top:"auto",boxShadow:"0 -2px 16px rgba(0,0,0,0.05)",padding:"6px 12px",display:"flex",flexDirection:"column",gap:5}}>
-    {years&&years.length>1&&<div style={{display:"flex",gap:4,overflowX:"auto",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
-      {years.map(y=><button key={y} onClick={()=>setYearFilter(y)} style={{fontFamily:MONO,fontSize:10,fontWeight:yearFilter===y?700:400,padding:"2px 7px",background:yearFilter===y?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:yearFilter===y?"#000":"rgba(0,0,0,0.35)",letterSpacing:0.3,whiteSpace:"nowrap",flexShrink:0}}>{y}</button>)}
+  return (<div style={{...panelStyle,bottom:0,top:"auto",boxShadow:"0 -2px 16px rgba(0,0,0,0.05)",padding:dk?"10px 20px":"6px 12px",display:"flex",flexDirection:"column",gap:dk?8:5}}>
+    {years&&years.length>1&&<div style={{display:"flex",gap:dk?6:4,overflowX:"auto",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
+      {years.map(y=><button key={y} onClick={()=>setYearFilter(y)} style={{fontFamily:MONO,fontSize:dk?14:10,fontWeight:yearFilter===y?700:400,padding:dk?"4px 12px":"2px 7px",background:yearFilter===y?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:yearFilter===y?"#000":"rgba(0,0,0,0.35)",letterSpacing:0.3,whiteSpace:"nowrap",flexShrink:0}}>{y}</button>)}
     </div>}
-    <div style={{display:"flex",gap:6,alignItems:"center"}}>
+    <div style={{display:"flex",gap:dk?10:6,alignItems:"center"}}>
       <div style={{flex:1,position:"relative",minWidth:60}}>
-        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="search..." style={{width:"100%",padding:"5px 28px 5px 10px",border:"1px solid rgba(0,0,0,0.08)",fontFamily:MONO,fontSize:16,background:"rgba(255,255,255,0.3)",outline:"none",letterSpacing:0,color:"#000",boxSizing:"border-box"}}/>
-        {search&&<button onClick={()=>setSearch("")} style={{position:"absolute",right:4,top:"50%",transform:"translateY(-50%)",width:22,height:22,border:"none",background:"rgba(0,0,0,0.12)",color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"50%",padding:0,lineHeight:1}}>×</button>}
+        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="search..." style={{width:"100%",padding:dk?"8px 36px 8px 14px":"5px 28px 5px 10px",border:"1px solid rgba(0,0,0,0.08)",fontFamily:MONO,fontSize:dk?20:16,background:"rgba(255,255,255,0.3)",outline:"none",letterSpacing:0,color:"#000",boxSizing:"border-box"}}/>
+        {search&&<button onClick={()=>setSearch("")} style={{position:"absolute",right:dk?6:4,top:"50%",transform:"translateY(-50%)",width:dk?28:22,height:dk?28:22,border:"none",background:"rgba(0,0,0,0.12)",color:"#fff",fontSize:dk?16:13,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"50%",padding:0,lineHeight:1}}>×</button>}
       </div>
       {!hm&&<button style={bs} onClick={onTop}>▲</button>}{!hm&&<button style={bs} onClick={onBottom}>▼</button>}
-      {hm&&<button style={bs} onClick={onPrev}>‹</button>}{hm&&<span style={{fontFamily:MONO,fontSize:11,color:"rgba(0,0,0,0.35)",whiteSpace:"nowrap",letterSpacing:0,minWidth:36,textAlign:"center"}}>{matchIdx+1}/{matchCount}</span>}{hm&&<button style={bs} onClick={onNext}>›</button>}
-      <button onClick={onToggleMode} style={{fontFamily:FONT,fontSize:11,fontWeight:600,padding:"5px 10px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:0.3,whiteSpace:"nowrap",height:30,position:"relative",overflow:"hidden"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite",pointerEvents:"none",opacity:0.18}}/></button>
+      {hm&&<button style={bs} onClick={onPrev}>‹</button>}{hm&&<span style={{fontFamily:MONO,fontSize:dk?15:11,color:"rgba(0,0,0,0.35)",whiteSpace:"nowrap",letterSpacing:0,minWidth:dk?48:36,textAlign:"center"}}>{matchIdx+1}/{matchCount}</span>}{hm&&<button style={bs} onClick={onNext}>›</button>}
+      <button onClick={onToggleMode} style={{fontFamily:FONT,fontSize:dk?15:11,fontWeight:600,padding:dk?"8px 16px":"5px 10px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:0.3,whiteSpace:"nowrap",height:dk?42:30,position:"relative",overflow:"hidden"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite",pointerEvents:"none",opacity:0.18}}/></button>
       <style>{`@keyframes evBlink{0%,100%{opacity:0.18}50%{opacity:0}}`}</style>
     </div>
   </div>);
@@ -267,7 +268,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   if(mode==="everything"){const mH=document.getElementById('ukho-menu')?.offsetHeight||HEADER_H;const items=everything[evSec]||[];return(<>
     <div data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
       <div style={{height:mH}}/>
-      <div style={{position:"sticky",top:mH,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:"8px 12px",display:"flex",gap:5,flexWrap:"wrap"}}>{Object.keys(everything).map(s=><button key={s} onClick={()=>setEvSec(s)} style={{fontFamily:FONT,fontSize:11,fontWeight:evSec===s?700:400,padding:"4px 9px",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button>)}</div>
+      <div style={{position:"sticky",top:mH,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"12px 20px":"8px 12px",display:"flex",gap:isDesk?8:5,flexWrap:"wrap"}}>{Object.keys(everything).map(s=><button key={s} onClick={()=>setEvSec(s)} style={{fontFamily:FONT,fontSize:isDesk?16:11,fontWeight:evSec===s?700:400,padding:isDesk?"8px 16px":"4px 9px",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button>)}</div>
       <div style={{padding:`12px 14px ${BAR_H+16}px`}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
         {items.map((item,i)=><div key={i} onClick={()=>jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
       </div></div>
