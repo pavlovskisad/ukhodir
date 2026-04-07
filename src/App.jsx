@@ -244,7 +244,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     setTimeout(()=>{setTapped(false);onOpenEvent?.(ev)},400);
   };
 
-  const everything=useMemo(()=>{const byLast=(a,b)=>{const la=a.split(/\s+/).pop().toLowerCase(),lb=b.split(/\s+/).pop().toLowerCase();return la<lb?-1:la>lb?1:0};return{names:[...new Set(reversed.map(e=>e.n))].sort(),performers:[...new Set(reversed.flatMap(e=>e.pe).filter(p=>p&&p.length>1))].sort(byLast),programs:[...new Set(reversed.flatMap(e=>e.pr).filter(Boolean))].sort(),places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.flatMap(e=>e.t.split(',').map(t=>t.trim())).filter(Boolean))].sort()}},[reversed]);
+  const everything=useMemo(()=>{const byLast=(a,b)=>{const la=a.split(/\s+/).pop().toLowerCase(),lb=b.split(/\s+/).pop().toLowerCase();return la<lb?-1:la>lb?1:0};return{names:[...new Set(reversed.map(e=>e.n))].sort(),performers:[...new Set(reversed.flatMap(e=>e.pe).filter(p=>p&&p.length>1))].sort(byLast),programs:[...new Set(reversed.flatMap(e=>e.pr).filter(Boolean))].sort(),places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.flatMap(e=>/let us stay here/.test(e.t)?[e.t]:e.t.split(',').map(t=>t.trim())).filter(Boolean))].sort()}},[reversed]);
   const[evSec,setEvSec]=useState("names");
   const setSearchSwitch=useCallback(v=>{setSearch(v);if(mode==="everything"&&v.trim().length>0){setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
   const jumpFrom=useCallback(t=>{setYearFilter("all");setSearch(t);setMode("list");setIdx(0);setEnterDir("None")},[]);
