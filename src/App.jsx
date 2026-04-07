@@ -366,7 +366,7 @@ function PhotoSlideIn({src,delay,index}){
     <div style={{
       transform:`translateY(${stackOffset}px) scale(${stackScale})`,
       opacity:visible?1:0.15,
-      transition:`transform ${delay}s cubic-bezier(0.16,1,0.3,1), opacity ${delay*0.7}s ease`,
+      transition:`transform ${delay}s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease`,
     }}>
       <img src={src} alt="" style={{width:"100%",display:"block",background:"white"}} loading="lazy"/>
     </div>
