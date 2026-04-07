@@ -360,10 +360,10 @@ function PhotoViewer({imgs,startIdx,onClose}){
     onClick={onClose}
     onTouchStart={e=>{e.preventDefault();touchRef.current.x=e.touches[0].clientX}}
     onTouchEnd={e=>{const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}}}>
-    <div onClick={e=>e.stopPropagation()} style={{position:"relative",maxWidth:window.innerWidth>768?"75vw":"94vw",maxHeight:"90vh",display:"flex",alignItems:"center",justifyContent:"center"}}
+    <div onClick={e=>e.stopPropagation()} style={{position:"relative",maxWidth:window.innerWidth>768?"75vw":"94vw",maxHeight:window.innerWidth>768?"56.25vw":"90vh",display:"flex",alignItems:"center",justifyContent:"center"}}
       onTouchStart={e=>{e.stopPropagation();touchRef.current.x=e.touches[0].clientX}}
       onTouchEnd={e=>{e.stopPropagation();const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}}}>
-      <img src={imgs[idx]} alt="" style={{maxWidth:window.innerWidth>768?"75vw":"94vw",maxHeight:"90vh",objectFit:"contain",transition:"opacity 0.2s",userSelect:"none",WebkitUserSelect:"none",pointerEvents:"none"}}/>
+      <img src={imgs[idx]} alt="" style={{maxWidth:window.innerWidth>768?"75vw":"94vw",maxHeight:window.innerWidth>768?"56.25vw":"90vh",objectFit:"contain",transition:"opacity 0.2s",userSelect:"none",WebkitUserSelect:"none",pointerEvents:"none"}}/>
     </div>
     <button onClick={onClose} style={{position:"fixed",top:16,right:16,background:"none",border:"none",color:"rgba(255,255,255,0.6)",fontSize:40,cursor:"pointer",padding:"8px 14px",lineHeight:1,zIndex:1}}>×</button>
     <div style={{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",fontFamily:MONO,fontSize:12,color:"rgba(255,255,255,0.4)",letterSpacing:1}}>{idx+1} / {imgs.length}</div>
@@ -392,7 +392,7 @@ function PhotoSlideIn({src,delay,index,onOpen}){
       opacity:visible?1:0.15,
       transition:`transform ${delay}s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease`,
     }}>
-      <img src={src} alt="" onClick={()=>onOpen?.()} style={{width:"100%",display:"block",background:"white",cursor:"pointer"}} loading="lazy"/>
+      <img src={src} alt="" onClick={()=>onOpen?.()} style={{maxWidth:window.innerWidth>768?"50vw":"100%",maxHeight:window.innerWidth>768?"37.5vw":undefined,objectFit:"contain",display:"block",background:"white",cursor:"pointer"}} loading="lazy"/>
     </div>
   </div>);
 }
@@ -443,9 +443,7 @@ function EventDetail({ev,onBack}){
       <div style={{position:"relative",marginBottom:24}}>
         <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:700,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-2px",pointerEvents:"none"}}>MEDIA</div>
       </div>
-      <div style={{maxWidth:window.innerWidth>768?"50vw":undefined}}>
       {imgs.map((src,i)=><PhotoSlideIn key={i} src={src} delay={i===0?1.8:1.2} index={i} onOpen={()=>setViewerIdx(i)}/>)}
-      </div>
     </div>);
   })()}
   {viewerIdx!==null&&(()=>{const imgs=(MEDIA.find(s=>s.id===ev.id)?.imgs)||[];return <PhotoViewer imgs={imgs} startIdx={viewerIdx} onClose={()=>setViewerIdx(null)}/>;})()}
