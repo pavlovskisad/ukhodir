@@ -360,7 +360,7 @@ function PhotoViewer({imgs,startIdx,onClose}){
     onClick={onClose}
     onTouchStart={e=>{e.preventDefault();touchRef.current.x=e.touches[0].clientX}}
     onTouchEnd={e=>{const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}}}>
-    <div onClick={e=>e.stopPropagation()} style={{position:"relative",display:"flex",alignItems:"center",justifyContent:"center"}}
+    <div onClick={e=>e.stopPropagation()} style={{position:"relative",width:"96vw",height:"96vh",display:"flex",alignItems:"center",justifyContent:"center"}}
       onTouchStart={e=>{e.stopPropagation();touchRef.current.x=e.touches[0].clientX}}
       onTouchEnd={e=>{e.stopPropagation();const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}}}>
       <img src={imgs[idx]} alt="" className="ukho-viewer-img" style={{transition:"opacity 0.2s",userSelect:"none",WebkitUserSelect:"none",pointerEvents:"none"}}/>
@@ -386,7 +386,7 @@ function PhotoSlideIn({src,delay,index,onOpen}){
   // Stacked: shifted down + slightly scaled down, like cards in a pile
   const stackOffset=visible?0:Math.min(index,4)*12+40;
   const stackScale=visible?1:0.94;
-  return (<div ref={ref} style={{marginBottom:12,position:"relative",zIndex:visible?1:0}}>
+  return (<div ref={ref} style={{marginBottom:12,position:"relative",zIndex:visible?1:0,display:"flex",justifyContent:"center"}}>
     <div style={{
       transform:`translateY(${stackOffset}px) scale(${stackScale})`,
       opacity:visible?1:0.15,
@@ -428,8 +428,7 @@ function EventDetail({ev,onBack}){
   },[]);
   return(<div ref={scrollRef} data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white"}}>
   <style>{`
-    .ukho-viewer-img{max-width:94vw;max-height:94vh;object-fit:contain}
-    @media(min-width:769px){.ukho-viewer-img{max-width:94vw;max-height:94vh}}
+    .ukho-viewer-img{max-width:96vw;max-height:96vh;object-fit:contain}
   `}</style>
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
