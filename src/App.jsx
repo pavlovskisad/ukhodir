@@ -392,7 +392,7 @@ function PhotoSlideIn({src,delay,index,onOpen}){
       opacity:visible?1:0.15,
       transition:`transform ${delay}s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease`,
     }}>
-      <img src={src} alt="" onClick={()=>onOpen?.()} style={{width:"100%",maxWidth:"75vw",display:"block",background:"white",cursor:"pointer"}} loading="lazy"/>
+      <img src={src} alt="" onClick={()=>onOpen?.()} style={{width:"100%",maxWidth:"75vw",maxHeight:"80vh",objectFit:"contain",display:"block",background:"white",cursor:"pointer"}} loading="lazy"/>
     </div>
   </div>);
 }
@@ -428,8 +428,8 @@ function EventDetail({ev,onBack}){
   },[]);
   return(<div ref={scrollRef} data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white"}}>
   <style>{`
-    .ukho-viewer-img{max-width:94vw;max-height:90vh;object-fit:contain}
-    @media(min-width:769px){.ukho-viewer-img{max-width:92vw;max-height:90vh}}
+    .ukho-viewer-img{max-width:94vw;max-height:94vh;object-fit:contain}
+    @media(min-width:769px){.ukho-viewer-img{max-width:94vw;max-height:94vh}}
   `}</style>
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
