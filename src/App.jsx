@@ -918,17 +918,18 @@ function RiddlesPage({onOpenEvent,events}){
   const ds=(t,l)=>({position:"absolute",width:5,height:5,borderRadius:"50%",background:"rgba(0,255,65,0.6)",boxShadow:"0 0 4px rgba(0,255,65,0.3)",top:t,left:l,transform:"translate(-50%,-50%)"});
   const fs=tr=>({position:"absolute",width:S,height:S,border:"1.5px solid rgba(0,255,65,0.35)",background:"rgba(0,255,65,0.05)",transform:tr});
 
-  return (<div style={{paddingTop:HEADER_H,minHeight:"100vh",background:"white",display:"flex",alignItems:"center",justifyContent:"center",padding:20,paddingBottom:BAR_H+20}}>
-    <div style={{width:"100%",maxWidth:500,background:"rgba(255,255,255,0.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:"1px solid rgba(255,255,255,0.18)",display:"flex",flexDirection:"column"}}>
-      {/* Riddle text */}
-      <div style={{flex:1,padding:"20px 18px",minHeight:200,display:"flex",alignItems:"center"}}>
+  return (<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"white",display:"flex",flexDirection:"column"}}>
+    {/* Riddle text — fills from menu to buttons */}
+    <div style={{flex:1,overflowY:"auto",WebkitOverflowScrolling:"touch",padding:`${HEADER_H+20}px clamp(16px,5vw,40px) 20px`,display:"flex",alignItems:"center"}}>
+      <div style={{width:"100%",maxWidth:600,margin:"0 auto"}}>
         <div style={{fontFamily:MONO,fontSize:"clamp(12px,2.5vw,14px)",lineHeight:1.6,letterSpacing:.3,color:"rgba(0,0,0,0.9)"}}>
           {displayed}
           <span style={{display:"inline-block",width:6,height:13,background:"rgba(0,255,65,0.8)",verticalAlign:"middle",marginLeft:2,animation:"rcBlink 0.7s step-end infinite"}}/>
         </div>
       </div>
-      {/* Bottom bar with dice and door */}
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-evenly",borderTop:"1px solid rgba(255,255,255,0.1)",padding:"6px 0",height:56}}>
+    </div>
+    {/* Bottom buttons — fixed at dice level */}
+    <div style={{flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",gap:24,padding:`12px 0 ${140}px`}}>
         <style>{`
           @keyframes rcBlink{0%,100%{opacity:1}50%{opacity:0}}
           @keyframes rdFloat{0%{transform:rotateX(15deg) rotateY(0) translateY(0)}25%{transform:rotateX(20deg) rotateY(90deg) translateY(-4px)}50%{transform:rotateX(10deg) rotateY(180deg) translateY(1px)}75%{transform:rotateX(18deg) rotateY(270deg) translateY(4px)}100%{transform:rotateX(15deg) rotateY(360deg) translateY(0)}}
@@ -965,7 +966,6 @@ function RiddlesPage({onOpenEvent,events}){
             </div>
           </div>
         </div>
-      </div>
     </div>
   </div>);
 }
