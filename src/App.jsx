@@ -247,7 +247,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const everything=useMemo(()=>({names:[...new Set(reversed.map(e=>e.n))].sort(),performers:[...new Set(reversed.flatMap(e=>e.pe).filter(p=>p&&p.length>1))].sort(),programs:[...new Set(reversed.flatMap(e=>e.pr).filter(Boolean))].sort(),places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.map(e=>e.t))].sort()}),[reversed]);
   const[evSec,setEvSec]=useState("names");
   const setSearchSwitch=useCallback(v=>{setSearch(v);if(mode==="everything"&&v.trim().length>0){setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
-  const jumpFrom=useCallback(t=>{setSearch(t);setMode("list");setIdx(0);setEnterDir("None")},[]);
+  const jumpFrom=useCallback(t=>{setYearFilter("all");setSearch(t);setMode("list");setIdx(0);setEnterDir("None")},[]);
 
   const ev=filtered[idx];
   // Restore & save desktop scroll position
@@ -260,10 +260,10 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   },[isDesk,mode]);
 
   // ── EVERYTHING mode ──
-  if(mode==="everything"){const items=everything[evSec]||[];return(<>
+  if(mode==="everything"){const mH=document.getElementById('ukho-menu')?.offsetHeight||HEADER_H;const items=everything[evSec]||[];return(<>
     <div data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
-      <div style={{height:HEADER_H}}/>
-      <div style={{position:"sticky",top:HEADER_H,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:"8px 12px",display:"flex",gap:5,flexWrap:"wrap"}}>{Object.keys(everything).map(s=><button key={s} onClick={()=>setEvSec(s)} style={{fontFamily:FONT,fontSize:11,fontWeight:evSec===s?700:400,padding:"4px 9px",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button>)}</div>
+      <div style={{height:mH}}/>
+      <div style={{position:"sticky",top:mH,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:"8px 12px",display:"flex",gap:5,flexWrap:"wrap"}}>{Object.keys(everything).map(s=><button key={s} onClick={()=>setEvSec(s)} style={{fontFamily:FONT,fontSize:11,fontWeight:evSec===s?700:400,padding:"4px 9px",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button>)}</div>
       <div style={{padding:`12px 14px ${BAR_H+16}px`}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
         {items.map((item,i)=><div key={i} onClick={()=>jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
       </div></div>
