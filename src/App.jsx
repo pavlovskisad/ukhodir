@@ -144,18 +144,18 @@ function CardContent({ev,search,selected,showGreen,onClick}){
     <div style={{position:"absolute",top:8,left:12,fontFamily:FONT,fontSize:"clamp(52px,13vw,95px)",fontWeight:700,color:"rgba(0,0,0,0.08)",lineHeight:.85,letterSpacing:-3,pointerEvents:"none",transform:`scale(${shrink})`,transformOrigin:"top left",transition:"transform 0.2s ease"}}>{ev.id}</div>
     <div ref={innerRef} style={{
       padding:"clamp(12px,3vw,28px) 14px clamp(16px,4vw,36px)",paddingRight:"clamp(56px,13vw,120px)",
-      display:"flex",flexDirection:"column",justifyContent:"space-between",
+      display:"flex",flexDirection:"column",justifyContent:"space-between",gap:"clamp(8px,2vh,20px)",
       minHeight:`${100/shrink}%`,
       transform:`scale(${shrink})`,transformOrigin:"top left",
       width:`${100/shrink}%`,
       transition:"transform 0.2s ease",
     }}>
-      <div data-field="name" style={{fontFamily:FONT,fontSize:"clamp(17px,4vw,28px)",fontWeight:600,color:"#000",lineHeight:1.2,letterSpacing:"-.5px",zIndex:1}}>{hl(ev.n)}</div>
-      <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
-      <div data-field="program" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{ev.pr.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
-      <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.5}}>{hl(ev.pl)}</div>
-      <div data-field="tags" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.5,textTransform:"lowercase"}}>{hl(ev.t)}</div>
-      <div data-field="date" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.5}}>{ev.d}</div>
+      <div data-field="name" style={{fontFamily:FONT,fontSize:"clamp(17px,4vw,28px)",fontWeight:600,color:"#000",lineHeight:1.15,letterSpacing:"-.5px",zIndex:1}}>{hl(ev.n)}</div>
+      <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
+      <div data-field="program" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pr.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
+      <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35}}>{hl(ev.pl)}</div>
+      <div data-field="tags" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35,textTransform:"lowercase"}}>{hl(ev.t)}</div>
+      <div data-field="date" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35}}>{ev.d}</div>
     </div>
   </div>);
 }
