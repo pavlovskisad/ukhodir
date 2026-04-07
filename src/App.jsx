@@ -355,7 +355,7 @@ function PhotoSlideIn({src,delay,index}){
   useEffect(()=>{
     if(!ref.current)return;
     const root=ref.current.closest('[data-scroll-container]');
-    const obs=new IntersectionObserver(([e])=>setVisible(e.isIntersecting),{threshold:0.01,rootMargin:"-12% 0px -35% 0px",root:root||undefined});
+    const obs=new IntersectionObserver(([e])=>setVisible(e.isIntersecting),{threshold:0.01,rootMargin:"-12% 0px -20% 0px",root:root||undefined});
     obs.observe(ref.current);
     return ()=>obs.disconnect();
   },[]);
