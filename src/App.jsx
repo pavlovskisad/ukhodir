@@ -209,11 +209,14 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const prevEvRef=useRef(null);
   const mountedRef=useRef(false);
   useEffect(()=>{if(!mountedRef.current){mountedRef.current=true;return;}
-    // When clearing search, try to stay on the same event
-    if(!search.trim()&&prevEvRef.current){
-      const newList=yearFilter!=="all"?reversed.filter(e=>e.d.includes(yearFilter)):reversed;
-      const newIdx=newList.findIndex(e=>e.id===prevEvRef.current.id);
-      if(newIdx>=0){setIdx(newIdx);setEnterDir("None");return;}
+    // When clearing search, return to everything if came from there
+    if(!search.trim()){
+      if(cameFromEv.current){cameFromEv.current=false;setMode("everything");return;}
+      if(prevEvRef.current){
+        const newList=yearFilter!=="all"?reversed.filter(e=>e.d.includes(yearFilter)):reversed;
+        const newIdx=newList.findIndex(e=>e.id===prevEvRef.current.id);
+        if(newIdx>=0){setIdx(newIdx);setEnterDir("None");return;}
+      }
     }
     setIdx(0);setSelected(false);selBlink.stop();setExiting(null);setEnterDir("None");navKey.current++},[search,yearFilter]);
   // Track current event for search-clear restore
@@ -246,8 +249,9 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
 
   const everything=useMemo(()=>{const byLast=(a,b)=>{const la=a.split(/\s+/).pop().toLowerCase(),lb=b.split(/\s+/).pop().toLowerCase();return la<lb?-1:la>lb?1:0};return{names:[...new Set(reversed.map(e=>e.n))].sort(),performers:[...new Set(reversed.flatMap(e=>e.pe).filter(p=>p&&p.length>1))].sort(byLast),programs:[...new Set(reversed.flatMap(e=>e.pr).filter(Boolean))].sort(),places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.flatMap(e=>/let us stay here/i.test(e.t)?[e.t]:e.t.split(',').map(t=>t.trim())).filter(Boolean))].sort()}},[reversed]);
   const[evSec,setEvSec]=useState("names");
-  const setSearchSwitch=useCallback(v=>{setSearch(v);if(mode==="everything"&&v.trim().length>0){setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
-  const jumpFrom=useCallback(t=>{setYearFilter("all");setSearch(t);setMode("list");setIdx(0);setEnterDir("None")},[]);
+  const cameFromEv=useRef(false);
+  const setSearchSwitch=useCallback(v=>{setSearch(v);if(mode==="everything"&&v.trim().length>0){cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
+  const jumpFrom=useCallback(t=>{setYearFilter("all");setSearch(t);cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
 
   const ev=filtered[idx];
   // Restore & save desktop scroll position
