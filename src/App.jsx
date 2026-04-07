@@ -437,6 +437,7 @@ function EventDetail({ev,onBack}){
     <div style={{fontFamily:FONT,fontSize:"clamp(22px,5vw,36px)",fontWeight:600,color:"#000",lineHeight:1.2,marginBottom:24,letterSpacing:"-0.5px"}}>{ev.n}</div>
     <div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,18px)",color:"#000",lineHeight:1.6,marginBottom:20}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div>
     <div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,18px)",color:"rgba(0,0,0,0.6)",lineHeight:1.6,fontStyle:"italic",marginBottom:20}}>{ev.pr.map((p,i)=><div key={i}>{p}</div>)}</div>
+    {ev.desc&&<div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.45)",lineHeight:1.7,marginBottom:20}}>{ev.desc.map((p,i)=><div key={i} style={{marginBottom:10}}>{p}</div>)}</div>}
     <div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,16px)",color:"rgba(0,0,0,0.4)",marginBottom:8}}>{ev.pl}</div>
     <div style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.3)",letterSpacing:0.3,textTransform:"lowercase",marginBottom:8}}>{ev.t}</div>
     <div style={{fontFamily:MONO,fontSize:"clamp(13px,2.2vw,16px)",color:"rgba(0,0,0,0.35)"}}>{ev.d}</div>
