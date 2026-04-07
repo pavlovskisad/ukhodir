@@ -151,11 +151,11 @@ function CardContent({ev,search,selected,showGreen,onClick}){
       transition:"transform 0.2s ease",
     }}>
       <div data-field="name" style={{fontFamily:FONT,fontSize:"clamp(17px,4vw,28px)",fontWeight:600,color:"#000",lineHeight:1.2,letterSpacing:"-.5px",zIndex:1}}>{hl(ev.n)}</div>
-      <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2.1vw,15px)",color:"#000",lineHeight:1.6}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
-      <div data-field="program" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.55)",lineHeight:1.6,fontStyle:"italic"}}>{ev.pr.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
-      <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.38)",letterSpacing:0}}>{hl(ev.pl)}</div>
-      <div data-field="tags" style={{fontFamily:FONT,fontSize:"clamp(10px,1.6vw,12px)",color:"rgba(0,0,0,0.25)",letterSpacing:0.3,textTransform:"lowercase"}}>{hl(ev.t)}</div>
-      <div data-field="date" style={{fontFamily:MONO,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.3)",letterSpacing:0}}>{ev.d}</div>
+      <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
+      <div data-field="program" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{ev.pr.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
+      <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.5}}>{hl(ev.pl)}</div>
+      <div data-field="tags" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.5,textTransform:"lowercase"}}>{hl(ev.t)}</div>
+      <div data-field="date" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.5}}>{ev.d}</div>
     </div>
   </div>);
 }
@@ -296,13 +296,13 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
         {filtered.map(e=>(
           <div key={e.id} className="ukho-row" onClick={()=>onOpenEvent?.(e)}>
             <div className="ukho-sel"/>
-            <div style={{fontFamily:FONT,fontSize:13,fontWeight:700,color:"rgba(0,0,0,0.12)"}}>{e.id}</div>
-            <div style={{fontFamily:FONT,fontSize:13,fontWeight:600,color:"#000",letterSpacing:"-0.3px"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
-            <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.7)",lineHeight:1.5}}>{e.pe.slice(0,3).map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}{e.pe.length>3&&<div style={{color:"rgba(0,0,0,0.25)"}}>+{e.pe.length-3}</div>}</div>
-            <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.5)",fontStyle:"italic",lineHeight:1.5}}>{e.pr.slice(0,2).map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
-            <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)"}}>{e.pl}</div>
-            <div style={{fontFamily:FONT,fontSize:11,color:"rgba(0,0,0,0.25)",letterSpacing:0.3}}>{e.t}</div>
-            <div style={{fontFamily:MONO,fontSize:11,color:"rgba(0,0,0,0.3)"}}>{e.d}</div>
+            <div style={{fontFamily:FONT,fontSize:13,fontWeight:700,color:"rgba(0,0,0,0.1)"}}>{e.id}</div>
+            <div style={{fontFamily:FONT,fontSize:13,fontWeight:600,color:"#000"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
+            <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.slice(0,3).map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}{e.pe.length>3&&<div style={{color:"rgba(0,0,0,0.2)"}}>+{e.pe.length-3}</div>}</div>
+            <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pr.slice(0,2).map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
+            <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.2)"}}>{e.pl}</div>
+            <div style={{fontFamily:FONT,fontSize:11,color:"rgba(0,0,0,0.2)"}}>{e.t}</div>
+            <div style={{fontFamily:FONT,fontSize:11,color:"rgba(0,0,0,0.2)"}}>{e.d}</div>
           </div>
         ))}
       </div>
@@ -355,7 +355,7 @@ function PosterSlideIn({src,credit,alt}){
       transition:"transform 1.4s cubic-bezier(0.16,1,0.3,1), opacity 1.2s ease",
     }}>
       <img src={src} alt={alt||""} style={{width:"100%",display:"block",maxHeight:"80vh",objectFit:"contain",background:"white"}} loading="lazy"/>
-      {credit&&<div style={{fontFamily:MONO,fontSize:"clamp(10px,1.8vw,12px)",color:"rgba(0,0,0,0.25)",marginTop:8,letterSpacing:0.3}}>poster by {credit}</div>}
+      {credit&&<div style={{fontFamily:FONT,fontSize:"clamp(10px,1.8vw,12px)",color:"rgba(0,0,0,0.2)",marginTop:8}}>poster by {credit}</div>}
     </div>
   </div>);
 }
@@ -445,14 +445,14 @@ function EventDetail({ev,onBack}){
   `}</style>
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
-    <div style={{fontFamily:FONT,fontSize:"clamp(50px,14vw,100px)",fontWeight:700,color:"rgba(0,0,0,0.09)",lineHeight:.85,letterSpacing:-3,marginBottom:8}}>{ev.id}</div>
+    <div style={{fontFamily:FONT,fontSize:"clamp(50px,14vw,100px)",fontWeight:700,color:"rgba(0,0,0,0.06)",lineHeight:.85,letterSpacing:-3,marginBottom:8}}>{ev.id}</div>
     <div style={{fontFamily:FONT,fontSize:"clamp(22px,5vw,36px)",fontWeight:600,color:"#000",lineHeight:1.2,marginBottom:24,letterSpacing:"-0.5px"}}>{ev.n}</div>
-    <div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,18px)",color:"#000",lineHeight:1.6,marginBottom:20}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div>
-    <div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,18px)",color:"rgba(0,0,0,0.6)",lineHeight:1.6,fontStyle:"italic",marginBottom:20}}>{ev.pr.map((p,i)=><div key={i}>{p}</div>)}</div>
-    {ev.desc&&<div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.45)",lineHeight:1.7,marginBottom:20}}>{ev.desc.map((p,i)=><div key={i} style={{marginBottom:10}}>{p}</div>)}</div>}
-    <div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,16px)",color:"rgba(0,0,0,0.4)",marginBottom:8}}>{ev.pl}</div>
-    <div style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.3)",letterSpacing:0.3,textTransform:"lowercase",marginBottom:8}}>{ev.t}</div>
-    <div style={{fontFamily:MONO,fontSize:"clamp(13px,2.2vw,16px)",color:"rgba(0,0,0,0.35)"}}>{ev.d}</div>
+    <div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6,marginBottom:20}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div>
+    <div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6,marginBottom:20}}>{ev.pr.map((p,i)=><div key={i}>{p}</div>)}</div>
+    {ev.desc&&<div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.3)",lineHeight:1.7,marginBottom:20}}>{ev.desc.map((p,i)=><div key={i} style={{marginBottom:10}}>{p}</div>)}</div>}
+    <div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)",marginBottom:8}}>{ev.pl}</div>
+    <div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)",textTransform:"lowercase",marginBottom:8}}>{ev.t}</div>
+    <div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)"}}>{ev.d}</div>
   </div>
   {ev.poster&&<div style={{padding:"0 clamp(16px,4vw,40px)",paddingBottom:40}}><PosterSlideIn src={ev.poster} credit={ev.pc} alt={ev.n}/></div>}
   </div>{/* close maxWidth:860 container */}
@@ -573,7 +573,7 @@ function Home({setPage}){
     <div style={{position:"relative",zIndex:1,maxWidth:800,margin:"0 auto",padding:"clamp(60px,12vw,120px) clamp(16px,5vw,40px) 80px"}}>
 
       {/* Description */}
-      <p style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,18px)",fontWeight:400,fontStyle:"italic",color:"#000",lineHeight:1.7,...LS,marginBottom:40}}>
+      <p style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,18px)",fontWeight:400,color:"rgba(0,0,0,0.4)",lineHeight:1.7,...LS,marginBottom:40}}>
         Ukho is a 13-year, founder-led curatorial practice that has functioned as a full contemporary music and performance institution, building a body of work across concerts, opera, ensemble production, exhibitions, and international programming, largely outside formal institutional frameworks.
         <br/><br/>Ukho is based in Kyiv.
       </p>
@@ -616,7 +616,7 @@ function Home({setPage}){
       </div>
 
       {/* Team */}
-      <p style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",fontWeight:400,fontStyle:"italic",color:"rgba(0,0,0,0.6)",lineHeight:1.7,...LS,margin:"48px 0 40px"}}>
+      <p style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",fontWeight:400,color:"rgba(0,0,0,0.4)",lineHeight:1.7,...LS,margin:"48px 0 40px"}}>
         Ukho's curatorial and production work is sustained by a small core, with collaborators joining for specific periods. At different times, the curatorial team included Sasha Andrusyk, Eugene Shimalsky, Katya Sula, Katya Libkind, Luigi Gaggero, Ian Spektor, and Mykhailo Bogachov.
       </p>
 
