@@ -351,16 +351,16 @@ function PosterSlideIn({src,credit,alt}){
 /* ── Fullscreen photo viewer with swipe ── */
 function PhotoViewer({imgs,startIdx,onClose}){
   const[idx,setIdx]=useState(startIdx);
+  const[open,setOpen]=useState(false);
   const touchRef=useRef({x:0});
   const go=d=>{const n=idx+d;if(n>=0&&n<imgs.length)setIdx(n)};
   useEffect(()=>{const h=e=>{if(e.key==="Escape")onClose();if(e.key==="ArrowLeft")go(-1);if(e.key==="ArrowRight")go(1)};window.addEventListener("keydown",h);return()=>window.removeEventListener("keydown",h)});
-  // Prevent background scroll
-  useEffect(()=>{document.body.style.overflow="hidden";return()=>{document.body.style.overflow=""}},[]);
-  return(<div style={{position:"fixed",inset:0,zIndex:100000,background:"rgba(0,0,0,0.95)",display:"flex",alignItems:"center",justifyContent:"center",touchAction:"none",overscrollBehavior:"none"}}
+  useEffect(()=>{document.body.style.overflow="hidden";requestAnimationFrame(()=>requestAnimationFrame(()=>setOpen(true)));return()=>{document.body.style.overflow=""}},[]);
+  return(<div style={{position:"fixed",inset:0,zIndex:100000,background:open?"rgba(0,0,0,0.95)":"rgba(0,0,0,0)",transition:"background 0.35s ease",display:"flex",alignItems:"center",justifyContent:"center",touchAction:"none",overscrollBehavior:"none"}}
     onClick={onClose}
     onTouchStart={e=>{e.preventDefault();touchRef.current.x=e.touches[0].clientX}}
     onTouchEnd={e=>{const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}}}>
-    <div onClick={e=>e.stopPropagation()} style={{position:"relative",width:"96vw",height:"96vh",display:"flex",alignItems:"center",justifyContent:"center"}}
+    <div onClick={e=>e.stopPropagation()} style={{position:"relative",width:"67vw",height:"67vh",display:"flex",alignItems:"center",justifyContent:"center",transform:open?"scale(1)":"scale(0.85)",opacity:open?1:0,transition:"transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease"}}
       onTouchStart={e=>{e.stopPropagation();touchRef.current.x=e.touches[0].clientX}}
       onTouchEnd={e=>{e.stopPropagation();const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}}}>
       <img src={imgs[idx]} alt="" className="ukho-viewer-img" style={{transition:"opacity 0.2s",userSelect:"none",WebkitUserSelect:"none",pointerEvents:"none"}}/>
@@ -428,7 +428,7 @@ function EventDetail({ev,onBack}){
   },[]);
   return(<div ref={scrollRef} data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white"}}>
   <style>{`
-    .ukho-viewer-img{width:96vw;height:96vh;object-fit:contain}
+    .ukho-viewer-img{width:67vw;height:67vh;object-fit:contain}
   `}</style>
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
