@@ -769,7 +769,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
         }}>{slide.id}</div>
       </div>
     ))}
-    <FloatingDice onRoll={()=>{const slide=SLIDES[Math.floor(Math.random()*SLIDES.length)];const ev=events.find(e=>e.id===slide.id);if(ev)onOpenEvent(ev);}}/>
+    <FloatingDice onRoll={()=>{const i=Math.floor(Math.random()*SLIDES.length);const card=cardRefs.current[i];if(card)card.scrollIntoView({behavior:"smooth",block:"center"})}}/>
   </div></div>);
 }
 
