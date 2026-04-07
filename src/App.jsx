@@ -373,7 +373,7 @@ function PhotoViewer({imgs,startIdx,onClose}){
 }
 
 /* ── Single photo slide-in for event detail ── */
-function PhotoSlideIn({src,delay,index,onOpen,maxW}){
+function PhotoSlideIn({src,delay,index,onOpen}){
   const ref=useRef(null);
   const[visible,setVisible]=useState(false);
   useEffect(()=>{
@@ -392,7 +392,7 @@ function PhotoSlideIn({src,delay,index,onOpen,maxW}){
       opacity:visible?1:0.15,
       transition:`transform ${delay}s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease`,
     }}>
-      <img src={src} alt="" onClick={()=>onOpen?.()} style={{width:"100%",maxWidth:maxW||undefined,display:"block",background:"white",cursor:"pointer"}} loading="lazy"/>
+      <img src={src} alt="" onClick={()=>onOpen?.()} style={{width:"100%",display:"block",background:"white",cursor:"pointer"}} loading="lazy"/>
     </div>
   </div>);
 }
@@ -443,8 +443,8 @@ function EventDetail({ev,onBack}){
       <div style={{position:"relative",marginBottom:24}}>
         <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:700,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-2px",pointerEvents:"none"}}>MEDIA</div>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:window.innerWidth>768?"repeat(2, 1fr)":"1fr",gap:window.innerWidth>768?12:0}}>
-      {imgs.map((src,i)=><PhotoSlideIn key={i} src={src} delay={i===0?1.8:1.2} index={i} onOpen={()=>setViewerIdx(i)} maxW="50vw"/>)}
+      <div style={{maxWidth:window.innerWidth>768?"50vw":undefined}}>
+      {imgs.map((src,i)=><PhotoSlideIn key={i} src={src} delay={i===0?1.8:1.2} index={i} onOpen={()=>setViewerIdx(i)}/>)}
       </div>
     </div>);
   })()}
