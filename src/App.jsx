@@ -497,12 +497,12 @@ function Home({setPage}){
       <div style={{fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.6)",lineHeight:1.8,letterSpacing:"0px",margin:"32px 0",whiteSpace:"pre-wrap"}}>
         {tw1.displayed}
         {!tw1.done&&<span style={{display:"inline-block",width:6,height:13,background:GREEN,animation:"hCur 0.7s step-end infinite",verticalAlign:"middle",marginLeft:2}}/>}
-        {tw1.done&&<img src="https://raw.githubusercontent.com/pavlovskisad/ukhodir/main/goethe.PNG" alt="Goethe-Institut" style={{height:"clamp(120px,24vw,200px)",verticalAlign:"middle",marginLeft:8,opacity:0.7}}/>}
+        {tw1.done&&<div style={{marginTop:12}}><img src="https://raw.githubusercontent.com/pavlovskisad/ukhodir/main/goethe.PNG" alt="Goethe-Institut" style={{height:"clamp(120px,24vw,200px)",display:"block",opacity:0.7}}/></div>}
       </div>
 
       {/* Upcoming */}
       <div style={{position:"relative",margin:"48px 0"}}>
-        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:700,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-2px",position:"absolute",top:-10,left:0,pointerEvents:"none"}}>UPCOMING</div>
+        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:700,color:"rgba(0,0,0,0.08)",lineHeight:1,letterSpacing:"-2px",position:"absolute",top:-10,left:0,pointerEvents:"none"}}>UPCOMING</div>
         <div style={{fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.55)",lineHeight:1.9,letterSpacing:"0px",paddingTop:40,whiteSpace:"pre-wrap"}}>
           {tw2.displayed}
           {!tw2.done&&<span style={{display:"inline-block",width:6,height:13,background:GREEN,animation:"hCur 0.7s step-end infinite",verticalAlign:"middle",marginLeft:2}}/>}
@@ -511,7 +511,7 @@ function Home({setPage}){
 
       {/* Umbrella */}
       <div style={{position:"relative",margin:"48px 0"}}>
-        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:700,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-2px",position:"absolute",top:-10,left:0,pointerEvents:"none"}}>UMBRELLA</div>
+        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:700,color:"rgba(0,0,0,0.08)",lineHeight:1,letterSpacing:"-2px",position:"absolute",top:-10,left:0,pointerEvents:"none"}}>UMBRELLA</div>
         <div style={{paddingTop:40,display:"flex",flexDirection:"column",gap:12}}>
           <TapButton href="https://kyivdispat.ch" style={{fontFamily:FONT,fontSize:"clamp(22px,5.5vw,40px)",fontWeight:700,color:BLUE,background:"none",border:"none",textDecoration:"underline",textUnderlineOffset:"4px",letterSpacing:"-1.5px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
             kyiv dispatch record label
