@@ -354,15 +354,18 @@ function PhotoViewer({imgs,startIdx,onClose}){
   const touchRef=useRef({x:0});
   const go=d=>{const n=idx+d;if(n>=0&&n<imgs.length)setIdx(n)};
   useEffect(()=>{const h=e=>{if(e.key==="Escape")onClose();if(e.key==="ArrowLeft")go(-1);if(e.key==="ArrowRight")go(1)};window.addEventListener("keydown",h);return()=>window.removeEventListener("keydown",h)});
-  return(<div style={{position:"fixed",inset:0,zIndex:100000,background:"rgba(0,0,0,0.95)",display:"flex",alignItems:"center",justifyContent:"center",touchAction:"pan-y"}}
+  // Prevent background scroll
+  useEffect(()=>{document.body.style.overflow="hidden";return()=>{document.body.style.overflow=""}},[]);
+  return(<div style={{position:"fixed",inset:0,zIndex:100000,background:"rgba(0,0,0,0.95)",display:"flex",alignItems:"center",justifyContent:"center",touchAction:"none",overscrollBehavior:"none"}}
     onClick={onClose}
-    onTouchStart={e=>touchRef.current.x=e.touches[0].clientX}
-    onTouchEnd={e=>{const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1);e.stopPropagation()}}}>
+    onTouchStart={e=>{e.preventDefault();touchRef.current.x=e.touches[0].clientX}}
+    onTouchEnd={e=>{const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}}}>
     <div onClick={e=>e.stopPropagation()} style={{position:"relative",maxWidth:"94vw",maxHeight:"90vh",display:"flex",alignItems:"center",justifyContent:"center"}}
-      onTouchStart={e=>touchRef.current.x=e.touches[0].clientX}
-      onTouchEnd={e=>{const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}}}>
-      <img src={imgs[idx]} alt="" style={{maxWidth:"94vw",maxHeight:"90vh",objectFit:"contain",transition:"opacity 0.2s",userSelect:"none",WebkitUserSelect:"none"}}/>
+      onTouchStart={e=>{e.stopPropagation();touchRef.current.x=e.touches[0].clientX}}
+      onTouchEnd={e=>{e.stopPropagation();const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}}}>
+      <img src={imgs[idx]} alt="" style={{maxWidth:"94vw",maxHeight:"90vh",objectFit:"contain",transition:"opacity 0.2s",userSelect:"none",WebkitUserSelect:"none",pointerEvents:"none"}}/>
     </div>
+    <button onClick={onClose} style={{position:"fixed",top:16,right:16,background:"none",border:"none",color:"rgba(255,255,255,0.6)",fontSize:40,cursor:"pointer",padding:"8px 14px",lineHeight:1,zIndex:1}}>×</button>
     <div style={{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",fontFamily:MONO,fontSize:12,color:"rgba(255,255,255,0.4)",letterSpacing:1}}>{idx+1} / {imgs.length}</div>
     {idx>0&&<button onClick={e=>{e.stopPropagation();go(-1)}} style={{position:"fixed",left:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:"rgba(255,255,255,0.5)",fontSize:36,cursor:"pointer",padding:12}}>‹</button>}
     {idx<imgs.length-1&&<button onClick={e=>{e.stopPropagation();go(1)}} style={{position:"fixed",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:"rgba(255,255,255,0.5)",fontSize:36,cursor:"pointer",padding:12}}>›</button>}
