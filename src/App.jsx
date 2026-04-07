@@ -127,7 +127,7 @@ function CardContent({ev,search,selected,showGreen,onClick}){
       const s=need>avail?Math.max(0.65,avail/need):1;
       setShrink(s);
     });
-  },[ev.id]);
+  },[ev.id,search]);
   return(<div ref={outerRef} onClick={onClick} style={{
     position:"absolute",top:topOff,left:0,right:0,height:cardH,
     transform:selected?"scale(0.95)":"scale(1)",transition:"transform 0.15s ease",cursor:"pointer",
