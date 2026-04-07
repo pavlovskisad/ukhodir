@@ -429,9 +429,9 @@ function EventDetail({ev,onBack}){
   return(<div ref={scrollRef} data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white"}}>
   <style>{`
     .ukho-media-img{width:100%}
-    @media(min-width:769px){.ukho-media-img{width:50vw;max-height:37.5vw;object-fit:contain}}
+    @media(min-width:769px){.ukho-media-img{width:75vw;max-height:56.25vw;object-fit:contain}}
     .ukho-viewer-img{max-width:94vw;max-height:90vh;object-fit:contain}
-    @media(min-width:769px){.ukho-viewer-img{max-width:75vw;max-height:56.25vw}}
+    @media(min-width:769px){.ukho-viewer-img{max-width:92vw;max-height:90vh}}
   `}</style>
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
