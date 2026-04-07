@@ -392,7 +392,7 @@ function PhotoSlideIn({src,delay,index,onOpen}){
       opacity:visible?1:0.15,
       transition:`transform ${delay}s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease`,
     }}>
-      <img src={src} alt="" onClick={()=>onOpen?.()} className="ukho-media-img" style={{display:"block",background:"white",cursor:"pointer"}} loading="lazy"/>
+      <img src={src} alt="" onClick={()=>onOpen?.()} style={{width:"100%",display:"block",background:"white",cursor:"pointer"}} loading="lazy"/>
     </div>
   </div>);
 }
@@ -428,8 +428,6 @@ function EventDetail({ev,onBack}){
   },[]);
   return(<div ref={scrollRef} data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white"}}>
   <style>{`
-    .ukho-media-img{width:100%}
-    @media(min-width:769px){.ukho-media-img{width:75vw;max-height:56.25vw;object-fit:contain}}
     .ukho-viewer-img{max-width:94vw;max-height:90vh;object-fit:contain}
     @media(min-width:769px){.ukho-viewer-img{max-width:92vw;max-height:90vh}}
   `}</style>
@@ -444,8 +442,9 @@ function EventDetail({ev,onBack}){
     <div style={{fontFamily:MONO,fontSize:"clamp(13px,2.2vw,16px)",color:"rgba(0,0,0,0.35)"}}>{ev.d}</div>
   </div>
   {ev.poster&&<div style={{padding:"0 clamp(16px,4vw,40px)",paddingBottom:40}}><PosterSlideIn src={ev.poster} credit={ev.pc} alt={ev.n}/></div>}
+  </div>{/* close maxWidth:860 container */}
   {(()=>{const slide=MEDIA.find(s=>s.id===ev.id);const imgs=slide?.imgs||[];if(!imgs.length)return ev.poster?null:<div style={{height:80}}/>;return(
-    <div style={{padding:"0 clamp(16px,4vw,40px)",paddingBottom:120}}>
+    <div style={{width:"75vw",maxWidth:"100%",margin:"0 auto",paddingBottom:120}}>
       <div style={{position:"relative",marginBottom:24}}>
         <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:700,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-2px",pointerEvents:"none"}}>MEDIA</div>
       </div>
@@ -463,7 +462,7 @@ function EventDetail({ev,onBack}){
   </>}
   <div style={{position:"fixed",bottom:20,right:20}}>
     <TapButton onClick={onBack} style={{fontFamily:FONT,fontSize:"clamp(30px,6vw,46px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"underline",cursor:"pointer",padding:"6px 10px",lineHeight:1}}>back</TapButton>
-  </div></div></div>)}
+  </div></div>)}
 
 /* ── Home canvas background ── */
 function HomeCanvas(){
