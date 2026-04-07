@@ -782,7 +782,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
     rowGap:isMobile?24:"2.5vw",
     padding:isMobile?`${HEADER_H+32}px 12px 12px`:`130px 0 0`,
   }}>
-    {!isMobile&&<style>{`.ukho-card-slide{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-slide{transform:scale(0.95)}.ukho-card-label{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-label{transform:scale(1.05)}.ukho-card-sel{display:none}`}</style>}
+    {!isMobile&&<style>{`.ukho-card-slide{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-slide{transform:scale(0.95)}.ukho-card-label{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-label{transform:scale(1.10)}.ukho-card-sel{display:none}`}</style>}
     {SLIDES.map((slide,idx)=>(
       <div key={slide.id} ref={el=>cardRefs.current[idx]=el} className={isMobile?undefined:"ukho-card-wrap"} onClick={()=>handleTap(slide)} style={{
         cursor:"pointer",position:"relative",
