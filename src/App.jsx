@@ -349,7 +349,7 @@ function PosterSlideIn({src,credit,alt}){
 }
 
 /* ── Single photo slide-in for event detail ── */
-function PhotoSlideIn({src,delay}){
+function PhotoSlideIn({src,delay,index}){
   const ref=useRef(null);
   const[visible,setVisible]=useState(false);
   useEffect(()=>{
@@ -359,11 +359,14 @@ function PhotoSlideIn({src,delay}){
     obs.observe(ref.current);
     return ()=>obs.disconnect();
   },[]);
-  return (<div ref={ref} style={{marginBottom:12}}>
+  // Stacked: shifted down + slightly scaled down, like cards in a pile
+  const stackOffset=visible?0:Math.min(index,4)*12+40;
+  const stackScale=visible?1:0.94;
+  return (<div ref={ref} style={{marginBottom:12,position:"relative",zIndex:visible?1:0}}>
     <div style={{
-      transform:visible?"translateY(0) scale(1)":"translateY(50px) scale(0.97)",
-      opacity:visible?1:0,
-      transition:`transform ${delay}s cubic-bezier(0.16,1,0.3,1), opacity ${delay*0.85}s ease`,
+      transform:`translateY(${stackOffset}px) scale(${stackScale})`,
+      opacity:visible?1:0.15,
+      transition:`transform ${delay}s cubic-bezier(0.16,1,0.3,1), opacity ${delay*0.7}s ease`,
     }}>
       <img src={src} alt="" style={{width:"100%",display:"block",background:"white"}} loading="lazy"/>
     </div>
@@ -415,7 +418,7 @@ function EventDetail({ev,onBack}){
       <div style={{position:"relative",marginBottom:24}}>
         <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:700,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-2px",pointerEvents:"none"}}>MEDIA</div>
       </div>
-      {imgs.map((src,i)=><PhotoSlideIn key={i} src={src} delay={i===0?1.8:1.2}/>)}
+      {imgs.map((src,i)=><PhotoSlideIn key={i} src={src} delay={i===0?1.8:1.2} index={i}/>)}
     </div>);
   })()}
   {showHint&&<>
