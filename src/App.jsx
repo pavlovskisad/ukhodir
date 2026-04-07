@@ -207,7 +207,15 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   },[reversed,search,yearFilter]);
 
   const mountedRef=useRef(false);
-  useEffect(()=>{if(!mountedRef.current){mountedRef.current=true;return;}setIdx(0);setSelected(false);selBlink.stop();setExiting(null);setEnterDir("None")},[search,yearFilter]);
+  useEffect(()=>{if(!mountedRef.current){mountedRef.current=true;return;}
+    // When clearing search, try to stay on the same event
+    const curEv=filtered[idx];
+    if(!search.trim()&&curEv){
+      const newList=yearFilter!=="all"?reversed.filter(e=>e.d.includes(yearFilter)):reversed;
+      const newIdx=newList.findIndex(e=>e.id===curEv.id);
+      setIdx(newIdx>=0?newIdx:0);
+    }else{setIdx(0);}
+    setSelected(false);selBlink.stop();setExiting(null);setEnterDir("None")},[search,yearFilter]);
 
   const go=useCallback((ni,dir)=>{
     if(ni<0||ni>=filtered.length)return;
@@ -227,7 +235,12 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const onWheel=useCallback(e=>{if(wt.current)return;wt.current=setTimeout(()=>{wt.current=null},200);e.deltaY>15?go(idx+1,"Up"):e.deltaY<-15&&go(idx-1,"Down")},[idx,go]);
   useEffect(()=>{const h=e=>{if(e.target.tagName==="INPUT")return;if(e.key==="ArrowDown"||e.key==="j")go(idx+1,"Up");if(e.key==="ArrowUp"||e.key==="k")go(idx-1,"Down");if(e.key==="Enter"&&selected&&filtered[idx])onOpenEvent?.(filtered[idx])};window.addEventListener("keydown",h);return()=>window.removeEventListener("keydown",h)},[idx,go,selected,filtered,onOpenEvent]);
   const goRandom=()=>{const n=Math.floor(Math.random()*filtered.length);go(n,n>idx?"Up":"Down")};
-  const handleCardTap=()=>{if(selected){const ev=filtered[idx];if(ev)onOpenEvent?.(ev)}else{setSelected(true);selBlink.start()}};
+  const[tapped,setTapped]=useState(false);
+  const handleCardTap=()=>{
+    const ev=filtered[idx];if(!ev)return;
+    setTapped(true);
+    setTimeout(()=>{setTapped(false);onOpenEvent?.(ev)},280);
+  };
 
   const everything=useMemo(()=>({names:[...new Set(reversed.map(e=>e.n))].sort(),performers:[...new Set(reversed.flatMap(e=>e.pe).filter(p=>p&&p.length>1))].sort(),programs:[...new Set(reversed.flatMap(e=>e.pr).filter(Boolean))].sort(),places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.map(e=>e.t))].sort()}),[reversed]);
   const[evSec,setEvSec]=useState("names");
@@ -298,8 +311,8 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
       {exiting&&<div key={`exit-${navKey.current}`} style={{position:"absolute",inset:0,animation:`exit${exiting.dir} ${ANIM_MS}ms cubic-bezier(0.4,0.0,0.2,0.9) both`}}>
         <CardContent ev={exiting.ev} search={search} selected={false} showGreen={false}/>
       </div>}
-      {ev?<div key={`enter-${navKey.current}`} style={{position:"absolute",inset:0,animation:enterDir!=="None"?`enter${enterDir} ${ANIM_MS}ms cubic-bezier(0.4,0.0,0.2,0.9) both`:undefined}}>
-        <CardContent ev={ev} search={search} selected={selected} showGreen={selected||selBlink.flash} onClick={handleCardTap}/>
+      {ev?<div key={`enter-${navKey.current}`} style={{position:"absolute",inset:0,animation:enterDir!=="None"?`enter${enterDir} ${ANIM_MS}ms cubic-bezier(0.4,0.0,0.2,0.9) both`:undefined,transform:tapped?"scale(0.88)":"scale(1)",transition:"transform 0.3s cubic-bezier(0.4,0,0.2,1)"}}>
+        <CardContent ev={ev} search={search} selected={false} showGreen={tapped} onClick={handleCardTap}/>
       </div>:
         <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",fontFamily:FONT,fontSize:16,color:"rgba(0,0,0,0.12)"}}>no events match "{search}"</div>}
     </div>
