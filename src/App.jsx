@@ -271,6 +271,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     return["all",...[...yrs].sort().reverse()];
   },[reversed]);
 
+  const progTerms=useRef(null);
   const filtered=useMemo(()=>{
     let list=reversed;
     if(yearFilter!=="all")list=list.filter(e=>e.d.includes(yearFilter));
@@ -329,7 +330,6 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const everything=useMemo(()=>({names:[...new Set(reversed.map(e=>e.n))].sort(),performers:PERFORMERS,programs:PROGRAMS,places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.flatMap(e=>/let us stay here/i.test(e.t)?[e.t]:e.t.split(',').map(t=>t.trim())).filter(Boolean))].sort()}),[reversed]);
   const[evSec,setEvSec]=useState("names");
   const cameFromEv=useRef(false);
-  const progTerms=useRef(null);
   const setSearchSwitch=useCallback(v=>{progTerms.current=null;setSearch(v);if(mode==="everything"&&v.trim().length>0){cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
   const jumpFrom=useCallback(t=>{progTerms.current=null;setYearFilter("all");setSearch(t);cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
   const jumpFromProgram=useCallback(t=>{const dash=t.match(/\s[—–\-]\s/);let composer="",title="";if(dash){composer=t.slice(0,dash.index).trim();const rest=t.slice(dash.index+dash[0].length);const ym=rest.match(/^(.+?)\s*[\(\[]/);title=ym?ym[1].trim():rest.split(/ for /)[0].trim();}else{title=t.split(/ for /)[0].trim();}progTerms.current={composer:strip(composer),title:strip(title)};setYearFilter("all");setSearch(t);cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
