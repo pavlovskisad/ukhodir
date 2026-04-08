@@ -54,8 +54,8 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
   return (<div id="ukho-bar" style={{...panelStyle,top:menuH,bottom:"auto",boxShadow:"0 2px 16px rgba(0,0,0,0.04)",padding:dk?"10px 20px":"6px 12px",display:"flex",flexDirection:"column",gap:dk?8:5}}>
     <div style={{display:"flex",gap:dk?10:6,alignItems:"center"}}>
       <div style={{flex:1,position:"relative",minWidth:60}}>
-        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="search..." style={{width:"100%",padding:dk?"8px 36px 8px 14px":"5px 28px 5px 10px",border:"1px solid rgba(0,0,0,0.08)",fontFamily:MONO,fontSize:dk?20:16,background:"rgba(255,255,255,0.3)",outline:"none",letterSpacing:0,color:"#000",boxSizing:"border-box"}}/>
-        {search&&<button onClick={()=>setSearch("")} style={{position:"absolute",right:dk?6:4,top:"50%",transform:"translateY(-50%)",width:dk?28:22,height:dk?28:22,border:"none",background:"rgba(0,0,0,0.12)",color:"#fff",fontSize:dk?16:13,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"50%",padding:0,lineHeight:1}}>×</button>}
+        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="search..." style={{width:"100%",padding:dk?"8px 36px 8px 14px":"5px 28px 5px 10px",border:search?`2px solid rgba(255,0,0,0.5)`:"1px solid rgba(0,0,0,0.08)",fontFamily:MONO,fontSize:dk?20:16,background:search?"rgba(255,0,0,0.04)":"rgba(255,255,255,0.3)",outline:"none",letterSpacing:0,color:"#000",boxSizing:"border-box"}}/>
+        {search&&<button onClick={()=>setSearch("")} style={{position:"absolute",right:dk?6:4,top:"50%",transform:"translateY(-50%)",width:dk?28:22,height:dk?28:22,border:"none",background:"rgba(255,0,0,0.55)",color:"#fff",fontSize:dk?16:13,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"50%",padding:0,lineHeight:1}}>×</button>}
       </div>
       {!hm&&<button style={bs} onClick={onTop}>▲</button>}{!hm&&<button style={bs} onClick={onBottom}>▼</button>}
       {hm&&<button style={bs} onClick={onPrev}>‹</button>}{hm&&<span style={{fontFamily:MONO,fontSize:dk?15:11,color:"rgba(0,0,0,0.35)",whiteSpace:"nowrap",letterSpacing:0,minWidth:dk?48:36,textAlign:"center"}}>{matchIdx+1}/{matchCount}</span>}{hm&&<button style={bs} onClick={onNext}>›</button>}
@@ -82,10 +82,16 @@ function FloatingDice({onRoll}){const[rolling,setRolling]=useState(false);const 
     </div></div></div>);
 }
 
+function useBarBottom(){
+  const[bb,setBb]=useState(HEADER_H+BAR_H);
+  useEffect(()=>{const m=()=>{const el=document.getElementById('ukho-bar');if(el)setBb(el.offsetTop+el.offsetHeight)};m();const t=setTimeout(m,100);window.addEventListener("resize",m);return()=>{clearTimeout(t);window.removeEventListener("resize",m)}},[]);
+  return bb;
+}
+
 function FloatingLabels({cardKey}){
   const[positions,setPositions]=useState(null);
-  const barEl=typeof document!=="undefined"&&document.getElementById('ukho-bar');
-  const topOff=(barEl?barEl.offsetTop+barEl.offsetHeight:HEADER_H+BAR_H)+12;
+  const barBottom=useBarBottom();
+  const topOff=barBottom+12;
   const h=typeof window!=="undefined"?window.innerHeight-topOff-16:500;
   useEffect(()=>{
     // After card animation settles, measure field positions
@@ -123,8 +129,8 @@ if(typeof window!=="undefined")window.addEventListener("resize",()=>{if(window.i
 /* ── Card — just the content, no animation here ── */
 function CardContent({ev,search,selected,showGreen,onClick}){
   const q=search.trim().toLowerCase();const hl=t=>!q?t:hlMatch(t,q);
-  const barEl=typeof document!=="undefined"&&document.getElementById('ukho-bar');
-  const topOff=(barEl?barEl.offsetTop+barEl.offsetHeight:HEADER_H+BAR_H)+12;
+  const barBottom=useBarBottom();
+  const topOff=barBottom+12;
   const cardH=stableVH.v-topOff-16;
   const outerRef=useRef(null);const innerRef=useRef(null);
   const[shrink,setShrink]=useState(1);
@@ -277,10 +283,10 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   },[isDesk,mode]);
 
   // ── EVERYTHING mode ──
-  if(mode==="everything"){const mH=document.getElementById('ukho-menu')?.offsetHeight||HEADER_H;const items=everything[evSec]||[];return(<>
+  if(mode==="everything"){const barB=document.getElementById('ukho-bar');const topH=barB?barB.offsetTop+barB.offsetHeight:(HEADER_H+BAR_H);const items=everything[evSec]||[];return(<>
     <div data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
-      <div style={{height:mH}}/>
-      <div style={{position:"sticky",top:mH,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"12px 20px":"8px 12px",display:"flex",gap:isDesk?8:0,flexWrap:"wrap",justifyContent:isDesk?"flex-start":"space-evenly"}}>{Object.keys(everything).map(s=><button key={s} onClick={()=>setEvSec(s)} style={{fontFamily:FONT,fontSize:isDesk?16:11,fontWeight:evSec===s?700:400,padding:isDesk?"8px 16px":"4px 9px",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button>)}</div>
+      <div style={{height:topH}}/>
+      <div style={{position:"sticky",top:topH,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"12px 20px":"8px 12px",display:"flex",gap:isDesk?8:0,flexWrap:"wrap",justifyContent:isDesk?"flex-start":"space-evenly"}}>{Object.keys(everything).map(s=><button key={s} onClick={()=>setEvSec(s)} style={{fontFamily:FONT,fontSize:isDesk?16:11,fontWeight:evSec===s?700:400,padding:isDesk?"8px 16px":"4px 9px",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button>)}</div>
       <div style={{padding:"12px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
         {items.map((item,i)=><div key={i} onClick={()=>jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
       </div></div>
@@ -291,13 +297,14 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   if(isDesk){
     const COLS="40px 2fr 2fr 2fr 1.2fr 1fr 0.8fr";
 
+    const barB2=document.getElementById('ukho-bar');const deskTopH=barB2?barB2.offsetTop+barB2.offsetHeight:menuH+BAR_H;
     return (<div style={{background:"white",minHeight:"100vh"}}>
       {/* Column headers */}
-      <div style={{position:"fixed",top:menuH,left:0,right:0,zIndex:940,background:"rgba(255,255,255,0.7)",backdropFilter:"blur(50px) saturate(180%)",WebkitBackdropFilter:"blur(50px) saturate(180%)",padding:"8px 16px",display:"grid",gridTemplateColumns:COLS,gap:8,boxShadow:"0 1px 8px rgba(0,0,0,0.04)"}}>
+      <div style={{position:"fixed",top:deskTopH,left:0,right:0,zIndex:940,background:"rgba(255,255,255,0.7)",backdropFilter:"blur(50px) saturate(180%)",WebkitBackdropFilter:"blur(50px) saturate(180%)",padding:"8px 16px",display:"grid",gridTemplateColumns:COLS,gap:8,boxShadow:"0 1px 8px rgba(0,0,0,0.04)"}}>
         {["#","name","performers","program","place","tags","date"].map(l=><div key={l} style={{fontFamily:FONT,fontSize:12,fontWeight:700,color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase"}}>{l}</div>)}
       </div>
       {/* Rows */}
-      <div style={{paddingTop:menuH+36,paddingBottom:40}}>
+      <div style={{paddingTop:deskTopH+36,paddingBottom:40}}>
         {filtered.map(e=>(
           <div key={e.id} className="ukho-row" onClick={()=>onOpenEvent?.(e)}>
             <div className="ukho-sel"/>
