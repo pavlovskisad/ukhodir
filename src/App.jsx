@@ -107,7 +107,7 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
       </div>
       {!hm&&<button style={bs} onClick={onTop}>▲</button>}{!hm&&<button style={bs} onClick={onBottom}>▼</button>}
       {hm&&<button style={bs} onClick={onPrev}>‹</button>}{hm&&<span style={{fontFamily:MONO,fontSize:dk?15:11,color:"rgba(0,0,0,0.35)",whiteSpace:"nowrap",letterSpacing:0,minWidth:dk?48:36,textAlign:"center"}}>{matchIdx+1}/{matchCount}</span>}{hm&&<button style={bs} onClick={onNext}>›</button>}
-      <button onClick={onToggleMode} style={{fontFamily:ARCH,fontSize:dk?42:28,fontWeight:400,padding:dk?"4px 12px":"1px 6px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:0,whiteSpace:"nowrap",height:dk?46:34,flexShrink:0,minWidth:dk?180:120,position:"relative",overflow:"hidden",textTransform:"lowercase",display:"flex",alignItems:"center",justifyContent:"center"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite 2s",pointerEvents:"none",opacity:0}}/></button>
+      <button onClick={onToggleMode} style={{fontFamily:ARCH,fontSize:dk?42:28,fontWeight:400,padding:dk?"4px 6px":"1px 3px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:0,whiteSpace:"nowrap",height:dk?46:34,flexShrink:0,position:"relative",overflow:"hidden",textTransform:"lowercase",display:"flex",alignItems:"center",justifyContent:"center"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite 2s",pointerEvents:"none",opacity:0}}/></button>
       <style>{`@keyframes evBlink{0%,100%{opacity:0.18}50%{opacity:0}}`}</style>
     </div>
     {years&&years.length>1&&<YearCarousel years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} dk={dk}/>}
@@ -684,14 +684,14 @@ function Home({setPage}){
       </div>
 
       {/* Stages + support — typewriter */}
-      <div style={{fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.6)",lineHeight:1.8,letterSpacing:"0px",margin:"32px 0 4px",whiteSpace:"pre-wrap"}}>
+      <div style={{fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.6)",lineHeight:1.8,letterSpacing:"0px",margin:"32px 0 0",whiteSpace:"pre-wrap"}}>
         {tw1.displayed}
         {!tw1.done&&<span style={{display:"inline-block",width:6,height:13,background:GREEN,animation:"hCur 0.7s step-end infinite",verticalAlign:"middle",marginLeft:2}}/>}
-        {tw1.done&&<div style={{marginTop:4}}><img src="https://raw.githubusercontent.com/pavlovskisad/ukhodir/main/goethe.PNG" alt="Goethe-Institut" style={{height:"clamp(120px,24vw,200px)",display:"block",opacity:0.7}}/></div>}
+        {tw1.done&&<div style={{marginTop:2}}><img src="https://raw.githubusercontent.com/pavlovskisad/ukhodir/main/goethe.PNG" alt="Goethe-Institut" style={{height:"clamp(160px,32vw,260px)",display:"block",opacity:0.7}}/></div>}
       </div>
 
       {/* Upcoming */}
-      <div style={{position:"relative",margin:"16px 0 48px"}}>
+      <div style={{position:"relative",margin:"8px 0 48px"}}>
         <div style={{fontFamily:ARCH,fontSize:"clamp(88px,22vw,176px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:1,letterSpacing:"-1px",position:"absolute",top:-10,left:0,pointerEvents:"none"}}>UPCOMING</div>
         <div style={{fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.55)",lineHeight:1.9,letterSpacing:"0px",paddingTop:40,whiteSpace:"pre-wrap"}}>
           {tw2.displayed}
