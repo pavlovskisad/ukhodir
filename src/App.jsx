@@ -7,7 +7,7 @@ import { PROGRAMS } from './programs.js';
 
 const FONT="'Satoshi',sans-serif";const MONO="'Geist Mono',monospace";
 const GREEN="#4af626";const BLUE="#0000ff";const HEADER_H=80;const BAR_H=48;
-const FIELD_KEYS=["name","performers","program","place","tags","date"];
+const FIELD_KEYS=["name","program","performers","place","tags","date"];
 const norm=s=>s.toLowerCase().replace(/[\u2018\u2019\u2032\u0060]/g,"'").replace(/[\u201c\u201d]/g,'"').normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 const strip=s=>norm(s).replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
 const ANIM_MS=400;
@@ -215,8 +215,8 @@ function CardContent({ev,search,selected,showGreen,onClick}){
       transition:"transform 0.2s ease",
     }}>
       <div data-field="name" style={{fontFamily:FONT,fontSize:"clamp(17px,4vw,28px)",fontWeight:600,color:"#000",lineHeight:1.15,letterSpacing:"-.5px",zIndex:1}}>{hl(ev.n)}</div>
-      <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
       <div data-field="program" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pr.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
+      <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
       <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35}}>{hl(ev.pl)}</div>
       <div data-field="tags" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35,textTransform:"lowercase"}}>{hl(ev.t)}</div>
       <div data-field="date" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35}}>{ev.d}</div>
@@ -363,7 +363,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     return (<div style={{background:"white",minHeight:"100vh"}}>
       {/* Column headers */}
       <div style={{position:"fixed",top:deskTopH,left:0,right:0,zIndex:940,background:"rgba(255,255,255,0.7)",backdropFilter:"blur(50px) saturate(180%)",WebkitBackdropFilter:"blur(50px) saturate(180%)",padding:"8px 16px",display:"grid",gridTemplateColumns:COLS,gap:8,boxShadow:"0 1px 8px rgba(0,0,0,0.04)"}}>
-        {["#","name","performers","program","place","tags","date"].map(l=><div key={l} style={{fontFamily:FONT,fontSize:12,fontWeight:700,color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase"}}>{l}</div>)}
+        {["#","name","program","performers","place","tags","date"].map(l=><div key={l} style={{fontFamily:FONT,fontSize:12,fontWeight:700,color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase"}}>{l}</div>)}
       </div>
       {/* Rows */}
       <div style={{paddingTop:deskTopH+36,paddingBottom:40}}>
@@ -372,8 +372,8 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
             <div className="ukho-sel"/>
             <div style={{fontFamily:FONT,fontSize:13,fontWeight:700,color:"rgba(0,0,0,0.1)"}}>{e.id}</div>
             <div style={{fontFamily:FONT,fontSize:13,fontWeight:600,color:"#000"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
-            <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.slice(0,3).map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}{e.pe.length>3&&<div style={{color:"rgba(0,0,0,0.2)"}}>+{e.pe.length-3}</div>}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pr.slice(0,2).map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
+            <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.slice(0,3).map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}{e.pe.length>3&&<div style={{color:"rgba(0,0,0,0.2)"}}>+{e.pe.length-3}</div>}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.2)"}}>{e.pl}</div>
             <div style={{fontFamily:FONT,fontSize:11,color:"rgba(0,0,0,0.2)"}}>{e.t}</div>
             <div style={{fontFamily:FONT,fontSize:11,color:"rgba(0,0,0,0.2)"}}>{e.d}</div>
@@ -522,8 +522,8 @@ function EventDetail({ev,onBack}){
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
     <div style={{fontFamily:FONT,fontSize:"clamp(50px,14vw,100px)",fontWeight:700,color:"rgba(0,0,0,0.06)",lineHeight:.85,letterSpacing:-3,marginBottom:8}}>{ev.id}</div>
     <div style={{marginBottom:24}}><div style={lb}>name</div><div style={{fontFamily:FONT,fontSize:"clamp(22px,5vw,36px)",fontWeight:600,color:"#000",lineHeight:1.2,letterSpacing:"-0.5px"}}>{ev.n}</div></div>
-    <div style={{marginBottom:20}}><div style={lb}>performers</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div></div>
     <div style={{marginBottom:20}}><div style={lb}>program</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pr.map((p,i)=><div key={i}>{p}</div>)}</div></div>
+    <div style={{marginBottom:20}}><div style={lb}>performers</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div></div>
     {ev.desc&&<div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.3)",lineHeight:1.7,marginBottom:20}}>{ev.desc.map((p,i)=><div key={i} style={{marginBottom:10}}>{p}</div>)}</div>}
     <div style={{marginBottom:8}}><div style={lb}>place</div><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)"}}>{ev.pl}</div></div>
     <div style={{marginBottom:8}}><div style={lb}>tags</div><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)",textTransform:"lowercase"}}>{ev.t}</div></div>
