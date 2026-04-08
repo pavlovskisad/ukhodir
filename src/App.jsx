@@ -218,9 +218,9 @@ function CardContent({ev,search,selected,showGreen,onClick}){
       <div data-field="name" style={{fontFamily:FONT,fontSize:"clamp(17px,4vw,28px)",fontWeight:600,color:"#000",lineHeight:1.15,letterSpacing:"-.5px",zIndex:1}}>{hl(ev.n)}</div>
       <div data-field="program" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pr.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
       <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
-      <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35}}>{hl(ev.pl)}</div>
-      <div data-field="tags" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35,textTransform:"lowercase"}}>{hl(ev.t)}</div>
-      <div data-field="date" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35}}>{ev.d}</div>
+      <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35}}>{hl(ev.pl)}</div>
+      <div data-field="tags" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35,textTransform:"lowercase"}}>{hl(ev.t)}</div>
+      <div data-field="date" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35}}>{ev.d}</div>
     </div>
   </div>);
 }
@@ -439,7 +439,7 @@ function PosterSlideIn({src,credit,alt}){
       transition:"transform 1.4s cubic-bezier(0.16,1,0.3,1), opacity 1.2s ease",
     }}>
       <img src={src} alt={alt||""} style={{width:"100%",display:"block",maxHeight:"80vh",objectFit:"contain",background:"white"}} loading="lazy"/>
-      {credit&&<div style={{fontFamily:FONT,fontSize:"clamp(10px,1.8vw,12px)",color:"rgba(0,0,0,0.2)",marginTop:8}}>poster by {credit}</div>}
+      {credit&&<div style={{fontFamily:FONT,fontSize:"clamp(11px,2vw,13px)",color:"rgba(0,0,0,0.4)",marginTop:8}}>poster by {credit}</div>}
     </div>
   </div>);
 }
