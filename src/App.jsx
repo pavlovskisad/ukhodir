@@ -888,6 +888,8 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
 
 function PortalsPage(){
   const mountRef=useRef(null);
+  const[loadProg,setLoadProg]=useState(0);
+  const[loaded,setLoaded]=useState(false);
   useEffect(()=>{
     const el=mountRef.current;if(!el)return;
     const w=el.clientWidth,h=el.clientHeight;
@@ -915,7 +917,8 @@ function PortalsPage(){
       group.position.sub(center);
       if(maxDim>0)group.scale.multiplyScalar(1.5/maxDim);
       scene.add(group);
-    },undefined,(err)=>console.error("USDZ load error:",err));
+      setLoaded(true);
+    },(xhr)=>{if(xhr.total>0)setLoadProg(Math.min(xhr.loaded/xhr.total,1));else setLoadProg(p=>Math.min(p+0.02,0.95))},(err)=>console.error("USDZ load error:",err));
     let raf;
     const animate=()=>{raf=requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)};
     animate();
@@ -923,8 +926,20 @@ function PortalsPage(){
     window.addEventListener("resize",onResize);
     return()=>{window.removeEventListener("resize",onResize);cancelAnimationFrame(raf);renderer.dispose();controls.dispose();if(el.contains(renderer.domElement))el.removeChild(renderer.domElement)};
   },[]);
+  const pct=loaded?100:Math.round(loadProg*100);
   return(<div style={{minHeight:"100vh",background:"#000",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",paddingTop:HEADER_H+20}}>
-    <div ref={mountRef} style={{width:"min(80vw,500px)",height:"min(80vw,500px)",position:"relative"}}/>
+    <div ref={mountRef} style={{width:"min(80vw,500px)",height:"min(80vw,500px)",position:"relative"}}>
+      {!loaded&&<div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:10,pointerEvents:"none"}}>
+        <style>{`@keyframes holo{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}@keyframes barPulse{0%,100%{box-shadow:0 0 8px rgba(74,246,38,0.4),0 0 20px rgba(74,246,38,0.15)}50%{box-shadow:0 0 14px rgba(74,246,38,0.7),0 0 30px rgba(74,246,38,0.25)}}@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}`}</style>
+        <div style={{width:"60%",maxWidth:220}}>
+          <div style={{height:3,borderRadius:2,background:"rgba(255,255,255,0.06)",position:"relative",overflow:"hidden",animation:"barPulse 2s ease-in-out infinite"}}>
+            <div style={{position:"absolute",top:0,left:0,height:"100%",width:pct+"%",borderRadius:2,background:"linear-gradient(90deg,#4af626,#00ffd5,#4af626,#00ffd5)",backgroundSize:"200% 100%",animation:"holo 3s ease infinite",transition:"width 0.3s ease"}}/>
+            <div style={{position:"absolute",top:0,left:0,width:pct+"%",height:"100%",overflow:"hidden"}}><div style={{width:"100%",height:"200%",background:"linear-gradient(180deg,transparent 40%,rgba(255,255,255,0.15) 50%,transparent 60%)",animation:"scanline 1.5s linear infinite"}}/></div>
+          </div>
+          <div style={{fontFamily:MONO,fontSize:10,color:"rgba(74,246,38,0.5)",marginTop:6,textAlign:"center",letterSpacing:2}}>{pct}%</div>
+        </div>
+      </div>}
+    </div>
     <div style={{fontFamily:FONT,fontSize:22,color:"rgba(255,255,255,0.15)",letterSpacing:1,marginTop:24}}>coming soon</div>
   </div>);
 }
