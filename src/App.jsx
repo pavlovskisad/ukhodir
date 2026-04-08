@@ -143,7 +143,7 @@ function CardContent({ev,search,selected,showGreen,onClick}){
     {showGreen&&<div style={{position:"absolute",inset:0,background:"rgba(74,246,38,0.12)",pointerEvents:"none",zIndex:0,transition:"background 0.1s"}}/>}
     <div style={{position:"absolute",top:8,left:12,fontFamily:FONT,fontSize:"clamp(52px,13vw,95px)",fontWeight:700,color:"rgba(0,0,0,0.08)",lineHeight:.85,letterSpacing:-3,pointerEvents:"none",transform:`scale(${shrink})`,transformOrigin:"top left",transition:"transform 0.2s ease"}}>{ev.id}</div>
     <div ref={innerRef} style={{
-      padding:"clamp(12px,3vw,28px) 14px clamp(16px,4vw,36px)",paddingRight:"clamp(56px,13vw,120px)",
+      padding:"clamp(12px,3vw,28px) 14px clamp(16px,4vw,36px)",paddingRight:"clamp(100px,22vw,140px)",
       display:"flex",flexDirection:"column",justifyContent:"space-between",gap:"clamp(8px,2vh,20px)",
       minHeight:`${100/shrink}%`,
       transform:`scale(${shrink})`,transformOrigin:"top left",
@@ -809,8 +809,8 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
         <div className={isMobile?undefined:"ukho-card-label"} style={{
           position:"absolute",top:6,left:8,
           fontFamily:FONT,fontSize:isMobile?"clamp(22px,6vw,36px)":"clamp(18px,2vw,28px)",
-          fontWeight:700,color:slide.imgs.length>0?"rgba(255,255,255,0.7)":"rgba(0,0,0,0.1)",
-          textShadow:slide.imgs.length>0?"0 1px 6px rgba(0,0,0,0.4)":"none",
+          fontWeight:700,color:slide.imgs.length>0?"rgba(0,0,255,0.6)":"rgba(0,0,255,0.15)",
+          textShadow:slide.imgs.length>0?"0 1px 6px rgba(0,0,0,0.3)":"none",
           pointerEvents:"none",letterSpacing:-1,lineHeight:1,zIndex:2,
           transformOrigin:"top left",
         }}>{slide.id}</div>
