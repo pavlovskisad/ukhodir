@@ -959,7 +959,7 @@ function PortalsPage(){
         </div>
       </div>}
     </div>
-    <div style={{fontFamily:FONT,fontSize:22,color:"rgba(255,255,255,0.15)",letterSpacing:1,marginTop:24}}>coming soon</div>
+    {loaded&&<div style={{fontFamily:FONT,fontSize:22,color:"rgba(255,255,255,0.15)",letterSpacing:1,marginTop:24}}>coming soon</div>}
   </div>);
 }
 
