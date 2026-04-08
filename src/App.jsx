@@ -48,37 +48,42 @@ function Menu({page,setPage}){
 
 function YearCarousel({years,yearFilter,setYearFilter,dk}){
   const n=years.length;
-  const angleStep=360/n;
-  const radius=dk?n*14:n*10;
-  const selIdx=years.indexOf(yearFilter);
-  const[angle,setAngle]=useState(selIdx>0?-selIdx*angleStep:0);
+  const itemW=dk?62:46;
+  const totalW=n*itemW;
+  const containerRef=useRef(null);
+  const[offset,setOffset]=useState(0);
   const[auto,setAuto]=useState(true);
-  const rafRef=useRef(null);const angleRef=useRef(angle);
-  angleRef.current=angle;
-  // Auto-rotate slowly
+  const touchRef=useRef({x:0,o:0});
+  const rafRef=useRef(null);
+  // Auto-scroll slowly
   useEffect(()=>{
     if(!auto)return;
     let last=performance.now();
-    const tick=()=>{const now=performance.now(),dt=(now-last)/1000;last=now;setAngle(a=>a-dt*3);rafRef.current=requestAnimationFrame(tick)};
+    const tick=()=>{const now=performance.now(),dt=(now-last)/1000;last=now;setOffset(o=>{let next=o-dt*(dk?20:15);if(next<-totalW)next+=totalW;return next});rafRef.current=requestAnimationFrame(tick)};
     rafRef.current=requestAnimationFrame(tick);
     return()=>cancelAnimationFrame(rafRef.current);
-  },[auto]);
-  // Stop auto on select, resume after 4s
-  const handleClick=(y,i)=>{setAuto(false);setAngle(-i*angleStep);setYearFilter(y);setTimeout(()=>setAuto(true),4000)};
-  return(<div style={{height:dk?28:22,perspective:400,overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center"}}>
-    <div style={{position:"relative",transformStyle:"preserve-3d",transform:`rotateY(${angle}deg)`,transition:auto?"none":"transform 0.5s cubic-bezier(0.25,1,0.5,1)",width:0,height:dk?28:22}}>
-      {years.map((y,i)=>{const a=i*angleStep;return(
-        <button key={y} onClick={()=>handleClick(y,i)} style={{
-          position:"absolute",left:"50%",top:0,
-          transform:`rotateY(${a}deg) translateZ(${radius}px) translateX(-50%)`,
-          backfaceVisibility:"hidden",
-          fontFamily:MONO,fontSize:dk?14:10,fontWeight:yearFilter===y?700:400,
-          padding:dk?"4px 12px":"2px 7px",
-          background:yearFilter===y?"rgba(74,246,38,0.15)":"none",
-          border:yearFilter===y?"1px solid rgba(74,246,38,0.3)":"1px solid rgba(0,0,0,0.06)",
-          cursor:"pointer",color:yearFilter===y?"#000":"rgba(0,0,0,0.35)",
-          letterSpacing:0.3,whiteSpace:"nowrap",
-        }}>{y}</button>)})}
+  },[auto,totalW,dk]);
+  const handleClick=(y,i)=>{setAuto(false);setYearFilter(y);
+    const cw=containerRef.current?.offsetWidth||300;
+    setOffset(-i*itemW+cw/2-itemW/2);
+    setTimeout(()=>setAuto(true),4000)};
+  const onTS=e=>{setAuto(false);touchRef.current={x:e.touches[0].clientX,o:offset}};
+  const onTM=e=>{const dx=e.touches[0].clientX-touchRef.current.x;setOffset(touchRef.current.o+dx)};
+  const onTE=()=>{setTimeout(()=>setAuto(true),3000)};
+  // Render 3 copies for seamless loop
+  const items=[];for(let c=0;c<3;c++)years.forEach((y,i)=>items.push({y,i,c}));
+  return(<div ref={containerRef} style={{overflow:"hidden",position:"relative",height:dk?28:22}}
+    onTouchStart={onTS} onTouchMove={onTM} onTouchEnd={onTE}>
+    <div style={{display:"flex",transform:`translateX(${offset}px)`,transition:auto?"none":"transform 0.4s cubic-bezier(0.25,1,0.5,1)",willChange:"transform"}}>
+      {items.map(({y,i,c})=><button key={`${c}-${y}`} onClick={()=>handleClick(y,i)} style={{
+        flexShrink:0,width:itemW,
+        fontFamily:MONO,fontSize:dk?14:10,fontWeight:yearFilter===y?700:400,
+        padding:dk?"4px 0":"2px 0",textAlign:"center",
+        background:yearFilter===y?"rgba(74,246,38,0.15)":"none",
+        border:yearFilter===y?"1px solid rgba(74,246,38,0.3)":"1px solid transparent",
+        cursor:"pointer",color:yearFilter===y?"#000":"rgba(0,0,0,0.35)",
+        letterSpacing:0.3,whiteSpace:"nowrap",
+      }}>{y}</button>)}
     </div>
   </div>);
 }
