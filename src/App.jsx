@@ -13,7 +13,7 @@ const strip=s=>norm(s).replace(/[\u0400-\u04ff]/g,c=>{const m={"\u0430":"a","\u0
 const PROG_MAP={"Johann Strauss II / arr. Alban Berg":5,"Johann Strauss II / arr. Anton Webern":5,"Johann Strauss II / arr. Arnold Schoenberg":5,'Carlo Gesualdo — "Mercè" grido piangendo (1611)':52,"Nataliia Polovynka, Slovo i Holos (Word and Voice)":46};
 const ANIM_MS=400;
 
-function BlinkRect(){const[on,setOn]=useState(false);useEffect(()=>{let t;const tick=()=>{setOn(true);setTimeout(()=>{setOn(false);t=setTimeout(tick,4000+Math.random()*8000)},Math.random()<.12?200:100)};t=setTimeout(tick,Math.random()*6000);return()=>clearTimeout(t)},[]);return <div style={{position:"absolute",inset:"-2px -6px",background:GREEN,opacity:on?.5:0,zIndex:-1,transition:"opacity 0.04s"}}/>}
+function BlinkRect(){const[on,setOn]=useState(false);useEffect(()=>{let t;const tick=()=>{setOn(true);setTimeout(()=>{setOn(false);t=setTimeout(tick,4000+Math.random()*8000)},Math.random()<.12?200:100)};t=setTimeout(tick,2000+Math.random()*6000);return()=>clearTimeout(t)},[]);return <div style={{position:"absolute",inset:"-2px -6px",background:GREEN,opacity:on?.5:0,zIndex:-1,transition:"opacity 0.04s"}}/>}
 
 function useSelBlink(){const[flash,setFlash]=useState(false);const t=useRef(null);
   const start=useCallback(()=>{const tick=()=>{setFlash(true);setTimeout(()=>{setFlash(false);t.current=setTimeout(tick,1500+Math.random()*2500)},120)};t.current=setTimeout(tick,800+Math.random()*1200)},[]);
@@ -107,7 +107,7 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
       </div>
       {!hm&&<button style={bs} onClick={onTop}>▲</button>}{!hm&&<button style={bs} onClick={onBottom}>▼</button>}
       {hm&&<button style={bs} onClick={onPrev}>‹</button>}{hm&&<span style={{fontFamily:MONO,fontSize:dk?15:11,color:"rgba(0,0,0,0.35)",whiteSpace:"nowrap",letterSpacing:0,minWidth:dk?48:36,textAlign:"center"}}>{matchIdx+1}/{matchCount}</span>}{hm&&<button style={bs} onClick={onNext}>›</button>}
-      <button onClick={onToggleMode} style={{fontFamily:FONT,fontSize:dk?16:13,fontWeight:400,padding:dk?"8px 20px":"5px 14px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:1.5,whiteSpace:"nowrap",height:dk?42:30,position:"relative",overflow:"hidden",textTransform:"lowercase"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite",pointerEvents:"none",opacity:0.18}}/></button>
+      <button onClick={onToggleMode} style={{fontFamily:FONT,fontSize:dk?16:13,fontWeight:400,padding:dk?"8px 20px":"5px 14px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:1.5,whiteSpace:"nowrap",height:dk?42:30,position:"relative",overflow:"hidden",textTransform:"lowercase"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite 2s",pointerEvents:"none",opacity:0}}/></button>
       <style>{`@keyframes evBlink{0%,100%{opacity:0.18}50%{opacity:0}}`}</style>
     </div>
     {years&&years.length>1&&<YearCarousel years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} dk={dk}/>}
