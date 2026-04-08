@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { USDLoader } from "three/addons/loaders/USDLoader.js";
 import { EVENTS, SLIDES, MEDIA, PERFORMERS } from './data.js';
+import { PROGRAMS } from './programs.js';
 
 const FONT="'Satoshi',sans-serif";const MONO="'Geist Mono',monospace";
 const GREEN="#4af626";const BLUE="#0000ff";const HEADER_H=80;const BAR_H=48;
@@ -317,7 +318,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     setTimeout(()=>{setTapped(false);onOpenEvent?.(ev)},400);
   };
 
-  const everything=useMemo(()=>({names:[...new Set(reversed.map(e=>e.n))].sort(),performers:PERFORMERS,programs:[...new Set(reversed.flatMap(e=>e.pr).filter(Boolean))].sort(),places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.flatMap(e=>/let us stay here/i.test(e.t)?[e.t]:e.t.split(',').map(t=>t.trim())).filter(Boolean))].sort()}),[reversed]);
+  const everything=useMemo(()=>({names:[...new Set(reversed.map(e=>e.n))].sort(),performers:PERFORMERS,programs:PROGRAMS,places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.flatMap(e=>/let us stay here/i.test(e.t)?[e.t]:e.t.split(',').map(t=>t.trim())).filter(Boolean))].sort()}),[reversed]);
   const[evSec,setEvSec]=useState("names");
   const cameFromEv=useRef(false);
   const setSearchSwitch=useCallback(v=>{setSearch(v);if(mode==="everything"&&v.trim().length>0){cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
