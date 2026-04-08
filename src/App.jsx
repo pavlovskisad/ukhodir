@@ -47,43 +47,45 @@ function Menu({page,setPage}){
 }
 
 function YearCarousel({years,yearFilter,setYearFilter,dk}){
-  const n=years.length;
+  const rest=years.filter(y=>y!==yearFilter);
+  const n=rest.length;
   const itemW=dk?62:46;
   const totalW=n*itemW;
   const containerRef=useRef(null);
   const[offset,setOffset]=useState(0);
-  const[auto,setAuto]=useState(true);
-  const touchRef=useRef({x:0,o:0});
   const rafRef=useRef(null);
-  // Auto-scroll slowly
+  const touchRef=useRef({x:0,o:0});
+  // Auto-scroll the non-selected years
   useEffect(()=>{
-    if(!auto)return;
     let last=performance.now();
-    const tick=()=>{const now=performance.now(),dt=(now-last)/1000;last=now;setOffset(o=>{let next=o-dt*(dk?20:15);if(next<-totalW)next+=totalW;return next});rafRef.current=requestAnimationFrame(tick)};
+    const tick=()=>{const now=performance.now(),dt=(now-last)/1000;last=now;setOffset(o=>{let next=o-dt*(dk?18:12);if(next<-totalW)next+=totalW;return next});rafRef.current=requestAnimationFrame(tick)};
     rafRef.current=requestAnimationFrame(tick);
     return()=>cancelAnimationFrame(rafRef.current);
-  },[auto,totalW,dk]);
-  const handleClick=(y,i)=>{setAuto(false);setYearFilter(y);
-    const cw=containerRef.current?.offsetWidth||300;
-    setOffset(-i*itemW+cw/2-itemW/2);
-    setTimeout(()=>setAuto(true),4000)};
-  const onTS=e=>{setAuto(false);touchRef.current={x:e.touches[0].clientX,o:offset}};
+  },[totalW,dk]);
+  const handleClick=(y)=>{setYearFilter(y);setOffset(0)};
+  const onTS=e=>{touchRef.current={x:e.touches[0].clientX,o:offset}};
   const onTM=e=>{const dx=e.touches[0].clientX-touchRef.current.x;setOffset(touchRef.current.o+dx)};
-  const onTE=()=>{setTimeout(()=>setAuto(true),3000)};
-  // Render 3 copies for seamless loop
-  const items=[];for(let c=0;c<3;c++)years.forEach((y,i)=>items.push({y,i,c}));
-  return(<div ref={containerRef} style={{overflow:"hidden",position:"relative",height:dk?28:22}}
-    onTouchStart={onTS} onTouchMove={onTM} onTouchEnd={onTE}>
-    <div style={{display:"flex",transform:`translateX(${offset}px)`,transition:auto?"none":"transform 0.4s cubic-bezier(0.25,1,0.5,1)",willChange:"transform"}}>
-      {items.map(({y,i,c})=><button key={`${c}-${y}`} onClick={()=>handleClick(y,i)} style={{
-        flexShrink:0,width:itemW,
-        fontFamily:MONO,fontSize:dk?14:10,fontWeight:yearFilter===y?700:400,
-        padding:dk?"4px 0":"2px 0",textAlign:"center",
-        background:yearFilter===y?"rgba(74,246,38,0.15)":"none",
-        border:yearFilter===y?"1px solid rgba(74,246,38,0.3)":"1px solid transparent",
-        cursor:"pointer",color:yearFilter===y?"#000":"rgba(0,0,0,0.35)",
-        letterSpacing:0.3,whiteSpace:"nowrap",
-      }}>{y}</button>)}
+  // 3 copies for loop
+  const items=[];for(let c=0;c<3;c++)rest.forEach((y,i)=>items.push({y,c}));
+  return(<div style={{display:"flex",alignItems:"center",gap:dk?8:4,height:dk?28:22}}>
+    <button onClick={()=>handleClick(yearFilter)} style={{
+      flexShrink:0,fontFamily:MONO,fontSize:dk?14:11,fontWeight:700,
+      padding:dk?"4px 12px":"2px 8px",
+      background:"rgba(74,246,38,0.15)",border:"1px solid rgba(74,246,38,0.3)",
+      cursor:"pointer",color:"#000",letterSpacing:0.3,whiteSpace:"nowrap",
+    }}>{yearFilter}</button>
+    <div ref={containerRef} style={{flex:1,overflow:"hidden",position:"relative",height:"100%"}}
+      onTouchStart={onTS} onTouchMove={onTM}>
+      <div style={{display:"flex",transform:`translateX(${offset}px)`,willChange:"transform",height:"100%",alignItems:"center"}}>
+        {items.map(({y},idx)=><button key={idx} onClick={()=>handleClick(y)} style={{
+          flexShrink:0,width:itemW,
+          fontFamily:MONO,fontSize:dk?14:10,fontWeight:400,
+          padding:dk?"4px 0":"2px 0",textAlign:"center",
+          background:"none",border:"1px solid transparent",
+          cursor:"pointer",color:"rgba(0,0,0,0.3)",
+          letterSpacing:0.3,whiteSpace:"nowrap",
+        }}>{y}</button>)}
+      </div>
     </div>
   </div>);
 }
