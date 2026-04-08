@@ -46,6 +46,43 @@ function Menu({page,setPage}){
   </div>);
 }
 
+function YearCarousel({years,yearFilter,setYearFilter,dk}){
+  const n=years.length;
+  const angleStep=360/n;
+  const radius=dk?n*14:n*10;
+  const selIdx=years.indexOf(yearFilter);
+  const[angle,setAngle]=useState(selIdx>0?-selIdx*angleStep:0);
+  const[auto,setAuto]=useState(true);
+  const rafRef=useRef(null);const angleRef=useRef(angle);
+  angleRef.current=angle;
+  // Auto-rotate slowly
+  useEffect(()=>{
+    if(!auto)return;
+    let last=performance.now();
+    const tick=()=>{const now=performance.now(),dt=(now-last)/1000;last=now;setAngle(a=>a-dt*3);rafRef.current=requestAnimationFrame(tick)};
+    rafRef.current=requestAnimationFrame(tick);
+    return()=>cancelAnimationFrame(rafRef.current);
+  },[auto]);
+  // Stop auto on select, resume after 4s
+  const handleClick=(y,i)=>{setAuto(false);setAngle(-i*angleStep);setYearFilter(y);setTimeout(()=>setAuto(true),4000)};
+  return(<div style={{height:dk?28:22,perspective:400,overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center"}}>
+    <div style={{position:"relative",transformStyle:"preserve-3d",transform:`rotateY(${angle}deg)`,transition:auto?"none":"transform 0.5s cubic-bezier(0.25,1,0.5,1)",width:0,height:dk?28:22}}>
+      {years.map((y,i)=>{const a=i*angleStep;return(
+        <button key={y} onClick={()=>handleClick(y,i)} style={{
+          position:"absolute",left:"50%",top:0,
+          transform:`rotateY(${a}deg) translateZ(${radius}px) translateX(-50%)`,
+          backfaceVisibility:"hidden",
+          fontFamily:MONO,fontSize:dk?14:10,fontWeight:yearFilter===y?700:400,
+          padding:dk?"4px 12px":"2px 7px",
+          background:yearFilter===y?"rgba(74,246,38,0.15)":"none",
+          border:yearFilter===y?"1px solid rgba(74,246,38,0.3)":"1px solid rgba(0,0,0,0.06)",
+          cursor:"pointer",color:yearFilter===y?"#000":"rgba(0,0,0,0.35)",
+          letterSpacing:0.3,whiteSpace:"nowrap",
+        }}>{y}</button>)})}
+    </div>
+  </div>);
+}
+
 function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPrev,onNext,matchIdx,matchCount,years,yearFilter,setYearFilter}){
   const dk=typeof window!=="undefined"&&window.innerWidth>768;
   const bs={width:dk?42:30,height:dk?42:30,border:"1px solid rgba(0,0,0,0.08)",background:"rgba(255,255,255,0.4)",cursor:"pointer",fontFamily:MONO,fontSize:dk?16:12,display:"flex",alignItems:"center",justifyContent:"center",padding:0,color:"#000"};
@@ -62,9 +99,7 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
       <button onClick={onToggleMode} style={{fontFamily:FONT,fontSize:dk?15:11,fontWeight:600,padding:dk?"8px 16px":"5px 10px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:0.3,whiteSpace:"nowrap",height:dk?42:30,position:"relative",overflow:"hidden"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite",pointerEvents:"none",opacity:0.18}}/></button>
       <style>{`@keyframes evBlink{0%,100%{opacity:0.18}50%{opacity:0}}`}</style>
     </div>
-    {years&&years.length>1&&<div style={{display:"flex",gap:dk?6:4,overflowX:"auto",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
-      {years.map(y=><button key={y} onClick={()=>setYearFilter(y)} style={{fontFamily:MONO,fontSize:dk?14:10,fontWeight:yearFilter===y?700:400,padding:dk?"4px 12px":"2px 7px",background:yearFilter===y?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:yearFilter===y?"#000":"rgba(0,0,0,0.35)",letterSpacing:0.3,whiteSpace:"nowrap",flexShrink:0}}>{y}</button>)}
-    </div>}
+    {years&&years.length>1&&<YearCarousel years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} dk={dk}/>}
   </div>);
 }
 
