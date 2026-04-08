@@ -38,11 +38,11 @@ function scrollPageToTop(){
 function Menu({page,setPage}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
-  const bs={position:"relative",fontFamily:FONT,fontWeight:600,fontSize:isMob?"clamp(18px,4vw,26px)":"clamp(24px,2.5vw,34px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"5px 0",letterSpacing:"-0.3px",textTransform:"lowercase",zIndex:1,textDecoration:"underline",textUnderlineOffset:"3px"};
+  const bs={position:"relative",fontFamily:FONT,fontWeight:400,fontSize:isMob?"clamp(16px,4vw,22px)":"clamp(22px,2.5vw,30px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"5px 0",letterSpacing:"1.5px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
   return (<div id="ukho-menu" style={{...panelStyle,top:0}}>
     <div onClick={scrollPageToTop} style={{position:"absolute",top:0,left:0,right:0,height:12,cursor:"pointer",zIndex:10}}/>
-    <div style={{padding:"7px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(22px,5vw,30px)":"clamp(28px,3vw,40px)",fontWeight:700}} onClick={()=>setPage("home")}>/dir</TapButton></div>
-    <div style={{display:"flex",justifyContent:"space-between",padding:"3px 14px 7px"}}>{pages.map(p=><TapButton key={p} style={{...bs,fontWeight:page===p?700:600,color:page===p?"rgba(0,0,0,0.3)":BLUE,textDecoration:page===p?"none":"underline"}} onClick={()=>setPage(p)}>/{p}</TapButton>)}</div>
+    <div style={{padding:"7px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(22px,5vw,30px)":"clamp(28px,3vw,40px)",fontWeight:600,letterSpacing:"2px"}} onClick={()=>setPage("home")}>/dir</TapButton></div>
+    <div style={{display:"flex",justifyContent:"space-between",padding:"3px 14px 7px"}}>{pages.map(p=><TapButton key={p} style={{...bs,fontWeight:page===p?600:400,color:page===p?"rgba(0,0,0,0.25)":BLUE}} onClick={()=>setPage(p)}>/{p}</TapButton>)}</div>
   </div>);
 }
 
@@ -103,7 +103,7 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
       </div>
       {!hm&&<button style={bs} onClick={onTop}>▲</button>}{!hm&&<button style={bs} onClick={onBottom}>▼</button>}
       {hm&&<button style={bs} onClick={onPrev}>‹</button>}{hm&&<span style={{fontFamily:MONO,fontSize:dk?15:11,color:"rgba(0,0,0,0.35)",whiteSpace:"nowrap",letterSpacing:0,minWidth:dk?48:36,textAlign:"center"}}>{matchIdx+1}/{matchCount}</span>}{hm&&<button style={bs} onClick={onNext}>›</button>}
-      <button onClick={onToggleMode} style={{fontFamily:FONT,fontSize:dk?15:11,fontWeight:600,padding:dk?"8px 16px":"5px 10px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:0.3,whiteSpace:"nowrap",height:dk?42:30,position:"relative",overflow:"hidden"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite",pointerEvents:"none",opacity:0.18}}/></button>
+      <button onClick={onToggleMode} style={{fontFamily:FONT,fontSize:dk?14:10,fontWeight:400,padding:dk?"8px 16px":"5px 10px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:1.5,whiteSpace:"nowrap",height:dk?42:30,position:"relative",overflow:"hidden",textTransform:"lowercase"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite",pointerEvents:"none",opacity:0.18}}/></button>
       <style>{`@keyframes evBlink{0%,100%{opacity:0.18}50%{opacity:0}}`}</style>
     </div>
     {years&&years.length>1&&<YearCarousel years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} dk={dk}/>}
@@ -523,7 +523,7 @@ function EventDetail({ev,onBack}){
   {(()=>{const slide=MEDIA.find(s=>s.id===ev.id);const imgs=slide?.imgs||[];if(!imgs.length)return ev.poster?null:<div style={{height:80}}/>;return(
     <div style={{maxWidth:860,margin:"0 auto",padding:"0 clamp(16px,4vw,40px)",paddingBottom:120}}>
       <div style={{position:"relative",marginBottom:24}}>
-        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:700,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-2px",pointerEvents:"none"}}>MEDIA</div>
+        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"4px",pointerEvents:"none"}}>MEDIA</div>
       </div>
       {imgs.map((src,i)=><PhotoSlideIn key={i} src={src} delay={i===0?1.8:1.2} index={i} onOpen={()=>setViewerIdx(i)}/>)}
     </div>);
@@ -538,7 +538,7 @@ function EventDetail({ev,onBack}){
     }}>▼</div>
   </>}
   <div style={{position:"fixed",bottom:20,right:20}}>
-    <TapButton onClick={onBack} style={{fontFamily:FONT,fontSize:"clamp(30px,6vw,46px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"underline",cursor:"pointer",padding:"6px 10px",lineHeight:1}}>back</TapButton>
+    <TapButton onClick={onBack} style={{fontFamily:FONT,fontSize:"clamp(26px,5vw,40px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",cursor:"pointer",padding:"6px 10px",lineHeight:1,letterSpacing:"1.5px"}}>back</TapButton>
   </div></div>)}
 
 /* ── Home canvas background ── */
@@ -645,7 +645,7 @@ function Home({setPage}){
       {/* Enter archive */}
       <div style={{margin:"40px 0"}}>
         <style>{`@keyframes hCur{0%,100%{opacity:1}50%{opacity:0}}`}</style>
-        <TapButton onClick={()=>setPage("cardindex")} style={{fontFamily:FONT,fontSize:"clamp(28px,7vw,52px)",fontWeight:700,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 16px",textDecoration:"underline",textUnderlineOffset:"6px",letterSpacing:"-1.5px",display:"inline-block"}}>
+        <TapButton onClick={()=>setPage("cardindex")} style={{fontFamily:FONT,fontSize:"clamp(26px,7vw,48px)",fontWeight:400,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 16px",textDecoration:"none",letterSpacing:"2px",display:"inline-block"}}>
           enter archive
         </TapButton>
       </div>
@@ -659,7 +659,7 @@ function Home({setPage}){
 
       {/* Upcoming */}
       <div style={{position:"relative",margin:"48px 0"}}>
-        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:700,color:"rgba(0,0,0,0.08)",lineHeight:1,letterSpacing:"-2px",position:"absolute",top:-10,left:0,pointerEvents:"none"}}>UPCOMING</div>
+        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:1,letterSpacing:"4px",position:"absolute",top:-10,left:0,pointerEvents:"none"}}>UPCOMING</div>
         <div style={{fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.55)",lineHeight:1.9,letterSpacing:"0px",paddingTop:40,whiteSpace:"pre-wrap"}}>
           {tw2.displayed}
           {!tw2.done&&<span style={{display:"inline-block",width:6,height:13,background:GREEN,animation:"hCur 0.7s step-end infinite",verticalAlign:"middle",marginLeft:2}}/>}
@@ -668,12 +668,12 @@ function Home({setPage}){
 
       {/* Umbrella */}
       <div style={{position:"relative",margin:"48px 0"}}>
-        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:700,color:"rgba(0,0,0,0.08)",lineHeight:1,letterSpacing:"-2px",position:"absolute",top:-10,left:0,pointerEvents:"none"}}>UMBRELLA</div>
+        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:1,letterSpacing:"4px",position:"absolute",top:-10,left:0,pointerEvents:"none"}}>UMBRELLA</div>
         <div style={{paddingTop:40,display:"flex",flexDirection:"column",gap:12}}>
-          <TapButton href="https://kyivdispat.ch" style={{fontFamily:FONT,fontSize:"clamp(22px,5.5vw,40px)",fontWeight:700,color:BLUE,background:"none",border:"none",textDecoration:"underline",textUnderlineOffset:"4px",letterSpacing:"-1.5px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
+          <TapButton href="https://kyivdispat.ch" style={{fontFamily:FONT,fontSize:"clamp(20px,5vw,36px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"1.5px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
             kyiv dispatch record label
           </TapButton>
-          <TapButton href="https://music.youtube.com/channel/UCOnv8gWUnKFFAC2So6EVS_Q" style={{fontFamily:FONT,fontSize:"clamp(22px,5.5vw,40px)",fontWeight:700,color:BLUE,background:"none",border:"none",textDecoration:"underline",textUnderlineOffset:"4px",letterSpacing:"-1.5px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
+          <TapButton href="https://music.youtube.com/channel/UCOnv8gWUnKFFAC2So6EVS_Q" style={{fontFamily:FONT,fontSize:"clamp(20px,5vw,36px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"1.5px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
             ukho ensemble kyiv
           </TapButton>
         </div>
@@ -686,8 +686,8 @@ function Home({setPage}){
 
       {/* Social links */}
       <div style={{display:"flex",gap:24,alignItems:"center",margin:"24px 0 40px"}}>
-        <TapButton href="https://www.instagram.com/ukho.music/" style={{fontFamily:FONT,fontSize:"clamp(18px,4vw,28px)",fontWeight:700,color:BLUE,background:"none",border:"none",textDecoration:"underline",textUnderlineOffset:"3px",letterSpacing:"-0.5px",cursor:"pointer",padding:"4px 8px"}}>inst</TapButton>
-        <TapButton href="https://www.facebook.com/ukhomusic" style={{fontFamily:FONT,fontSize:"clamp(18px,4vw,28px)",fontWeight:700,color:BLUE,background:"none",border:"none",textDecoration:"underline",textUnderlineOffset:"3px",letterSpacing:"-0.5px",cursor:"pointer",padding:"4px 8px"}}>fb</TapButton>
+        <TapButton href="https://www.instagram.com/ukho.music/" style={{fontFamily:FONT,fontSize:"clamp(16px,4vw,24px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"1.5px",cursor:"pointer",padding:"4px 8px"}}>inst</TapButton>
+        <TapButton href="https://www.facebook.com/ukhomusic" style={{fontFamily:FONT,fontSize:"clamp(16px,4vw,24px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"1.5px",cursor:"pointer",padding:"4px 8px"}}>fb</TapButton>
       </div>
 
     </div>
