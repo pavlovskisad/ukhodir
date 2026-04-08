@@ -7,7 +7,7 @@ import { PROGRAMS } from './programs.js';
 
 const FONT="'Satoshi',sans-serif";const MONO="'Geist Mono',monospace";
 const GREEN="#4af626";const BLUE="#0000ff";const HEADER_H=80;const BAR_H=48;
-const FIELD_KEYS=["name","performers","program","place","tags","date"];
+const FIELD_KEYS=["name","program","performers","place","tags","date"];
 const norm=s=>s.toLowerCase().replace(/[\u2018\u2019\u2032\u0060]/g,"'").replace(/[\u201c\u201d]/g,'"').normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 const strip=s=>norm(s).replace(/[\u0400-\u04ff]/g,c=>{const m={"\u0430":"a","\u0435":"e","\u043e":"o","\u0440":"p","\u0441":"c","\u0443":"y","\u0445":"x","\u0456":"i","\u0457":"i"};return m[c]||""}).replace(/[^a-z0-9]/g,"");
 const PROG_MAP={"Johann Strauss II / arr. Alban Berg":5,"Johann Strauss II / arr. Anton Webern":5,"Johann Strauss II / arr. Arnold Schoenberg":5,'Carlo Gesualdo — "Mercè" grido piangendo (1611)':52,"Nataliia Polovynka, Slovo i Holos (Word and Voice)":46};
@@ -216,8 +216,8 @@ function CardContent({ev,search,selected,showGreen,onClick}){
       transition:"transform 0.2s ease",
     }}>
       <div data-field="name" style={{fontFamily:FONT,fontSize:"clamp(17px,4vw,28px)",fontWeight:600,color:"#000",lineHeight:1.15,letterSpacing:"-.5px",zIndex:1}}>{hl(ev.n)}</div>
-      <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
       <div data-field="program" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pr.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
+      <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
       <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35}}>{hl(ev.pl)}</div>
       <div data-field="tags" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35,textTransform:"lowercase"}}>{hl(ev.t)}</div>
       <div data-field="date" style={{fontFamily:FONT,fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35}}>{ev.d}</div>
@@ -336,7 +336,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     setTimeout(()=>{setTapped(false);onOpenEvent?.(ev)},400);
   };
 
-  const everything=useMemo(()=>({names:[...new Set(reversed.map(e=>e.n))].sort(),performers:PERFORMERS,programs:PROGRAMS,places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.flatMap(e=>/let us stay here/i.test(e.t)?[e.t]:e.t.split(',').map(t=>t.trim())).filter(Boolean))].sort()}),[reversed]);
+  const everything=useMemo(()=>({names:[...new Set(reversed.map(e=>e.n))].sort(),performers:PERFORMERS,pieces:PROGRAMS,places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.flatMap(e=>/let us stay here/i.test(e.t)?[e.t]:e.t.split(',').map(t=>t.trim())).filter(Boolean))].sort()}),[reversed]);
   const[evSec,setEvSec]=useState("names");
   const cameFromEv=useRef(false);
   const setSearchSwitch=useCallback(v=>{setSearch(v);if(mode==="everything"&&v.trim().length>0){cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
@@ -360,7 +360,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
       <div style={{height:topH}}/>
       <div style={{position:"sticky",top:topH,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"12px 20px":"8px 12px",display:"flex",gap:isDesk?8:0,flexWrap:"wrap",justifyContent:isDesk?"flex-start":"space-evenly"}}>{Object.keys(everything).map(s=><button key={s} onClick={()=>setEvSec(s)} style={{fontFamily:FONT,fontSize:isDesk?16:11,fontWeight:evSec===s?700:400,padding:isDesk?"8px 16px":"4px 9px",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button>)}</div>
       <div style={{padding:"12px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
-        {items.map((item,i)=><div key={i} onClick={()=>evSec==="programs"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
+        {items.map((item,i)=><div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
       </div></div>
     </div>
     <BottomBar search={search} setSearch={setSearchSwitch} onTop={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:0,behavior:"smooth"})}} onBottom={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:el.scrollHeight,behavior:"smooth"})}} onToggleMode={()=>setMode("list")} modeLabel="list"/></>)}
@@ -373,7 +373,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     return (<div style={{background:"white",minHeight:"100vh"}}>
       {/* Column headers */}
       <div style={{position:"fixed",top:deskTopH,left:0,right:0,zIndex:940,background:"rgba(255,255,255,0.7)",backdropFilter:"blur(50px) saturate(180%)",WebkitBackdropFilter:"blur(50px) saturate(180%)",padding:"8px 16px",display:"grid",gridTemplateColumns:COLS,gap:8,boxShadow:"0 1px 8px rgba(0,0,0,0.04)"}}>
-        {["#","name","performers","program","place","tags","date"].map(l=><div key={l} style={{fontFamily:FONT,fontSize:12,fontWeight:700,color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase"}}>{l}</div>)}
+        {["#","name","program","performers","place","tags","date"].map(l=><div key={l} style={{fontFamily:FONT,fontSize:12,fontWeight:700,color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase"}}>{l}</div>)}
       </div>
       {/* Rows */}
       <div style={{paddingTop:deskTopH+36,paddingBottom:40}}>
@@ -382,8 +382,8 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
             <div className="ukho-sel"/>
             <div style={{fontFamily:FONT,fontSize:13,fontWeight:700,color:"rgba(0,0,0,0.1)"}}>{e.id}</div>
             <div style={{fontFamily:FONT,fontSize:13,fontWeight:600,color:"#000"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
-            <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.slice(0,3).map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}{e.pe.length>3&&<div style={{color:"rgba(0,0,0,0.2)"}}>+{e.pe.length-3}</div>}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pr.slice(0,2).map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
+            <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.slice(0,3).map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}{e.pe.length>3&&<div style={{color:"rgba(0,0,0,0.2)"}}>+{e.pe.length-3}</div>}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.2)"}}>{e.pl}</div>
             <div style={{fontFamily:FONT,fontSize:11,color:"rgba(0,0,0,0.2)"}}>{e.t}</div>
             <div style={{fontFamily:FONT,fontSize:11,color:"rgba(0,0,0,0.2)"}}>{e.d}</div>
@@ -532,8 +532,8 @@ function EventDetail({ev,onBack}){
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
     <div style={{fontFamily:FONT,fontSize:"clamp(50px,14vw,100px)",fontWeight:700,color:"rgba(0,0,0,0.06)",lineHeight:.85,letterSpacing:-3,marginBottom:8}}>{ev.id}</div>
     <div style={{marginBottom:24}}><div style={lb}>name</div><div style={{fontFamily:FONT,fontSize:"clamp(22px,5vw,36px)",fontWeight:600,color:"#000",lineHeight:1.2,letterSpacing:"-0.5px"}}>{ev.n}</div></div>
-    <div style={{marginBottom:20}}><div style={lb}>performers</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div></div>
     <div style={{marginBottom:20}}><div style={lb}>program</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pr.map((p,i)=><div key={i}>{p}</div>)}</div></div>
+    <div style={{marginBottom:20}}><div style={lb}>performers</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div></div>
     {ev.desc&&<div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.3)",lineHeight:1.7,marginBottom:20}}>{ev.desc.map((p,i)=><div key={i} style={{marginBottom:10}}>{p}</div>)}</div>}
     <div style={{marginBottom:8}}><div style={lb}>place</div><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)"}}>{ev.pl}</div></div>
     <div style={{marginBottom:8}}><div style={lb}>tags</div><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)",textTransform:"lowercase"}}>{ev.t}</div></div>
