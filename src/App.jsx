@@ -54,7 +54,6 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
   const rest=years.filter(y=>y!==yearFilter);
   const n=rest.length;
   const itemW=dk?62:52;
-  const totalW=n*itemW;
   const containerRef=useRef(null);
   const[offset,setOffset]=useState(0);
   const rafRef=useRef(null);
@@ -62,15 +61,16 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
   // Auto-scroll the non-selected years
   useEffect(()=>{
     let last=performance.now();
-    const tick=()=>{const now=performance.now(),dt=(now-last)/1000;last=now;setOffset(o=>{let next=o-dt*(dk?18:12);if(next<-totalW)next+=totalW;return next});rafRef.current=requestAnimationFrame(tick)};
+    const tick=()=>{const now=performance.now(),dt=(now-last)/1000;last=now;setOffset(o=>{let next=o-dt*(dk?18:12);if(next<-loopW)next+=loopW;return next});rafRef.current=requestAnimationFrame(tick)};
     rafRef.current=requestAnimationFrame(tick);
     return()=>cancelAnimationFrame(rafRef.current);
-  },[totalW,dk]);
+  },[loopW,dk]);
   const handleClick=(y)=>{setYearFilter(y);setOffset(0)};
   const onTS=e=>{touchRef.current={x:e.touches[0].clientX,o:offset}};
   const onTM=e=>{const dx=e.touches[0].clientX-touchRef.current.x;setOffset(touchRef.current.o+dx)};
-  // 3 copies for loop
-  const items=[];for(let c=0;c<3;c++)rest.forEach((y,i)=>items.push({y,c}));
+  const sepW=dk?32:24;
+  const loopW=n*itemW+sepW;
+  const items=[];for(let c=0;c<3;c++){rest.forEach((y)=>items.push({y,sep:false}));items.push({y:null,sep:true});}
   return(<div style={{display:"flex",alignItems:"center",gap:dk?8:4,height:dk?28:26}}>
     <button onClick={()=>handleClick(yearFilter)} style={{
       flexShrink:0,fontFamily:MONO,fontSize:dk?14:13,fontWeight:700,
@@ -81,7 +81,7 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
     <div ref={containerRef} style={{flex:1,overflow:"hidden",position:"relative",height:"100%"}}
       onTouchStart={onTS} onTouchMove={onTM}>
       <div style={{display:"flex",transform:`translateX(${offset}px)`,willChange:"transform",height:"100%",alignItems:"center"}}>
-        {items.map(({y},idx)=><button key={idx} onClick={()=>handleClick(y)} style={{
+        {items.map(({y,sep},idx)=>sep?<div key={idx} style={{flexShrink:0,width:sepW,display:"flex",alignItems:"center",justifyContent:"center",color:"rgba(0,0,0,0.1)",fontSize:dk?10:8}}>·</div>:<button key={idx} onClick={()=>handleClick(y)} style={{
           flexShrink:0,width:itemW,
           fontFamily:MONO,fontSize:dk?14:12,fontWeight:400,
           padding:dk?"4px 0":"3px 0",textAlign:"center",
