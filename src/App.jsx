@@ -297,7 +297,9 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
 
   const prevEvRef=useRef(null);
   const mountedRef=useRef(false);
+  const swipeClearedRef=useRef(false);
   useEffect(()=>{if(!mountedRef.current){mountedRef.current=true;return;}
+    if(swipeClearedRef.current){swipeClearedRef.current=false;return;}
     // When clearing search, return to everything if came from there
     if(!search.trim()){
       if(cameFromEv.current){cameFromEv.current=false;setMode("everything");return;}
@@ -314,7 +316,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const go=useCallback((ni,dir)=>{
     if(cameFromEv.current&&search.trim()){
       const curEv=filtered[idx];
-      cameFromEv.current=false;
+      cameFromEv.current=false;swipeClearedRef.current=true;
       const fullList=yearFilter!=="all"?reversed.filter(e=>e.d.includes(yearFilter)):reversed;
       const newIdx=curEv?fullList.findIndex(e=>e.id===curEv.id):0;
       const target=dir==="Up"?Math.min(newIdx+1,fullList.length-1):Math.max(newIdx-1,0);
