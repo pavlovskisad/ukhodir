@@ -1204,8 +1204,9 @@ export default function App(){const[page,setPage]=useState("home");const[openEve
   // Browser back button support
   useEffect(()=>{const onPop=()=>{if(openEvent){setOpenEvent(null);if(prevPage)setPage(prevPage)}};window.addEventListener("popstate",onPop);return()=>window.removeEventListener("popstate",onPop)},[openEvent,prevPage]);
   const handleRollEvent=useCallback(()=>{const other=EVENTS.filter(e=>e.id!==openEvent?.id);const ev=other[Math.floor(Math.random()*other.length)];if(ev){setOpenEvent(ev);window.scrollTo(0,0);window.history.pushState({event:ev.id},"")}},[openEvent]);
-  if(openEvent) return (<><EventDetail ev={openEvent} onBack={handleBack}/><FloatingDice onRoll={handleRollEvent}/><AnalogOverlay/></>);
+  if(openEvent) return (<><style>{`button,a{transition:transform 0.12s ease!important}button:hover,a:hover{transform:scale(0.95)!important}button:active,a:active{transform:scale(0.90)!important}`}</style><EventDetail ev={openEvent} onBack={handleBack}/><FloatingDice onRoll={handleRollEvent}/><AnalogOverlay/></>);
   return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden"}}>
+    <style>{`button,a{transition:transform 0.12s ease!important}button:hover,a:hover{transform:scale(0.95)!important}button:active,a:active{transform:scale(0.90)!important}`}</style>
     {page!=="home"&&<Menu page={page} setPage={setPage}/>}
     {page==="home"&&<Home setPage={setPage}/>}
     {page==="list"&&<ListPage events={EVENTS} onOpenEvent={handleOpenEvent} idxRef={listIdxRef} searchRef={listSearchRef} yearRef={listYearRef} modeRef={listModeRef} scrollRef={listScrollRef}/>}
