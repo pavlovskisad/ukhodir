@@ -230,7 +230,7 @@ function hlMatch(text,q){const i=text.toLowerCase().indexOf(q);if(i===-1)return 
 function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef}){
   const reversed=useMemo(()=>[...events].reverse(),[events]);
   const[search,_setSearch]=useState(searchRef?.current||"");const[idx,_setIdx]=useState(idxRef?.current||0);const[mode,_setMode]=useState(modeRef?.current||"list");
-  const setSearch=v=>{progTerms.current=null;_setSearch(v);if(searchRef)searchRef.current=v};
+  const setSearch=v=>{setProgTerms(null);_setSearch(v);if(searchRef)searchRef.current=v};
   const setIdx=v=>{_setIdx(v);if(idxRef)idxRef.current=v};
   const setMode=v=>{_setMode(v);if(modeRef)modeRef.current=v};
   const[selected,setSelected]=useState(false);const selBlink=useSelBlink();
@@ -271,20 +271,19 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     return["all",...[...yrs].sort().reverse()];
   },[reversed]);
 
-  const progTerms=useRef(null);
+  const[progTerms,setProgTerms]=useState(null);
   const filtered=useMemo(()=>{
     let list=reversed;
     if(yearFilter!=="all")list=list.filter(e=>e.d.includes(yearFilter));
     if(search.trim()){
-      const pt=progTerms.current;
-      if(pt&&(pt.composer||pt.title)){
-        list=list.filter(e=>e.pr.some(p=>{const s=strip(p);return(!pt.composer||s.includes(pt.composer))&&(!pt.title||s.includes(pt.title))}));
+      if(progTerms&&(progTerms.composer||progTerms.title)){
+        list=list.filter(e=>e.pr.some(p=>{const s=strip(p);return(!progTerms.composer||s.includes(progTerms.composer))&&(!progTerms.title||s.includes(progTerms.title))}));
       }else{
         const q=norm(search);list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q));
       }
     }
     return list;
-  },[reversed,search,yearFilter]);
+  },[reversed,search,yearFilter,progTerms]);
 
   const prevEvRef=useRef(null);
   const mountedRef=useRef(false);
@@ -330,9 +329,9 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const everything=useMemo(()=>({names:[...new Set(reversed.map(e=>e.n))].sort(),performers:PERFORMERS,programs:PROGRAMS,places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.flatMap(e=>/let us stay here/i.test(e.t)?[e.t]:e.t.split(',').map(t=>t.trim())).filter(Boolean))].sort()}),[reversed]);
   const[evSec,setEvSec]=useState("names");
   const cameFromEv=useRef(false);
-  const setSearchSwitch=useCallback(v=>{progTerms.current=null;setSearch(v);if(mode==="everything"&&v.trim().length>0){cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
-  const jumpFrom=useCallback(t=>{progTerms.current=null;setYearFilter("all");setSearch(t);cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
-  const jumpFromProgram=useCallback(t=>{const dash=t.match(/\s[—–\-]\s/);let composer="",title="";if(dash){composer=t.slice(0,dash.index).trim();const rest=t.slice(dash.index+dash[0].length);const ym=rest.match(/^(.+?)\s*[\(\[]/);title=ym?ym[1].trim():rest.split(/ for /)[0].trim();}else{title=t.split(/ for /)[0].trim();}setYearFilter("all");setSearch(t);progTerms.current={composer:strip(composer),title:strip(title)};cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
+  const setSearchSwitch=useCallback(v=>{setSearch(v);if(mode==="everything"&&v.trim().length>0){cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
+  const jumpFrom=useCallback(t=>{setYearFilter("all");setSearch(t);cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
+  const jumpFromProgram=useCallback(t=>{const dash=t.match(/\s[—–\-]\s/);let composer="",title="";if(dash){composer=t.slice(0,dash.index).trim();const rest=t.slice(dash.index+dash[0].length);const ym=rest.match(/^(.+?)\s*[\(\[]/);title=ym?ym[1].trim():rest.split(/ for /)[0].trim();}else{title=t.split(/ for /)[0].trim();}setYearFilter("all");_setSearch(t);if(searchRef)searchRef.current=t;setProgTerms({composer:strip(composer),title:strip(title)});cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
 
   const ev=filtered[idx];
   // Restore & save desktop scroll position
