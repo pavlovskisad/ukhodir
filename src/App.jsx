@@ -9,6 +9,8 @@ const FONT="'Satoshi',sans-serif";const MONO="'Geist Mono',monospace";
 const GREEN="#4af626";const BLUE="#0000ff";const HEADER_H=80;const BAR_H=48;
 const FIELD_KEYS=["name","performers","program","place","tags","date"];
 const norm=s=>s.toLowerCase().replace(/[\u2018\u2019\u2032\u0060]/g,"'").replace(/[\u201c\u201d]/g,'"').normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const strip=s=>norm(s).replace(/[\u0400-\u04ff]/g,c=>{const m={"\u0430":"a","\u0435":"e","\u043e":"o","\u0440":"p","\u0441":"c","\u0443":"y","\u0445":"x","\u0456":"i","\u0457":"i"};return m[c]||""}).replace(/[^a-z0-9]/g,"");
+const PROG_MAP={"Johann Strauss II / arr. Alban Berg":5,"Johann Strauss II / arr. Anton Webern":5,"Johann Strauss II / arr. Arnold Schoenberg":5,'Carlo Gesualdo — "Mercè" grido piangendo (1611)':52,"Nataliia Polovynka, Slovo i Holos (Word and Voice)":46};
 const ANIM_MS=400;
 
 function BlinkRect(){const[on,setOn]=useState(false);useEffect(()=>{let t;const tick=()=>{setOn(true);setTimeout(()=>{setOn(false);t=setTimeout(tick,4000+Math.random()*8000)},Math.random()<.12?200:100)};t=setTimeout(tick,Math.random()*6000);return()=>clearTimeout(t)},[]);return <div style={{position:"absolute",inset:"-2px -6px",background:GREEN,opacity:on?.5:0,zIndex:-1,transition:"opacity 0.04s"}}/>}
@@ -229,7 +231,8 @@ function hlMatch(text,q){const i=text.toLowerCase().indexOf(q);if(i===-1)return 
 function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef}){
   const reversed=useMemo(()=>[...events].reverse(),[events]);
   const[search,_setSearch]=useState(searchRef?.current||"");const[idx,_setIdx]=useState(idxRef?.current||0);const[mode,_setMode]=useState(modeRef?.current||"list");
-  const setSearch=v=>{_setSearch(v);if(searchRef)searchRef.current=v};
+  const[progTerms,setProgTerms]=useState(null);
+  const setSearch=v=>{setProgTerms(null);_setSearch(v);if(searchRef)searchRef.current=v};
   const setIdx=v=>{_setIdx(v);if(idxRef)idxRef.current=v};
   const setMode=v=>{_setMode(v);if(modeRef)modeRef.current=v};
   const[selected,setSelected]=useState(false);const selBlink=useSelBlink();
@@ -273,9 +276,24 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const filtered=useMemo(()=>{
     let list=reversed;
     if(yearFilter!=="all")list=list.filter(e=>e.d.includes(yearFilter));
-    if(search.trim()){const q=norm(search);list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q));}
+    if(search.trim()){
+      if(progTerms){
+        const{composer,title,names,raw}=progTerms;
+        const hcKey=raw&&Object.keys(PROG_MAP).find(k=>raw===k||raw.startsWith(k));const hcId=hcKey?PROG_MAP[hcKey]:0;
+        if(hcId){list=list.filter(e=>e.id===hcId);}
+        else{const matchEv=e=>{const all=s=>[...e.pr,...e.pe,e.n].some(p=>strip(p).includes(s));
+          if(composer&&title&&e.pr.some(p=>{const s=strip(p);return s.includes(composer)&&s.includes(title)}))return true;
+          if(title&&e.pr.some(p=>strip(p).includes(title))&&(names||[]).some(n=>all(n)))return true;
+          if(composer&&all(composer))return true;
+          if((names||[]).length>1&&names.some(n=>all(n)))return true;
+          return false;};
+        list=list.filter(matchEv);}
+      }else{
+        const q=norm(search);list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q));
+      }
+    }
     return list;
-  },[reversed,search,yearFilter]);
+  },[reversed,search,yearFilter,progTerms]);
 
   const prevEvRef=useRef(null);
   const mountedRef=useRef(false);
@@ -323,6 +341,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const cameFromEv=useRef(false);
   const setSearchSwitch=useCallback(v=>{setSearch(v);if(mode==="everything"&&v.trim().length>0){cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
   const jumpFrom=useCallback(t=>{setYearFilter("all");setSearch(t);cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
+  const jumpFromProgram=useCallback(t=>{const dash=t.match(/\s[—–\-]\s/);let composer="",title="",names=[];if(dash){composer=t.slice(0,dash.index).trim();names=composer.split(/,\s*(?:with\s+)?|(?:^|\s)with\s+/).map(n=>n.trim().replace(/\s*\(.*?\)\s*/g,"")).filter(Boolean);const rest=t.slice(dash.index+dash[0].length);const ym=rest.match(/^(.+?)\s*[\(\[]/);title=ym?ym[1].trim():rest.split(/ for /)[0].trim();}else{title=t.split(/ for /)[0].trim();}setYearFilter("all");_setSearch(t);if(searchRef)searchRef.current=t;setProgTerms({composer:strip(composer),title:strip(title),names:names.map(n=>strip(n)),raw:t});cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
 
   const ev=filtered[idx];
   // Restore & save desktop scroll position
@@ -341,7 +360,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
       <div style={{height:topH}}/>
       <div style={{position:"sticky",top:topH,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"12px 20px":"8px 12px",display:"flex",gap:isDesk?8:0,flexWrap:"wrap",justifyContent:isDesk?"flex-start":"space-evenly"}}>{Object.keys(everything).map(s=><button key={s} onClick={()=>setEvSec(s)} style={{fontFamily:FONT,fontSize:isDesk?16:11,fontWeight:evSec===s?700:400,padding:isDesk?"8px 16px":"4px 9px",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button>)}</div>
       <div style={{padding:"12px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
-        {items.map((item,i)=><div key={i} onClick={()=>jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
+        {items.map((item,i)=><div key={i} onClick={()=>evSec==="programs"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
       </div></div>
     </div>
     <BottomBar search={search} setSearch={setSearchSwitch} onTop={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:0,behavior:"smooth"})}} onBottom={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:el.scrollHeight,behavior:"smooth"})}} onToggleMode={()=>setMode("list")} modeLabel="list"/></>)}
