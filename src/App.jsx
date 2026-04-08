@@ -534,7 +534,7 @@ function EventDetail({ev,onBack}){
   {(()=>{const slide=MEDIA.find(s=>s.id===ev.id);const imgs=slide?.imgs||[];if(!imgs.length)return ev.poster?null:<div style={{height:80}}/>;return(
     <div style={{maxWidth:860,margin:"0 auto",padding:"0 clamp(16px,4vw,40px)",paddingBottom:120}}>
       <div style={{position:"relative",marginBottom:24}}>
-        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:400,color:"rgba(0,0,0,0.12)",lineHeight:1,letterSpacing:"4px",pointerEvents:"none"}}>MEDIA</div>
+        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"4px",pointerEvents:"none"}}>MEDIA</div>
       </div>
       {imgs.map((src,i)=><PhotoSlideIn key={i} src={src} delay={i===0?1.8:1.2} index={i} onOpen={()=>setViewerIdx(i)}/>)}
     </div>);
