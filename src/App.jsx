@@ -501,6 +501,7 @@ function EventDetail({ev,onBack}){
     el.addEventListener("scroll",onScroll,{passive:true});
     return()=>el.removeEventListener("scroll",onScroll);
   },[]);
+  const lb={position:"absolute",right:0,top:0,fontFamily:FONT,fontSize:"clamp(10px,1.6vw,13px)",fontWeight:700,color:"rgba(0,0,0,0.08)",letterSpacing:0.3,textTransform:"uppercase",pointerEvents:"none"};
   return(<div ref={scrollRef} data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white"}}>
   <style>{`
     .ukho-viewer-img{width:96vw;height:96vh;object-fit:contain}
@@ -509,13 +510,13 @@ function EventDetail({ev,onBack}){
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
     <div style={{fontFamily:FONT,fontSize:"clamp(50px,14vw,100px)",fontWeight:700,color:"rgba(0,0,0,0.06)",lineHeight:.85,letterSpacing:-3,marginBottom:8}}>{ev.id}</div>
-    <div style={{fontFamily:FONT,fontSize:"clamp(22px,5vw,36px)",fontWeight:600,color:"#000",lineHeight:1.2,marginBottom:24,letterSpacing:"-0.5px"}}>{ev.n}</div>
-    <div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6,marginBottom:20}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div>
-    <div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6,marginBottom:20}}>{ev.pr.map((p,i)=><div key={i}>{p}</div>)}</div>
+    <div style={{position:"relative",marginBottom:24}}><span style={lb}>name</span><div style={{fontFamily:FONT,fontSize:"clamp(22px,5vw,36px)",fontWeight:600,color:"#000",lineHeight:1.2,letterSpacing:"-0.5px"}}>{ev.n}</div></div>
+    <div style={{position:"relative",marginBottom:20}}><span style={lb}>performers</span><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div></div>
+    <div style={{position:"relative",marginBottom:20}}><span style={lb}>program</span><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pr.map((p,i)=><div key={i}>{p}</div>)}</div></div>
     {ev.desc&&<div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.3)",lineHeight:1.7,marginBottom:20}}>{ev.desc.map((p,i)=><div key={i} style={{marginBottom:10}}>{p}</div>)}</div>}
-    <div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)",marginBottom:8}}>{ev.pl}</div>
-    <div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)",textTransform:"lowercase",marginBottom:8}}>{ev.t}</div>
-    <div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)"}}>{ev.d}</div>
+    <div style={{position:"relative",marginBottom:8}}><span style={lb}>place</span><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)"}}>{ev.pl}</div></div>
+    <div style={{position:"relative",marginBottom:8}}><span style={lb}>tags</span><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)",textTransform:"lowercase"}}>{ev.t}</div></div>
+    <div style={{position:"relative"}}><span style={lb}>date</span><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)"}}>{ev.d}</div></div>
   </div>
   {ev.poster&&<div style={{padding:"0 clamp(16px,4vw,40px)",paddingBottom:40}}><PosterSlideIn src={ev.poster} credit={ev.pc} alt={ev.n}/></div>}
   </div>{/* close maxWidth:860 container */}
