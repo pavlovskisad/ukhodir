@@ -312,6 +312,17 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   useEffect(()=>{if(filtered[idx])prevEvRef.current=filtered[idx]},[filtered,idx]);
 
   const go=useCallback((ni,dir)=>{
+    if(cameFromEv.current&&search.trim()){
+      const curEv=filtered[idx];
+      cameFromEv.current=false;
+      const fullList=yearFilter!=="all"?reversed.filter(e=>e.d.includes(yearFilter)):reversed;
+      const newIdx=curEv?fullList.findIndex(e=>e.id===curEv.id):0;
+      const target=dir==="Up"?Math.min(newIdx+1,fullList.length-1):Math.max(newIdx-1,0);
+      navKey.current++;setExiting({ev:curEv,dir});setSelected(false);selBlink.stop();
+      setProgTerms(null);_setSearch("");if(searchRef)searchRef.current="";
+      setEnterDir(dir);setIdx(target);
+      clearTimeout(animating.current);animating.current=setTimeout(()=>setExiting(null),ANIM_MS);return;
+    }
     if(ni<0||ni>=filtered.length)return;
     navKey.current++;
     const oldEv=filtered[idx];
@@ -320,7 +331,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     setEnterDir(dir);setIdx(ni);
     clearTimeout(animating.current);
     animating.current=setTimeout(()=>setExiting(null),ANIM_MS);
-  },[filtered,idx]);
+  },[filtered,idx,search,yearFilter,reversed]);
 
   // Touch — only on the content area, prevent propagation
   const onTouchStart=useCallback(e=>{touchRef.current={y:e.touches[0].clientY,t:Date.now()};e.stopPropagation()},[]);
