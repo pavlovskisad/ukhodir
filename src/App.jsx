@@ -50,10 +50,8 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
   const dk=typeof window!=="undefined"&&window.innerWidth>768;
   const bs={width:dk?42:30,height:dk?42:30,border:"1px solid rgba(0,0,0,0.08)",background:"rgba(255,255,255,0.4)",cursor:"pointer",fontFamily:MONO,fontSize:dk?16:12,display:"flex",alignItems:"center",justifyContent:"center",padding:0,color:"#000"};
   const hm=search.trim()&&matchCount>1;
-  return (<div style={{...panelStyle,bottom:0,top:"auto",boxShadow:"0 -2px 16px rgba(0,0,0,0.05)",padding:dk?"10px 20px":"6px 12px",display:"flex",flexDirection:"column",gap:dk?8:5}}>
-    {years&&years.length>1&&<div style={{display:"flex",gap:dk?6:4,overflowX:"auto",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
-      {years.map(y=><button key={y} onClick={()=>setYearFilter(y)} style={{fontFamily:MONO,fontSize:dk?14:10,fontWeight:yearFilter===y?700:400,padding:dk?"4px 12px":"2px 7px",background:yearFilter===y?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:yearFilter===y?"#000":"rgba(0,0,0,0.35)",letterSpacing:0.3,whiteSpace:"nowrap",flexShrink:0}}>{y}</button>)}
-    </div>}
+  const menuH=document.getElementById('ukho-menu')?.offsetHeight||HEADER_H;
+  return (<div id="ukho-bar" style={{...panelStyle,top:menuH,bottom:"auto",boxShadow:"0 2px 16px rgba(0,0,0,0.04)",padding:dk?"10px 20px":"6px 12px",display:"flex",flexDirection:"column",gap:dk?8:5}}>
     <div style={{display:"flex",gap:dk?10:6,alignItems:"center"}}>
       <div style={{flex:1,position:"relative",minWidth:60}}>
         <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="search..." style={{width:"100%",padding:dk?"8px 36px 8px 14px":"5px 28px 5px 10px",border:"1px solid rgba(0,0,0,0.08)",fontFamily:MONO,fontSize:dk?20:16,background:"rgba(255,255,255,0.3)",outline:"none",letterSpacing:0,color:"#000",boxSizing:"border-box"}}/>
@@ -64,12 +62,15 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
       <button onClick={onToggleMode} style={{fontFamily:FONT,fontSize:dk?15:11,fontWeight:600,padding:dk?"8px 16px":"5px 10px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:0.3,whiteSpace:"nowrap",height:dk?42:30,position:"relative",overflow:"hidden"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite",pointerEvents:"none",opacity:0.18}}/></button>
       <style>{`@keyframes evBlink{0%,100%{opacity:0.18}50%{opacity:0}}`}</style>
     </div>
+    {years&&years.length>1&&<div style={{display:"flex",gap:dk?6:4,overflowX:"auto",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
+      {years.map(y=><button key={y} onClick={()=>setYearFilter(y)} style={{fontFamily:MONO,fontSize:dk?14:10,fontWeight:yearFilter===y?700:400,padding:dk?"4px 12px":"2px 7px",background:yearFilter===y?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:yearFilter===y?"#000":"rgba(0,0,0,0.35)",letterSpacing:0.3,whiteSpace:"nowrap",flexShrink:0}}>{y}</button>)}
+    </div>}
   </div>);
 }
 
 /* ── Dice ── */
 function FloatingDice({onRoll}){const[rolling,setRolling]=useState(false);const drag=useRef({active:false,moved:false,sx:0,sy:0,ex:0,ey:0});const[pos,setPos]=useState({x:null,y:null});
-  useEffect(()=>{if(pos.x===null){const dk=window.innerWidth>768;setPos({x:window.innerWidth-(dk?120:66),y:window.innerHeight-BAR_H-(dk?200:140)})}},[]);
+  useEffect(()=>{if(pos.x===null){const dk=window.innerWidth>768;setPos({x:window.innerWidth-(dk?120:66),y:window.innerHeight-(dk?160:100)})}},[]);
   const onDown=(cx,cy)=>{drag.current={active:true,moved:false,sx:cx,sy:cy,ex:pos.x,ey:pos.y}};const onMove=(cx,cy)=>{if(!drag.current.active)return;const dx=cx-drag.current.sx,dy=cy-drag.current.sy;if(Math.abs(dx)>3||Math.abs(dy)>3)drag.current.moved=true;if(drag.current.moved)setPos({x:drag.current.ex+dx,y:drag.current.ey+dy})};const onUp=()=>{if(!drag.current.active)return;const w=drag.current.moved;drag.current.active=false;if(!w&&!rolling){setRolling(true);setTimeout(()=>{setRolling(false);onRoll?.()},600)}};
   useEffect(()=>{const mm=e=>onMove(e.clientX,e.clientY),mu=()=>onUp(),tm=e=>onMove(e.touches[0].clientX,e.touches[0].clientY),tu=()=>onUp();window.addEventListener("mousemove",mm);window.addEventListener("mouseup",mu);window.addEventListener("touchmove",tm,{passive:true});window.addEventListener("touchend",tu);return()=>{window.removeEventListener("mousemove",mm);window.removeEventListener("mouseup",mu);window.removeEventListener("touchmove",tm);window.removeEventListener("touchend",tu)}});
   if(pos.x===null)return null;const deskDice=typeof window!=="undefined"&&window.innerWidth>768;const S=36,R=S/2;
@@ -83,14 +84,16 @@ function FloatingDice({onRoll}){const[rolling,setRolling]=useState(false);const 
 
 function FloatingLabels({cardKey}){
   const[positions,setPositions]=useState(null);
-  const topOff=HEADER_H+32;const h=typeof window!=="undefined"?window.innerHeight-topOff-BAR_H-32:500;
+  const barEl=typeof document!=="undefined"&&document.getElementById('ukho-bar');
+  const topOff=(barEl?barEl.offsetTop+barEl.offsetHeight:HEADER_H+BAR_H)+12;
+  const h=typeof window!=="undefined"?window.innerHeight-topOff-16:500;
   useEffect(()=>{
     // After card animation settles, measure field positions
     const timer=setTimeout(()=>{
       const ys=[];
       FIELD_KEYS.forEach(k=>{
         const el=document.querySelector(`[data-field="${k}"]`);
-        if(el){const r=el.getBoundingClientRect();ys.push(r.top+r.height/2);}
+        if(el){const r=el.getBoundingClientRect();ys.push(r.top);}
         else ys.push(null);
       });
       if(ys.some(y=>y!==null))setPositions(ys);
@@ -106,7 +109,6 @@ function FloatingLabels({cardKey}){
     {FIELD_KEYS.map((l,i)=><div key={l} style={{
       position:"absolute",right:0,
       top:pts[i]!=null?pts[i]:fallback[i],
-      transform:"translateY(-50%)",
       fontFamily:FONT,fontSize:"clamp(10px,1.6vw,14px)",fontWeight:700,
       color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase",textAlign:"right",
       transition:positions?"top 0.5s cubic-bezier(0.25,1,0.5,1)":"none",
@@ -120,7 +122,10 @@ if(typeof window!=="undefined")window.addEventListener("resize",()=>{if(window.i
 
 /* ── Card — just the content, no animation here ── */
 function CardContent({ev,search,selected,showGreen,onClick}){
-  const q=search.trim().toLowerCase();const hl=t=>!q?t:hlMatch(t,q);const topOff=HEADER_H+32;const cardH=stableVH.v-topOff-BAR_H-32;
+  const q=search.trim().toLowerCase();const hl=t=>!q?t:hlMatch(t,q);
+  const barEl=typeof document!=="undefined"&&document.getElementById('ukho-bar');
+  const topOff=(barEl?barEl.offsetTop+barEl.offsetHeight:HEADER_H+BAR_H)+12;
+  const cardH=stableVH.v-topOff-16;
   const outerRef=useRef(null);const innerRef=useRef(null);
   const[shrink,setShrink]=useState(1);
   useEffect(()=>{
@@ -276,7 +281,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     <div data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
       <div style={{height:mH}}/>
       <div style={{position:"sticky",top:mH,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"12px 20px":"8px 12px",display:"flex",gap:isDesk?8:0,flexWrap:"wrap",justifyContent:isDesk?"flex-start":"space-evenly"}}>{Object.keys(everything).map(s=><button key={s} onClick={()=>setEvSec(s)} style={{fontFamily:FONT,fontSize:isDesk?16:11,fontWeight:evSec===s?700:400,padding:isDesk?"8px 16px":"4px 9px",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button>)}</div>
-      <div style={{padding:`12px 14px ${BAR_H+16}px`}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
+      <div style={{padding:"12px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
         {items.map((item,i)=><div key={i} onClick={()=>jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
       </div></div>
     </div>
@@ -292,7 +297,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
         {["#","name","performers","program","place","tags","date"].map(l=><div key={l} style={{fontFamily:FONT,fontSize:12,fontWeight:700,color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase"}}>{l}</div>)}
       </div>
       {/* Rows */}
-      <div style={{paddingTop:menuH+36,paddingBottom:BAR_H+20}}>
+      <div style={{paddingTop:menuH+36,paddingBottom:40}}>
         {filtered.map(e=>(
           <div key={e.id} className="ukho-row" onClick={()=>onOpenEvent?.(e)}>
             <div className="ukho-sel"/>
