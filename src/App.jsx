@@ -54,6 +54,8 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
   const rest=years.filter(y=>y!==yearFilter);
   const n=rest.length;
   const itemW=dk?62:52;
+  const sepW=dk?32:24;
+  const loopW=n*itemW+sepW;
   const containerRef=useRef(null);
   const[offset,setOffset]=useState(0);
   const rafRef=useRef(null);
@@ -68,8 +70,6 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
   const handleClick=(y)=>{setYearFilter(y);setOffset(0)};
   const onTS=e=>{touchRef.current={x:e.touches[0].clientX,o:offset}};
   const onTM=e=>{const dx=e.touches[0].clientX-touchRef.current.x;setOffset(touchRef.current.o+dx)};
-  const sepW=dk?32:24;
-  const loopW=n*itemW+sepW;
   const items=[];for(let c=0;c<3;c++){rest.forEach((y)=>items.push({y,sep:false}));items.push({y:null,sep:true});}
   return(<div style={{display:"flex",alignItems:"center",gap:dk?8:4,height:dk?28:26}}>
     <button onClick={()=>handleClick(yearFilter)} style={{
