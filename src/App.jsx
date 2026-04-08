@@ -145,8 +145,8 @@ function useBarBottom(){
 function FloatingLabels({cardKey}){
   const[positions,setPositions]=useState(null);
   const barBottom=useBarBottom();
-  const topOff=barBottom+12;
-  const h=typeof window!=="undefined"?window.innerHeight-topOff-16:500;
+  const topOff=barBottom+4;
+  const h=typeof window!=="undefined"?window.innerHeight-topOff-8:500;
   useEffect(()=>{
     // After card animation settles, measure field positions
     const timer=setTimeout(()=>{
@@ -184,8 +184,8 @@ if(typeof window!=="undefined")window.addEventListener("resize",()=>{if(window.i
 function CardContent({ev,search,selected,showGreen,onClick}){
   const q=search.trim().toLowerCase();const hl=t=>!q?t:hlMatch(t,q);
   const barBottom=useBarBottom();
-  const topOff=barBottom+12;
-  const cardH=stableVH.v-topOff-16;
+  const topOff=barBottom+4;
+  const cardH=stableVH.v-topOff-8;
   const outerRef=useRef(null);const innerRef=useRef(null);
   const[shrink,setShrink]=useState(1);
   useEffect(()=>{
@@ -196,7 +196,7 @@ function CardContent({ev,search,selected,showGreen,onClick}){
     inner.style.transform="scale(1)";inner.style.transformOrigin="top left";
     requestAnimationFrame(()=>{
       const need=inner.scrollHeight;
-      const s=need>avail?Math.max(0.65,avail/need):1;
+      const s=need>avail?Math.max(0.45,avail/need):1;
       setShrink(s);
     });
   },[ev.id,search]);
@@ -208,8 +208,8 @@ function CardContent({ev,search,selected,showGreen,onClick}){
     {showGreen&&<div style={{position:"absolute",inset:0,background:"rgba(74,246,38,0.12)",pointerEvents:"none",zIndex:0,transition:"background 0.1s"}}/>}
     <div style={{position:"absolute",top:8,left:12,fontFamily:FONT,fontSize:"clamp(52px,13vw,95px)",fontWeight:700,color:"rgba(0,0,0,0.08)",lineHeight:.85,letterSpacing:-3,pointerEvents:"none",transform:`scale(${shrink})`,transformOrigin:"top left",transition:"transform 0.2s ease"}}>{ev.id}</div>
     <div ref={innerRef} style={{
-      padding:"clamp(12px,3vw,28px) 14px clamp(16px,4vw,36px)",paddingRight:"clamp(100px,22vw,140px)",
-      display:"flex",flexDirection:"column",justifyContent:"space-between",gap:"clamp(8px,2vh,20px)",
+      padding:"clamp(8px,2vw,24px) 14px clamp(10px,3vw,28px)",paddingRight:"clamp(100px,22vw,140px)",
+      display:"flex",flexDirection:"column",justifyContent:"space-between",gap:"clamp(5px,1.5vh,16px)",
       minHeight:`${100/shrink}%`,
       transform:`scale(${shrink})`,transformOrigin:"top left",
       width:`${100/shrink}%`,
