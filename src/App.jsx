@@ -54,6 +54,8 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
   const rest=years.filter(y=>y!==yearFilter);
   const n=rest.length;
   const itemW=dk?62:52;
+  const sepW=dk?32:24;
+  const loopW=n*itemW+sepW;
   const containerRef=useRef(null);
   const[offset,setOffset]=useState(0);
   const rafRef=useRef(null);
@@ -68,8 +70,6 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
   const handleClick=(y)=>{setYearFilter(y);setOffset(0)};
   const onTS=e=>{touchRef.current={x:e.touches[0].clientX,o:offset}};
   const onTM=e=>{const dx=e.touches[0].clientX-touchRef.current.x;setOffset(touchRef.current.o+dx)};
-  const sepW=dk?32:24;
-  const loopW=n*itemW+sepW;
   const items=[];for(let c=0;c<3;c++){rest.forEach((y)=>items.push({y,sep:false}));items.push({y:null,sep:true});}
   return(<div style={{display:"flex",alignItems:"center",gap:dk?8:4,height:dk?28:26}}>
     <button onClick={()=>handleClick(yearFilter)} style={{
@@ -261,7 +261,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     if(document.getElementById(id))return;
     const s=document.createElement('style');
     s.id=id;
-    s.textContent=`.ukho-row{position:relative;display:grid;grid-template-columns:40px 2fr 2fr 2fr 1.2fr 1fr 0.8fr;gap:8px;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,0.03);cursor:pointer;transition:transform 0.12s ease;align-items:start}.ukho-row:hover{transform:scale(0.985)}.ukho-row .ukho-sel{position:absolute;inset:0;background:#4af626;opacity:0;transition:opacity 0.12s;pointer-events:none}.ukho-row:hover .ukho-sel{opacity:0.1}.ukho-row .ukho-slide{transition:transform 0.2s ease}.ukho-row:hover .ukho-slide{transform:scale(0.95)}.ukho-row .ukho-label{transition:transform 0.2s ease;transform-origin:left center}.ukho-row:hover .ukho-label{transform:scale(1.05)}`;
+    s.textContent=`.ukho-row{position:relative;display:grid;grid-template-columns:40px 2fr 2fr 2fr 1.2fr 1fr 0.8fr;gap:8px;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,0.03);cursor:pointer;transition:transform 0.12s ease;align-items:start}.ukho-row:hover{transform:scale(0.985)}.ukho-row .ukho-sel{position:absolute;inset:0;background:#4af626;opacity:0;pointer-events:none}.ukho-row:hover .ukho-sel{opacity:0.1;transition:opacity 0.12s}.ukho-row .ukho-slide{transition:transform 0.2s ease}.ukho-row:hover .ukho-slide{transform:scale(0.95)}.ukho-row .ukho-label{transition:transform 0.2s ease;transform-origin:left center}.ukho-row:hover .ukho-label{transform:scale(1.05)}`;
     document.head.appendChild(s);
     return ()=>{const el=document.getElementById(id);if(el)el.remove();};
   },[isDesk]);
@@ -1148,6 +1148,8 @@ function RiddlesPage({onOpenEvent,events}){
 /* ── Analog Overlay ── */
 function AnalogOverlay(){
   const canvasRef=useRef(null);
+  const[ready,setReady]=useState(false);
+  useEffect(()=>{const t=requestAnimationFrame(()=>requestAnimationFrame(()=>setReady(true)));return()=>cancelAnimationFrame(t)},[]);
   useEffect(()=>{
     const canvas=canvasRef.current;if(!canvas)return;
     const ctx=canvas.getContext('2d');
@@ -1193,7 +1195,7 @@ function AnalogOverlay(){
     document.addEventListener('visibilitychange',vis);loop();
     return ()=>{cancelAnimationFrame(rafId);window.removeEventListener('resize',resize);window.removeEventListener('scroll',onScroll);document.removeEventListener('scroll',onScroll);document.removeEventListener('visibilitychange',vis);};
   },[]);
-  return <canvas ref={canvasRef} style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',pointerEvents:'none',zIndex:99998}}/>;
+  return <canvas ref={canvasRef} style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',pointerEvents:'none',zIndex:99998,opacity:ready?1:0,transition:'opacity 0.3s ease'}}/>;
 }
 
 export default function App(){const[page,setPage]=useState("home");const[openEvent,setOpenEvent]=useState(null);const[prevPage,setPrevPage]=useState(null);
@@ -1204,7 +1206,7 @@ export default function App(){const[page,setPage]=useState("home");const[openEve
   // Browser back button support
   useEffect(()=>{const onPop=()=>{if(openEvent){setOpenEvent(null);if(prevPage)setPage(prevPage)}};window.addEventListener("popstate",onPop);return()=>window.removeEventListener("popstate",onPop)},[openEvent,prevPage]);
   const handleRollEvent=useCallback(()=>{const other=EVENTS.filter(e=>e.id!==openEvent?.id);const ev=other[Math.floor(Math.random()*other.length)];if(ev){setOpenEvent(ev);window.scrollTo(0,0);window.history.pushState({event:ev.id},"")}},[openEvent]);
-  const globalBtnStyle=`button,a{transition:transform 0.12s ease!important;position:relative!important;overflow:hidden!important}button:hover,a:hover{transform:scale(0.95)!important}button:active,a:active{transform:scale(0.90)!important}button::after,a::after{content:'';position:absolute;inset:0;background:#4af626;opacity:0;transition:opacity 0.12s;pointer-events:none}button:hover::after,a:hover::after{opacity:0.1}`;
+  const globalBtnStyle=`button,a{transition:transform 0.12s ease!important;position:relative!important;overflow:hidden!important}button:hover,a:hover{transform:scale(0.95)!important}button:active,a:active{transform:scale(0.90)!important}button::after,a::after{content:'';position:absolute;inset:0;background:#4af626;opacity:0;pointer-events:none}button:hover::after,a:hover::after{opacity:0.1;transition:opacity 0.12s}`;
   if(openEvent) return (<><style>{globalBtnStyle}</style><EventDetail ev={openEvent} onBack={handleBack}/><FloatingDice onRoll={handleRollEvent}/><AnalogOverlay/></>);
   return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden"}}>
     <style>{globalBtnStyle}</style>
