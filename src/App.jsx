@@ -230,7 +230,7 @@ function hlMatch(text,q){const i=text.toLowerCase().indexOf(q);if(i===-1)return 
 function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef}){
   const reversed=useMemo(()=>[...events].reverse(),[events]);
   const[search,_setSearch]=useState(searchRef?.current||"");const[idx,_setIdx]=useState(idxRef?.current||0);const[mode,_setMode]=useState(modeRef?.current||"list");
-  const setSearch=v=>{_setSearch(v);if(searchRef)searchRef.current=v};
+  const setSearch=v=>{progTerms.current=null;_setSearch(v);if(searchRef)searchRef.current=v};
   const setIdx=v=>{_setIdx(v);if(idxRef)idxRef.current=v};
   const setMode=v=>{_setMode(v);if(modeRef)modeRef.current=v};
   const[selected,setSelected]=useState(false);const selBlink=useSelBlink();
@@ -332,7 +332,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const cameFromEv=useRef(false);
   const setSearchSwitch=useCallback(v=>{progTerms.current=null;setSearch(v);if(mode==="everything"&&v.trim().length>0){cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
   const jumpFrom=useCallback(t=>{progTerms.current=null;setYearFilter("all");setSearch(t);cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
-  const jumpFromProgram=useCallback(t=>{const dash=t.match(/\s[—–\-]\s/);let composer="",title="";if(dash){composer=t.slice(0,dash.index).trim();const rest=t.slice(dash.index+dash[0].length);const ym=rest.match(/^(.+?)\s*[\(\[]/);title=ym?ym[1].trim():rest.split(/ for /)[0].trim();}else{title=t.split(/ for /)[0].trim();}progTerms.current={composer:strip(composer),title:strip(title)};setYearFilter("all");setSearch(t);cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
+  const jumpFromProgram=useCallback(t=>{const dash=t.match(/\s[—–\-]\s/);let composer="",title="";if(dash){composer=t.slice(0,dash.index).trim();const rest=t.slice(dash.index+dash[0].length);const ym=rest.match(/^(.+?)\s*[\(\[]/);title=ym?ym[1].trim():rest.split(/ for /)[0].trim();}else{title=t.split(/ for /)[0].trim();}setYearFilter("all");setSearch(t);progTerms.current={composer:strip(composer),title:strip(title)};cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
 
   const ev=filtered[idx];
   // Restore & save desktop scroll position
