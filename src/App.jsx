@@ -5,7 +5,7 @@ import { USDLoader } from "three/addons/loaders/USDLoader.js";
 import { EVENTS, SLIDES, MEDIA, PERFORMERS } from './data.js';
 import { PROGRAMS } from './programs.js';
 
-const FONT="'Satoshi',sans-serif";const MONO="'Geist Mono',monospace";
+const FONT="'Satoshi',sans-serif";const MONO="'Geist Mono',monospace";const ARCH="'Archaism','Satoshi',sans-serif";
 const GREEN="#4af626";const BLUE="#0000ff";const HEADER_H=80;const BAR_H=48;
 const FIELD_KEYS=["name","program","performers","place","tags","date"];
 const norm=s=>s.toLowerCase().replace(/[\u2018\u2019\u2032\u0060]/g,"'").replace(/[\u201c\u201d]/g,'"').normalize("NFD").replace(/[\u0300-\u036f]/g,"");
@@ -42,10 +42,10 @@ function scrollPageToTop(){
 function Menu({page,setPage}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
-  const bs={position:"relative",fontFamily:FONT,fontWeight:400,fontSize:isMob?"clamp(16px,4vw,22px)":"clamp(22px,2.5vw,30px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"5px 0",letterSpacing:"1.5px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
+  const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(16px,4vw,22px)":"clamp(22px,2.5vw,30px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"5px 0",letterSpacing:"-1px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
   return (<div id="ukho-menu" style={{...panelStyle,top:0}}>
     <div onClick={scrollPageToTop} style={{position:"absolute",top:0,left:0,right:0,height:12,cursor:"pointer",zIndex:10}}/>
-    <div style={{padding:"7px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(22px,5vw,30px)":"clamp(28px,3vw,40px)",fontWeight:600,letterSpacing:"2px"}} onClick={()=>setPage("home")}>/dir</TapButton></div>
+    <div style={{padding:"7px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(22px,5vw,30px)":"clamp(28px,3vw,40px)",fontWeight:400,letterSpacing:"-1px"}} onClick={()=>setPage("home")}>/dir</TapButton></div>
     <div style={{display:"flex",justifyContent:"space-between",padding:"3px 14px 7px"}}>{pages.map(p=><TapButton key={p} style={{...bs,fontWeight:page===p?600:400,color:page===p?"rgba(0,0,0,0.25)":BLUE}} onClick={()=>setPage(p)}>/{p}</TapButton>)}</div>
   </div>);
 }
@@ -107,7 +107,7 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
       </div>
       {!hm&&<button style={bs} onClick={onTop}>▲</button>}{!hm&&<button style={bs} onClick={onBottom}>▼</button>}
       {hm&&<button style={bs} onClick={onPrev}>‹</button>}{hm&&<span style={{fontFamily:MONO,fontSize:dk?15:11,color:"rgba(0,0,0,0.35)",whiteSpace:"nowrap",letterSpacing:0,minWidth:dk?48:36,textAlign:"center"}}>{matchIdx+1}/{matchCount}</span>}{hm&&<button style={bs} onClick={onNext}>›</button>}
-      <button onClick={onToggleMode} style={{fontFamily:FONT,fontSize:dk?20:13,fontWeight:400,padding:dk?"10px 28px":"5px 14px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:1.5,whiteSpace:"nowrap",height:dk?46:30,position:"relative",overflow:"hidden",textTransform:"lowercase",display:"flex",alignItems:"center",justifyContent:"center"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite 2s",pointerEvents:"none",opacity:0}}/></button>
+      <button onClick={onToggleMode} style={{fontFamily:ARCH,fontSize:dk?20:13,fontWeight:400,padding:dk?"10px 28px":"5px 14px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:"-1px",whiteSpace:"nowrap",height:dk?46:30,position:"relative",overflow:"hidden",textTransform:"lowercase",display:"flex",alignItems:"center",justifyContent:"center"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite 2s",pointerEvents:"none",opacity:0}}/></button>
       <style>{`@keyframes evBlink{0%,100%{opacity:0.18}50%{opacity:0}}`}</style>
     </div>
     {years&&years.length>1&&<YearCarousel years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} dk={dk}/>}
@@ -121,7 +121,7 @@ function FloatingDice({onRoll}){const[rolling,setRolling]=useState(false);const 
   useEffect(()=>{const mm=e=>onMove(e.clientX,e.clientY),mu=()=>onUp(),tm=e=>onMove(e.touches[0].clientX,e.touches[0].clientY),tu=()=>onUp();window.addEventListener("mousemove",mm);window.addEventListener("mouseup",mu);window.addEventListener("touchmove",tm,{passive:true});window.addEventListener("touchend",tu);return()=>{window.removeEventListener("mousemove",mm);window.removeEventListener("mouseup",mu);window.removeEventListener("touchmove",tm);window.removeEventListener("touchend",tu)}});
   if(pos.x===null)return null;const deskDice=typeof window!=="undefined"&&window.innerWidth>768;const S=36,R=S/2;
   const ds=(t,l)=>({position:"absolute",width:5,height:5,borderRadius:"50%",background:"rgba(0,255,65,0.6)",boxShadow:"0 0 4px rgba(0,255,65,0.3)",top:t,left:l,transform:"translate(-50%,-50%)"});const fs=tr=>({position:"absolute",width:S,height:S,border:"1.5px solid rgba(0,255,65,0.35)",background:"rgba(0,255,65,0.05)",transform:tr});
-  return(<div onMouseDown={e=>{e.preventDefault();onDown(e.clientX,e.clientY)}} onTouchStart={e=>onDown(e.touches[0].clientX,e.touches[0].clientY)} style={{position:"fixed",left:pos.x,top:pos.y,zIndex:99999,cursor:"grab",userSelect:"none",WebkitUserSelect:"none",touchAction:"none",padding:10,transform:deskDice?"scale(2)":"none",transformOrigin:"center"}}>
+  return(<div onMouseDown={e=>{e.preventDefault();onDown(e.clientX,e.clientY)}} onTouchStart={e=>onDown(e.touches[0].clientX,e.touches[0].clientY)} style={{position:"fixed",left:pos.x,top:pos.y,zIndex:99999,cursor:"grab",userSelect:"none",WebkitUserSelect:"none",touchAction:"none",padding:10,transform:deskDice?"scale(1.4)":"none",transformOrigin:"center"}}>
     <style>{`@keyframes dF{0%{transform:rotateX(15deg) rotateY(0) translateY(0)}25%{transform:rotateX(20deg) rotateY(90deg) translateY(-4px)}50%{transform:rotateX(10deg) rotateY(180deg) translateY(1px)}75%{transform:rotateX(18deg) rotateY(270deg) translateY(4px)}100%{transform:rotateX(15deg) rotateY(360deg) translateY(0)}}@keyframes dR{0%{transform:rotateX(0) rotateY(0) rotateZ(0)}100%{transform:rotateX(720deg) rotateY(540deg) rotateZ(360deg)}}`}</style>
     <div style={{perspective:200}}><div style={{width:S,height:S,position:"relative",transformStyle:"preserve-3d",animation:rolling?"dR 0.6s ease-out":"dF 8s ease-in-out infinite"}}>
       <div style={fs(`translateZ(${R}px)`)}><div style={ds("50%","50%")}/></div><div style={fs(`rotateY(180deg) translateZ(${R}px)`)}><div style={ds("20%","20%")}/><div style={ds("80%","80%")}/></div><div style={fs(`rotateY(90deg) translateZ(${R}px)`)}><div style={ds("20%","20%")}/><div style={ds("50%","50%")}/><div style={ds("80%","80%")}/></div><div style={fs(`rotateY(-90deg) translateZ(${R}px)`)}><div style={ds("25%","25%")}/><div style={ds("25%","75%")}/><div style={ds("75%","25%")}/><div style={ds("75%","75%")}/></div><div style={fs(`rotateX(90deg) translateZ(${R}px)`)}><div style={ds("22%","22%")}/><div style={ds("22%","78%")}/><div style={ds("50%","50%")}/><div style={ds("78%","22%")}/><div style={ds("78%","78%")}/></div><div style={fs(`rotateX(-90deg) translateZ(${R}px)`)}><div style={ds("22%","28%")}/><div style={ds("22%","72%")}/><div style={ds("50%","28%")}/><div style={ds("50%","72%")}/><div style={ds("78%","28%")}/><div style={ds("78%","72%")}/></div>
@@ -206,7 +206,7 @@ function CardContent({ev,search,selected,showGreen,onClick}){
     overflow:"hidden",
   }}>
     {showGreen&&<div style={{position:"absolute",inset:0,background:"rgba(74,246,38,0.12)",pointerEvents:"none",zIndex:0,transition:"background 0.1s"}}/>}
-    <div style={{position:"absolute",top:8,left:12,fontFamily:FONT,fontSize:"clamp(52px,13vw,95px)",fontWeight:700,color:"rgba(0,0,0,0.08)",lineHeight:.85,letterSpacing:-3,pointerEvents:"none",transform:`scale(${shrink})`,transformOrigin:"top left",transition:"transform 0.2s ease"}}>{ev.id}</div>
+    <div style={{position:"absolute",top:8,left:12,fontFamily:ARCH,fontSize:"clamp(52px,13vw,95px)",fontWeight:400,color:"rgba(0,0,0,0.08)",lineHeight:.85,letterSpacing:"-1px",pointerEvents:"none",transform:`scale(${shrink})`,transformOrigin:"top left",transition:"transform 0.2s ease"}}>{ev.id}</div>
     <div ref={innerRef} style={{
       padding:"clamp(8px,2vw,24px) 14px clamp(10px,3vw,28px)",paddingRight:"clamp(100px,22vw,140px)",
       display:"flex",flexDirection:"column",justifyContent:"space-between",gap:"clamp(5px,1.5vh,16px)",
@@ -215,7 +215,7 @@ function CardContent({ev,search,selected,showGreen,onClick}){
       width:`${100/shrink}%`,
       transition:"transform 0.2s ease",
     }}>
-      <div data-field="name" style={{fontFamily:FONT,fontSize:"clamp(17px,4vw,28px)",fontWeight:600,color:"#000",lineHeight:1.15,letterSpacing:"-.5px",zIndex:1}}>{hl(ev.n)}</div>
+      <div data-field="name" style={{fontFamily:ARCH,fontSize:"clamp(17px,4vw,28px)",fontWeight:400,color:"#000",lineHeight:1.15,letterSpacing:"-1px",zIndex:1}}>{hl(ev.n)}</div>
       <div data-field="program" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pr.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
       <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
       <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35}}>{hl(ev.pl)}</div>
@@ -371,7 +371,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   if(mode==="everything"){const topH=evBarBottom;const items=everything[evSec]||[];return(<>
     <div data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
       <div style={{height:topH}}/>
-      <div style={{position:"sticky",top:topH,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"12px 20px":"8px 8px",display:"flex",gap:isDesk?8:4,flexWrap:"nowrap",justifyContent:isDesk?"flex-start":"space-evenly"}}>{Object.keys(everything).map(s=><button key={s} onClick={()=>setEvSec(s)} style={{fontFamily:FONT,fontSize:isDesk?18:12,fontWeight:evSec===s?700:400,padding:isDesk?"10px 20px":"6px 10px",flex:isDesk?undefined:"1 1 0",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button>)}</div>
+      <div style={{position:"sticky",top:topH,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"12px 20px":"8px 8px",display:"flex",gap:isDesk?8:4,flexWrap:"nowrap",justifyContent:isDesk?"flex-start":"space-evenly"}}>{Object.keys(everything).map(s=><button key={s} onClick={()=>setEvSec(s)} style={{fontFamily:ARCH,fontSize:isDesk?18:12,fontWeight:400,padding:isDesk?"10px 20px":"6px 10px",flex:isDesk?undefined:"1 1 0",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:"-1px",textTransform:"lowercase"}}>{s}</button>)}</div>
       <div style={{padding:"12px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
         {items.map((item,i)=><div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
       </div></div>
@@ -393,8 +393,8 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
         {filtered.map(e=>(
           <div key={e.id} className="ukho-row" onClick={()=>onOpenEvent?.(e)}>
             <div className="ukho-sel"/>
-            <div style={{fontFamily:FONT,fontSize:13,fontWeight:700,color:"rgba(0,0,0,0.1)"}}>{e.id}</div>
-            <div style={{fontFamily:FONT,fontSize:13,fontWeight:600,color:"#000"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
+            <div style={{fontFamily:ARCH,fontSize:13,fontWeight:400,color:"rgba(0,0,0,0.1)",letterSpacing:"-1px"}}>{e.id}</div>
+            <div style={{fontFamily:ARCH,fontSize:13,fontWeight:400,color:"#000",letterSpacing:"-1px"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pr.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.2)"}}>{e.pl}</div>
@@ -543,8 +543,8 @@ function EventDetail({ev,onBack}){
   `}</style>
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
-    <div style={{fontFamily:FONT,fontSize:"clamp(50px,14vw,100px)",fontWeight:700,color:"rgba(0,0,0,0.06)",lineHeight:.85,letterSpacing:-3,marginBottom:8}}>{ev.id}</div>
-    <div style={{marginBottom:24}}><div style={{fontFamily:FONT,fontSize:"clamp(22px,5vw,36px)",fontWeight:600,color:"#000",lineHeight:1.2,letterSpacing:"-0.5px"}}>{ev.n}</div></div>
+    <div style={{fontFamily:ARCH,fontSize:"clamp(50px,14vw,100px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:.85,letterSpacing:"-1px",marginBottom:8}}>{ev.id}</div>
+    <div style={{marginBottom:24}}><div style={{fontFamily:ARCH,fontSize:"clamp(22px,5vw,36px)",fontWeight:400,color:"#000",lineHeight:1.2,letterSpacing:"-1px"}}>{ev.n}</div></div>
     <div style={{marginBottom:20}}><div style={lb}>program</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pr.map((p,i)=><div key={i}>{p}</div>)}</div></div>
     <div style={{marginBottom:20}}><div style={lb}>performers</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div></div>
     {ev.desc&&<div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.3)",lineHeight:1.7,marginBottom:20}}>{ev.desc.map((p,i)=><div key={i} style={{marginBottom:10}}>{p}</div>)}</div>}
@@ -557,7 +557,7 @@ function EventDetail({ev,onBack}){
   {(()=>{const slide=MEDIA.find(s=>s.id===ev.id);const imgs=slide?.imgs||[];if(!imgs.length)return ev.poster?null:<div style={{height:80}}/>;return(
     <div style={{maxWidth:860,margin:"0 auto",padding:"0 clamp(16px,4vw,40px)",paddingBottom:120}}>
       <div style={{position:"relative",marginBottom:24}}>
-        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"4px",pointerEvents:"none"}}>MEDIA</div>
+        <div style={{fontFamily:ARCH,fontSize:"clamp(40px,10vw,80px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-1px",pointerEvents:"none"}}>MEDIA</div>
       </div>
       {imgs.map((src,i)=><PhotoSlideIn key={i} src={src} delay={i===0?1.8:1.2} index={i} onOpen={()=>setViewerIdx(i)}/>)}
     </div>);
@@ -572,7 +572,7 @@ function EventDetail({ev,onBack}){
     }}>▼</div>
   </>}
   <div style={{position:"fixed",bottom:20,right:20}}>
-    <TapButton onClick={onBack} style={{fontFamily:FONT,fontSize:"clamp(26px,5vw,40px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",cursor:"pointer",padding:"6px 10px",lineHeight:1,letterSpacing:"1.5px"}}>back</TapButton>
+    <TapButton onClick={onBack} style={{fontFamily:ARCH,fontSize:"clamp(26px,5vw,40px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",cursor:"pointer",padding:"6px 10px",lineHeight:1,letterSpacing:"-1px"}}>back</TapButton>
   </div></div>)}
 
 /* ── Home canvas background ── */
@@ -679,7 +679,7 @@ function Home({setPage}){
       {/* Enter archive */}
       <div style={{margin:"40px 0"}}>
         <style>{`@keyframes hCur{0%,100%{opacity:1}50%{opacity:0}}`}</style>
-        <TapButton onClick={()=>setPage("cardindex")} style={{fontFamily:FONT,fontSize:"clamp(26px,7vw,48px)",fontWeight:400,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 16px",textDecoration:"none",letterSpacing:"2px",display:"inline-block"}}>
+        <TapButton onClick={()=>setPage("cardindex")} style={{fontFamily:ARCH,fontSize:"clamp(26px,7vw,48px)",fontWeight:400,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 16px",textDecoration:"none",letterSpacing:"-1px",display:"inline-block"}}>
           enter archive
         </TapButton>
       </div>
@@ -693,7 +693,7 @@ function Home({setPage}){
 
       {/* Upcoming */}
       <div style={{position:"relative",margin:"48px 0"}}>
-        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:1,letterSpacing:"4px",position:"absolute",top:-10,left:0,pointerEvents:"none"}}>UPCOMING</div>
+        <div style={{fontFamily:ARCH,fontSize:"clamp(40px,10vw,80px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:1,letterSpacing:"-1px",position:"absolute",top:-10,left:0,pointerEvents:"none"}}>UPCOMING</div>
         <div style={{fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.55)",lineHeight:1.9,letterSpacing:"0px",paddingTop:40,whiteSpace:"pre-wrap"}}>
           {tw2.displayed}
           {!tw2.done&&<span style={{display:"inline-block",width:6,height:13,background:GREEN,animation:"hCur 0.7s step-end infinite",verticalAlign:"middle",marginLeft:2}}/>}
@@ -702,12 +702,12 @@ function Home({setPage}){
 
       {/* Umbrella */}
       <div style={{position:"relative",margin:"48px 0"}}>
-        <div style={{fontFamily:FONT,fontSize:"clamp(40px,10vw,80px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:1,letterSpacing:"4px",position:"absolute",top:-10,left:0,pointerEvents:"none"}}>UMBRELLA</div>
+        <div style={{fontFamily:ARCH,fontSize:"clamp(40px,10vw,80px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:1,letterSpacing:"-1px",position:"absolute",top:-10,left:0,pointerEvents:"none"}}>UMBRELLA</div>
         <div style={{paddingTop:40,display:"flex",flexDirection:"column",gap:12}}>
-          <TapButton href="https://kyivdispat.ch" style={{fontFamily:FONT,fontSize:"clamp(20px,5vw,36px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"1.5px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
+          <TapButton href="https://kyivdispat.ch" style={{fontFamily:ARCH,fontSize:"clamp(20px,5vw,36px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
             kyiv dispatch record label
           </TapButton>
-          <TapButton href="https://music.youtube.com/channel/UCOnv8gWUnKFFAC2So6EVS_Q" style={{fontFamily:FONT,fontSize:"clamp(20px,5vw,36px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"1.5px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
+          <TapButton href="https://music.youtube.com/channel/UCOnv8gWUnKFFAC2So6EVS_Q" style={{fontFamily:ARCH,fontSize:"clamp(20px,5vw,36px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
             ukho ensemble kyiv
           </TapButton>
         </div>
@@ -720,8 +720,8 @@ function Home({setPage}){
 
       {/* Social links */}
       <div style={{display:"flex",gap:24,alignItems:"center",margin:"24px 0 40px"}}>
-        <TapButton href="https://www.instagram.com/ukho.music/" style={{fontFamily:FONT,fontSize:"clamp(16px,4vw,24px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"1.5px",cursor:"pointer",padding:"4px 8px"}}>inst</TapButton>
-        <TapButton href="https://www.facebook.com/ukhomusic" style={{fontFamily:FONT,fontSize:"clamp(16px,4vw,24px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"1.5px",cursor:"pointer",padding:"4px 8px"}}>fb</TapButton>
+        <TapButton href="https://www.instagram.com/ukho.music/" style={{fontFamily:ARCH,fontSize:"clamp(16px,4vw,24px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1px",cursor:"pointer",padding:"4px 8px"}}>inst</TapButton>
+        <TapButton href="https://www.facebook.com/ukhomusic" style={{fontFamily:ARCH,fontSize:"clamp(16px,4vw,24px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1px",cursor:"pointer",padding:"4px 8px"}}>fb</TapButton>
       </div>
 
     </div>
@@ -899,15 +899,15 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
         {slide.imgs.length>0 ? (
           <Slideshow imgs={slide.imgs} width={colW} forceLoad={idx>=loadRange[0]&&idx<loadRange[1]} fit={FIT_IDS.has(slide.id)}/>
         ) : <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",padding:"12px 16px"}}>
-          <div style={{fontFamily:FONT,fontSize:isMobile?"clamp(13px,3.5vw,18px)":"clamp(11px,1.2vw,15px)",fontWeight:600,color:"rgba(0,0,0,0.4)",textAlign:"center",lineHeight:1.3,letterSpacing:"-0.3px"}}>{(events.find(e=>e.id===slide.id)||{}).n||""}</div>
+          <div style={{fontFamily:ARCH,fontSize:isMobile?"clamp(13px,3.5vw,18px)":"clamp(11px,1.2vw,15px)",fontWeight:400,color:"rgba(0,0,0,0.4)",textAlign:"center",lineHeight:1.3,letterSpacing:"-1px"}}>{(events.find(e=>e.id===slide.id)||{}).n||""}</div>
         </div>}
         {!isMobile&&<div className="ukho-card-sel"/>}
         </div>
         {/* Number overlay — top left like original */}
         <div className={isMobile?undefined:"ukho-card-label"} style={{
           position:"absolute",top:6,left:8,
-          fontFamily:FONT,fontSize:isMobile?"clamp(22px,6vw,36px)":"clamp(18px,2vw,28px)",
-          fontWeight:700,color:slide.imgs.length>0?"rgba(0,0,255,0.6)":"rgba(0,0,255,0.15)",
+          fontFamily:ARCH,fontSize:isMobile?"clamp(22px,6vw,36px)":"clamp(18px,2vw,28px)",
+          fontWeight:400,color:slide.imgs.length>0?"rgba(0,0,255,0.6)":"rgba(0,0,255,0.15)",
           textShadow:slide.imgs.length>0?"0 1px 6px rgba(0,0,0,0.3)":"none",
           pointerEvents:"none",letterSpacing:-1,lineHeight:1,zIndex:2,
           transformOrigin:"top left",
@@ -972,7 +972,7 @@ function PortalsPage(){
         </div>
       </div>}
     </div>
-    {loaded&&<div style={{fontFamily:FONT,fontSize:22,color:"rgba(255,255,255,0.15)",letterSpacing:1,marginTop:24}}>coming soon</div>}
+    {loaded&&<div style={{fontFamily:ARCH,fontSize:22,color:"rgba(255,255,255,0.15)",letterSpacing:"-1px",marginTop:24}}>coming soon</div>}
   </div>);
 }
 
