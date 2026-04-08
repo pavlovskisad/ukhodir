@@ -531,7 +531,7 @@ function EventDetail({ev,onBack}){
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
     <div style={{fontFamily:FONT,fontSize:"clamp(50px,14vw,100px)",fontWeight:700,color:"rgba(0,0,0,0.06)",lineHeight:.85,letterSpacing:-3,marginBottom:8}}>{ev.id}</div>
-    <div style={{marginBottom:24}}><div style={lb}>name</div><div style={{fontFamily:FONT,fontSize:"clamp(22px,5vw,36px)",fontWeight:600,color:"#000",lineHeight:1.2,letterSpacing:"-0.5px"}}>{ev.n}</div></div>
+    <div style={{marginBottom:24}}><div style={{fontFamily:FONT,fontSize:"clamp(22px,5vw,36px)",fontWeight:600,color:"#000",lineHeight:1.2,letterSpacing:"-0.5px"}}>{ev.n}</div></div>
     <div style={{marginBottom:20}}><div style={lb}>program</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pr.map((p,i)=><div key={i}>{p}</div>)}</div></div>
     <div style={{marginBottom:20}}><div style={lb}>performers</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div></div>
     {ev.desc&&<div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.3)",lineHeight:1.7,marginBottom:20}}>{ev.desc.map((p,i)=><div key={i} style={{marginBottom:10}}>{p}</div>)}</div>}
