@@ -7,6 +7,7 @@ import { EVENTS, SLIDES, MEDIA, PERFORMERS } from './data.js';
 const FONT="'Satoshi',sans-serif";const MONO="'Geist Mono',monospace";
 const GREEN="#4af626";const BLUE="#0000ff";const HEADER_H=80;const BAR_H=48;
 const FIELD_KEYS=["name","performers","program","place","tags","date"];
+const norm=s=>s.toLowerCase().replace(/[\u2018\u2019\u2032\u0060]/g,"'").replace(/[\u201c\u201d]/g,'"').normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 const ANIM_MS=400;
 
 function BlinkRect(){const[on,setOn]=useState(false);useEffect(()=>{let t;const tick=()=>{setOn(true);setTimeout(()=>{setOn(false);t=setTimeout(tick,4000+Math.random()*8000)},Math.random()<.12?200:100)};t=setTimeout(tick,Math.random()*6000);return()=>clearTimeout(t)},[]);return <div style={{position:"absolute",inset:"-2px -6px",background:GREEN,opacity:on?.5:0,zIndex:-1,transition:"opacity 0.04s"}}/>}
@@ -271,7 +272,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const filtered=useMemo(()=>{
     let list=reversed;
     if(yearFilter!=="all")list=list.filter(e=>e.d.includes(yearFilter));
-    if(search.trim()){const q=search.toLowerCase();list=list.filter(e=>e.n.toLowerCase().includes(q)||e.pe.some(p=>p.toLowerCase().includes(q))||e.pr.some(p=>p.toLowerCase().includes(q))||e.pl.toLowerCase().includes(q)||e.t.toLowerCase().includes(q)||e.d.includes(q)||String(e.id).includes(q));}
+    if(search.trim()){const q=norm(search);list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q));}
     return list;
   },[reversed,search,yearFilter]);
 
