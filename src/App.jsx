@@ -325,7 +325,8 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   },[isDesk,mode]);
 
   // ── EVERYTHING mode ──
-  if(mode==="everything"){const barB=document.getElementById('ukho-bar');const topH=barB?barB.offsetTop+barB.offsetHeight:(HEADER_H+BAR_H);const items=everything[evSec]||[];return(<>
+  const evBarBottom=useBarBottom();
+  if(mode==="everything"){const topH=evBarBottom;const items=everything[evSec]||[];return(<>
     <div data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
       <div style={{height:topH}}/>
       <div style={{position:"sticky",top:topH,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"12px 20px":"8px 12px",display:"flex",gap:isDesk?8:0,flexWrap:"wrap",justifyContent:isDesk?"flex-start":"space-evenly"}}>{Object.keys(everything).map(s=><button key={s} onClick={()=>setEvSec(s)} style={{fontFamily:FONT,fontSize:isDesk?16:11,fontWeight:evSec===s?700:400,padding:isDesk?"8px 16px":"4px 9px",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button>)}</div>
