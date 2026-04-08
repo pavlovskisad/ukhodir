@@ -126,7 +126,15 @@ function FloatingDice({onRoll}){const[rolling,setRolling]=useState(false);const 
 
 function useBarBottom(){
   const[bb,setBb]=useState(HEADER_H+BAR_H);
-  useEffect(()=>{const m=()=>{const el=document.getElementById('ukho-bar');if(el)setBb(el.offsetTop+el.offsetHeight)};m();const t=setTimeout(m,100);window.addEventListener("resize",m);return()=>{clearTimeout(t);window.removeEventListener("resize",m)}},[]);
+  useEffect(()=>{
+    const m=()=>{const el=document.getElementById('ukho-bar');if(el)setBb(el.offsetTop+el.offsetHeight)};
+    m();const t1=setTimeout(m,50);const t2=setTimeout(m,200);
+    window.addEventListener("resize",m);
+    // Watch bar size changes (carousel appearing/disappearing)
+    const ro=new ResizeObserver(m);
+    const poll=setInterval(()=>{const el=document.getElementById('ukho-bar');if(el){ro.observe(el);clearInterval(poll)}},50);
+    return()=>{clearTimeout(t1);clearTimeout(t2);clearInterval(poll);window.removeEventListener("resize",m);ro.disconnect()};
+  },[]);
   return bb;
 }
 
