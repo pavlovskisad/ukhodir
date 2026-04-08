@@ -687,7 +687,7 @@ function Home({setPage}){
       <div style={{fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.6)",lineHeight:1.8,letterSpacing:"0px",margin:"32px 0",whiteSpace:"pre-wrap"}}>
         {tw1.displayed}
         {!tw1.done&&<span style={{display:"inline-block",width:6,height:13,background:GREEN,animation:"hCur 0.7s step-end infinite",verticalAlign:"middle",marginLeft:2}}/>}
-        {tw1.done&&<div style={{marginTop:12}}><img src="https://raw.githubusercontent.com/pavlovskisad/ukhodir/main/goethe.PNG" alt="Goethe-Institut" style={{height:"clamp(60px,12vw,100px)",display:"block",opacity:0.7,padding:"8px 0"}}/></div>}
+        {tw1.done&&<div style={{marginTop:12}}><img src="https://raw.githubusercontent.com/pavlovskisad/ukhodir/main/goethe.PNG" alt="Goethe-Institut" style={{height:"clamp(120px,24vw,200px)",display:"block",opacity:0.7,padding:"4px 12px"}}/></div>}
       </div>
 
       {/* Upcoming */}
