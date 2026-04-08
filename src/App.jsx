@@ -53,7 +53,7 @@ function Menu({page,setPage}){
 function YearCarousel({years,yearFilter,setYearFilter,dk}){
   const rest=years.filter(y=>y!==yearFilter);
   const n=rest.length;
-  const itemW=dk?62:46;
+  const itemW=dk?62:52;
   const totalW=n*itemW;
   const containerRef=useRef(null);
   const[offset,setOffset]=useState(0);
@@ -71,10 +71,10 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
   const onTM=e=>{const dx=e.touches[0].clientX-touchRef.current.x;setOffset(touchRef.current.o+dx)};
   // 3 copies for loop
   const items=[];for(let c=0;c<3;c++)rest.forEach((y,i)=>items.push({y,c}));
-  return(<div style={{display:"flex",alignItems:"center",gap:dk?8:4,height:dk?28:22}}>
+  return(<div style={{display:"flex",alignItems:"center",gap:dk?8:4,height:dk?28:26}}>
     <button onClick={()=>handleClick(yearFilter)} style={{
-      flexShrink:0,fontFamily:MONO,fontSize:dk?14:11,fontWeight:700,
-      padding:dk?"4px 12px":"2px 8px",
+      flexShrink:0,fontFamily:MONO,fontSize:dk?14:13,fontWeight:700,
+      padding:dk?"4px 12px":"3px 10px",
       background:"rgba(74,246,38,0.15)",border:"1px solid rgba(74,246,38,0.3)",
       cursor:"pointer",color:"#000",letterSpacing:0.3,whiteSpace:"nowrap",
     }}>{yearFilter}</button>
@@ -83,8 +83,8 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
       <div style={{display:"flex",transform:`translateX(${offset}px)`,willChange:"transform",height:"100%",alignItems:"center"}}>
         {items.map(({y},idx)=><button key={idx} onClick={()=>handleClick(y)} style={{
           flexShrink:0,width:itemW,
-          fontFamily:MONO,fontSize:dk?14:10,fontWeight:400,
-          padding:dk?"4px 0":"2px 0",textAlign:"center",
+          fontFamily:MONO,fontSize:dk?14:12,fontWeight:400,
+          padding:dk?"4px 0":"3px 0",textAlign:"center",
           background:"none",border:"1px solid transparent",
           cursor:"pointer",color:"rgba(0,0,0,0.3)",
           letterSpacing:0.3,whiteSpace:"nowrap",
