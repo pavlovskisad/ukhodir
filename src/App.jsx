@@ -42,7 +42,7 @@ function scrollPageToTop(){
 function Menu({page,setPage}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
-  const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(36px,9vw,48px)":"clamp(48px,5vw,68px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:"-1px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
+  const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(40px,10vw,52px)":"clamp(52px,5.5vw,74px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:"-1px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
   return (<div id="ukho-menu" style={{...panelStyle,top:0}}>
     <div onClick={scrollPageToTop} style={{position:"absolute",top:0,left:0,right:0,height:12,cursor:"pointer",zIndex:10}}/>
     <div style={{padding:"2px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(52px,13vw,68px)":"clamp(66px,6.5vw,88px)",fontWeight:400}} onClick={()=>setPage("home")}>/dir</TapButton></div>
@@ -107,7 +107,7 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
       </div>
       {!hm&&<button style={bs} onClick={onTop}>▲</button>}{!hm&&<button style={bs} onClick={onBottom}>▼</button>}
       {hm&&<button style={bs} onClick={onPrev}>‹</button>}{hm&&<span style={{fontFamily:MONO,fontSize:dk?15:11,color:"rgba(0,0,0,0.35)",whiteSpace:"nowrap",letterSpacing:0,minWidth:dk?48:36,textAlign:"center"}}>{matchIdx+1}/{matchCount}</span>}{hm&&<button style={bs} onClick={onNext}>›</button>}
-      <button onClick={onToggleMode} style={{fontFamily:ARCH,fontSize:dk?42:28,fontWeight:700,padding:dk?"4px 10px":"1px 5px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:0,whiteSpace:"nowrap",height:dk?46:34,flexShrink:0,position:"relative",overflow:"hidden",textTransform:"lowercase",display:"flex",alignItems:"center",justifyContent:"center"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite 2s",pointerEvents:"none",opacity:0}}/></button>
+      <button onClick={onToggleMode} style={{fontFamily:ARCH,fontSize:dk?42:28,fontWeight:400,padding:dk?"4px 18px":"1px 8px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:0,whiteSpace:"nowrap",height:dk?46:34,flexShrink:0,position:"relative",overflow:"hidden",textTransform:"lowercase",display:"flex",alignItems:"center",justifyContent:"center"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite 2s",pointerEvents:"none",opacity:0}}/></button>
       <style>{`@keyframes evBlink{0%,100%{opacity:0.18}50%{opacity:0}}`}</style>
     </div>
     {years&&years.length>1&&<YearCarousel years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} dk={dk}/>}
@@ -687,7 +687,7 @@ function Home({setPage}){
       <div style={{fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.6)",lineHeight:1.8,letterSpacing:"0px",margin:"32px 0 0",whiteSpace:"pre-wrap"}}>
         {tw1.displayed}
         {!tw1.done&&<span style={{display:"inline-block",width:6,height:13,background:GREEN,animation:"hCur 0.7s step-end infinite",verticalAlign:"middle",marginLeft:2}}/>}
-        {tw1.done&&<div style={{marginTop:2}}><img src="https://raw.githubusercontent.com/pavlovskisad/ukhodir/main/goethe.PNG" alt="Goethe-Institut" style={{height:"clamp(160px,32vw,260px)",display:"block",opacity:0.7}}/></div>}
+        {tw1.done&&<div style={{marginTop:2}}><img src="/goethe-cropped.png" alt="Goethe-Institut" style={{height:"clamp(160px,32vw,260px)",display:"block",opacity:0.7}}/></div>}
       </div>
 
       {/* Upcoming */}
