@@ -385,7 +385,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
           <div key={e.id} className="ukho-row" onClick={()=>onOpenEvent?.(e)}>
             <div className="ukho-sel"/>
             <div style={{fontFamily:ARCH,fontSize:18,fontWeight:400,color:"rgba(0,0,0,0.1)",letterSpacing:"-1px"}}>{e.id}</div>
-            <div style={{fontFamily:ARCH,fontSize:22,fontWeight:400,color:"#000",letterSpacing:"0.5px",whiteSpace:"pre-line"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
+            <div style={{fontFamily:ARCH,fontSize:28,fontWeight:400,color:"#000",letterSpacing:"0.5px",whiteSpace:"pre-line"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
             <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pr.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
             <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
             <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pl}</div>
