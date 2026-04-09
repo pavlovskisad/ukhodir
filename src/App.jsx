@@ -958,15 +958,23 @@ function PortalsPage(){
       const elapsed=Date.now()-startTime.current;
       const remaining=Math.max(0,2000-elapsed);
       setTimeout(()=>{setLoaded(true);setRevealed(true)},remaining);
-    },(xhr)=>{if(xhr.total>0)setLoadProg(Math.min(xhr.loaded/xhr.total,0.95));else setLoadProg(p=>Math.min(p+0.02,0.9))},(err)=>console.error("USDZ load error:",err));
-    // Fake random progress while loading
-    const fakeTimer=setInterval(()=>{if(realLoaded.current){clearInterval(fakeTimer);return}setLoadProg(p=>{const jump=Math.random()*0.08+0.01;return Math.min(p+jump,0.92)})},200+Math.random()*300);
+    },undefined,(err)=>console.error("USDZ load error:",err));
+    // Fake progress with natural feel
+    let fakeRaf;const runFake=()=>{fakeRaf=setTimeout(()=>{if(realLoaded.current){setLoadProg(1);return}
+      setLoadProg(p=>{
+        if(p<0.15)return p+Math.random()*0.04+0.01;
+        if(p<0.4)return p+Math.random()*0.06+0.02;
+        if(p<0.65)return Math.random()>0.3?p+Math.random()*0.03+0.005:p;
+        if(p<0.85)return Math.random()>0.5?p+Math.random()*0.02+0.003:p;
+        return Math.random()>0.7?p+Math.random()*0.008:p;
+      });runFake();
+    },150+Math.random()*450)};runFake();
     let raf;
     const animate=()=>{raf=requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)};
     animate();
     const onResize=()=>{const ww=el.clientWidth,hh=el.clientHeight;camera.aspect=ww/hh;camera.updateProjectionMatrix();renderer.setSize(ww,hh)};
     window.addEventListener("resize",onResize);
-    return()=>{window.removeEventListener("resize",onResize);cancelAnimationFrame(raf);clearInterval(fakeTimer);renderer.dispose();controls.dispose();if(el.contains(renderer.domElement))el.removeChild(renderer.domElement)};
+    return()=>{window.removeEventListener("resize",onResize);cancelAnimationFrame(raf);clearTimeout(fakeRaf);renderer.dispose();controls.dispose();if(el.contains(renderer.domElement))el.removeChild(renderer.domElement)};
   },[]);
   const pct=revealed?100:Math.round(loadProg*100);
   return(<div style={{minHeight:"100vh",background:"#000",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",paddingTop:HEADER_H-20}}>
