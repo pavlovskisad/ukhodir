@@ -684,8 +684,8 @@ function Home({setPage}){
       </div>
 
       {/* Upcoming — watermark behind typewriter */}
-      <div style={{position:"relative",margin:"0 0 48px"}}>
-        <div style={{fontFamily:ARCH,fontSize:"clamp(120px,30vw,260px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:0.85,letterSpacing:"-2px",position:"absolute",top:0,left:"-2%",width:"104%",pointerEvents:"none",overflow:"hidden",whiteSpace:"nowrap"}}>UPCOMING</div>
+      <div style={{position:"relative",margin:"0 0 80px",overflow:"hidden",padding:"20px 0"}}>
+        <div style={{fontFamily:ARCH,fontSize:"clamp(120px,30vw,260px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:0.85,letterSpacing:"-2px",position:"absolute",top:0,left:0,width:"100%",pointerEvents:"none",whiteSpace:"nowrap"}}>UPCOMING</div>
         <div style={{position:"relative",fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.55)",lineHeight:1.9,letterSpacing:"0px",whiteSpace:"pre-wrap"}}>
           {tw2.displayed}
           {!tw2.done&&<span style={{display:"inline-block",width:6,height:13,background:GREEN,animation:"hCur 0.7s step-end infinite",verticalAlign:"middle",marginLeft:2}}/>}
@@ -693,9 +693,9 @@ function Home({setPage}){
       </div>
 
       {/* Umbrella */}
-      <div style={{position:"relative",margin:"48px 0"}}>
-        <div style={{fontFamily:ARCH,fontSize:"clamp(120px,30vw,260px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:0.85,letterSpacing:"-2px",position:"absolute",top:0,left:"-2%",width:"104%",pointerEvents:"none",overflow:"hidden",whiteSpace:"nowrap"}}>UMBRELLA</div>
-        <div style={{paddingTop:0,display:"flex",flexDirection:"column",gap:12,position:"relative"}}>
+      <div style={{position:"relative",margin:"0 0 48px",overflow:"hidden",padding:"20px 0"}}>
+        <div style={{fontFamily:ARCH,fontSize:"clamp(120px,30vw,260px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:0.85,letterSpacing:"-2px",position:"absolute",top:0,left:0,width:"100%",pointerEvents:"none",whiteSpace:"nowrap"}}>UMBRELLA</div>
+        <div style={{display:"flex",flexDirection:"column",gap:12,position:"relative"}}>
           <TapButton href="https://kyivdispat.ch" style={{fontFamily:ARCH,fontSize:"clamp(56px,14vw,88px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
             kyiv dispatch record label
           </TapButton>
