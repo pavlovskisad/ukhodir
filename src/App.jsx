@@ -1101,8 +1101,9 @@ function RiddlesPage({onOpenEvent,events}){
 
   return (<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"white",display:"flex",flexDirection:"column"}}>
     {/* Riddle text — fills from menu to buttons */}
-    <div style={{flex:1,overflowY:"auto",WebkitOverflowScrolling:"touch",padding:`${HEADER_H+20}px clamp(16px,5vw,40px) 20px`,display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
-      <div style={{width:"100%",maxWidth:600,margin:isDesk?"auto":"0 auto",marginTop:isDesk?undefined:"auto"}}>
+    <div style={{flex:1,overflowY:"auto",WebkitOverflowScrolling:"touch",padding:`${HEADER_H+20}px clamp(16px,5vw,40px) 20px`}}>
+      {!isDesk&&<div style={{height:"40vh"}}/>}
+      <div style={{width:"100%",maxWidth:600,margin:"0 auto"}}>
         {/* Hidden measurer for full text height */}
         <div ref={measureRef} style={{fontFamily:MONO,fontSize:"clamp(14px,3vw,17px)",lineHeight:1.6,letterSpacing:.3,position:"absolute",visibility:"hidden",width:"100%",maxWidth:600,padding:`0 clamp(16px,5vw,40px)`}}>{fullText}</div>
         <div style={{minHeight:textH||"auto"}}>
