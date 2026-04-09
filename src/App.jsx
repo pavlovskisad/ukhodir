@@ -42,7 +42,7 @@ function scrollPageToTop(){
 function Menu({page,setPage}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
-  const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(40px,10vw,52px)":"clamp(52px,5.5vw,74px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:"-1px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
+  const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(40px,10vw,52px)":"clamp(52px,5.5vw,74px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-1px":"-0.5px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
   return (<div id="ukho-menu" style={{...panelStyle,top:0}}>
     <div onClick={scrollPageToTop} style={{position:"absolute",top:0,left:0,right:0,height:12,cursor:"pointer",zIndex:10}}/>
     <div style={{padding:"2px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(52px,13vw,68px)":"clamp(66px,6.5vw,88px)",fontWeight:400}} onClick={()=>setPage("home")}>/dir</TapButton></div>
@@ -393,7 +393,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
           <div key={e.id} className="ukho-row" onClick={()=>onOpenEvent?.(e)}>
             <div className="ukho-sel"/>
             <div style={{fontFamily:ARCH,fontSize:16,fontWeight:400,color:"rgba(0,0,0,0.1)",letterSpacing:"-1px"}}>{e.id}</div>
-            <div style={{fontFamily:ARCH,fontSize:24,fontWeight:400,color:"#000",letterSpacing:"-1px"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
+            <div style={{fontFamily:ARCH,fontSize:24,fontWeight:400,color:"#000",letterSpacing:"-0.3px"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pr.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.2)"}}>{e.pl}</div>
@@ -905,7 +905,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
         {/* Number overlay — top left like original */}
         <div className={isMobile?undefined:"ukho-card-label"} style={{
           position:"absolute",top:6,left:8,
-          fontFamily:ARCH,fontSize:isMobile?"clamp(34px,9vw,50px)":"clamp(26px,2.8vw,40px)",letterSpacing:"-1px",
+          fontFamily:ARCH,fontSize:isMobile?"clamp(38px,10vw,54px)":"clamp(30px,3.2vw,46px)",letterSpacing:"-1px",
           fontWeight:400,color:slide.imgs.length>0?"rgba(0,0,255,0.6)":"rgba(0,0,255,0.15)",
           textShadow:slide.imgs.length>0?"0 1px 6px rgba(0,0,0,0.3)":"none",
           pointerEvents:"none",letterSpacing:-1,lineHeight:1,zIndex:2,
@@ -971,7 +971,7 @@ function PortalsPage(){
         </div>
       </div>}
     </div>
-    {loaded&&<div style={{fontFamily:ARCH,fontSize:48,color:"rgba(255,255,255,0.15)",letterSpacing:"-1px",marginTop:24}}>coming soon</div>}
+    {loaded&&<div style={{fontFamily:ARCH,fontSize:48,color:"rgba(255,255,255,0.15)",letterSpacing:"-1px",marginTop:24,position:"relative",overflow:"hidden"}}>coming soon<div style={{position:"absolute",inset:0,background:"#4af626",animation:"evBlink 1.2s step-end infinite 2s",pointerEvents:"none",opacity:0}}/></div>}
   </div>);
 }
 
@@ -1088,15 +1088,15 @@ function RiddlesPage({onOpenEvent,events}){
   }
 
   const isDesk=typeof window!=="undefined"&&window.innerWidth>768;
-  const S=isDesk?72:36,R=S/2;
-  const ds=(t,l)=>({position:"absolute",width:isDesk?10:5,height:isDesk?10:5,borderRadius:"50%",background:"rgba(0,255,65,0.6)",boxShadow:`0 0 ${isDesk?8:4}px rgba(0,255,65,0.3)`,top:t,left:l,transform:"translate(-50%,-50%)"});
-  const fs=tr=>({position:"absolute",width:S,height:S,border:`${isDesk?2.5:1.5}px solid rgba(0,255,65,0.35)`,background:"rgba(0,255,65,0.05)",transform:tr});
+  const S=isDesk?48:36,R=S/2;
+  const ds=(t,l)=>({position:"absolute",width:isDesk?7:5,height:isDesk?7:5,borderRadius:"50%",background:"rgba(0,255,65,0.6)",boxShadow:`0 0 ${isDesk?6:4}px rgba(0,255,65,0.3)`,top:t,left:l,transform:"translate(-50%,-50%)"});
+  const fs=tr=>({position:"absolute",width:S,height:S,border:`${isDesk?2:1.5}px solid rgba(0,255,65,0.35)`,background:"rgba(0,255,65,0.05)",transform:tr});
 
   return (<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"white",display:"flex",flexDirection:"column"}}>
     {/* Riddle text — fills from menu to buttons */}
     <div style={{flex:1,overflowY:"auto",WebkitOverflowScrolling:"touch",padding:`${HEADER_H+20}px clamp(16px,5vw,40px) 20px`,display:"flex",alignItems:"center"}}>
       <div style={{width:"100%",maxWidth:600,margin:"0 auto"}}>
-        <div style={{fontFamily:MONO,fontSize:"clamp(12px,2.5vw,14px)",lineHeight:1.6,letterSpacing:.3,color:"rgba(0,0,0,0.9)"}}>
+        <div style={{fontFamily:MONO,fontSize:"clamp(14px,3vw,17px)",lineHeight:1.6,letterSpacing:.3,color:"rgba(0,0,0,0.9)"}}>
           {displayed}
           <span style={{display:"inline-block",width:6,height:13,background:"rgba(0,255,65,0.8)",verticalAlign:"middle",marginLeft:2,animation:"rcBlink 0.7s step-end infinite"}}/>
         </div>
