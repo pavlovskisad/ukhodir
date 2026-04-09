@@ -208,7 +208,7 @@ function CardContent({ev,search,selected,showGreen,onClick}){
     {showGreen&&<div style={{position:"absolute",inset:0,background:"rgba(74,246,38,0.12)",pointerEvents:"none",zIndex:0,transition:"background 0.1s"}}/>}
     <div ref={innerRef} style={{
       padding:"clamp(8px,2vw,24px) 14px clamp(10px,3vw,28px)",paddingRight:"clamp(100px,22vw,140px)",
-      display:"flex",flexDirection:"column",justifyContent:"space-between",gap:"clamp(5px,1.5vh,16px)",
+      display:"flex",flexDirection:"column",justifyContent:"space-between",gap:"clamp(3px,1vh,14px)",
       minHeight:`${100/shrink}%`,
       transform:`scale(${shrink})`,transformOrigin:"top left",
       width:`${100/shrink}%`,
@@ -217,9 +217,9 @@ function CardContent({ev,search,selected,showGreen,onClick}){
       <div><div data-field="name" style={{fontFamily:ARCH,fontSize:"clamp(40px,10vw,70px)",color:"rgba(0,0,0,0.08)",letterSpacing:0,lineHeight:0.85,marginBottom:"-0.3em"}}>{ev.id}</div><div style={{fontFamily:ARCH,fontSize:"clamp(36px,8vw,56px)",fontWeight:400,color:"#000",lineHeight:1.15,letterSpacing:"-0.3px",zIndex:1,position:"relative",whiteSpace:"pre-line"}}>{hl(ev.n)}</div></div>
       <div data-field="program" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pr.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
       <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
-      <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35}}>{hl(ev.pl)}</div>
-      <div data-field="tags" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35,textTransform:"lowercase"}}>{hl(ev.t)}</div>
-      <div data-field="date" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35}}>{ev.d}</div>
+      <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{hl(ev.pl)}</div>
+      <div data-field="tags" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35,textTransform:"uppercase"}}>{hl(ev.t)}</div>
+      <div data-field="date" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.d}</div>
     </div>
   </div>);
 }
@@ -546,11 +546,11 @@ function EventDetail({ev,onBack}){
     <div style={{marginBottom:24}}><div style={{fontFamily:ARCH,fontSize:"clamp(46px,11vw,72px)",fontWeight:400,color:"#000",lineHeight:1.2,letterSpacing:"-1px",whiteSpace:"pre-line"}}>{ev.n}</div></div>
     <div style={{marginBottom:20}}><div style={lb}>program</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pr.map((p,i)=><div key={i}>{p}</div>)}</div></div>
     <div style={{marginBottom:20}}><div style={lb}>performers</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div></div>
-    {ev.desc&&<div style={{marginBottom:20}}><div style={lb}>description</div><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.3)",lineHeight:1.7}}>{ev.desc.map((p,i)=><div key={i} style={{marginBottom:10}}>{p}</div>)}</div></div>}
-    {ev.team&&<div style={{marginBottom:20}}><div style={lb}>team</div><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.team.map((p,i)=><div key={i}>{p}</div>)}</div></div>}
-    <div style={{marginBottom:8}}><div style={lb}>place</div><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)"}}>{ev.pl}</div></div>
-    <div style={{marginBottom:8}}><div style={lb}>tags</div><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)",textTransform:"lowercase"}}>{ev.t}</div></div>
-    <div><div style={lb}>date</div><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.2)"}}>{ev.d}</div></div>
+    {ev.desc&&<div style={{marginBottom:20}}><div style={lb}>description</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.desc.map((p,i)=><div key={i} style={{marginBottom:10}}>{p}</div>)}</div></div>}
+    {ev.team&&<div style={{marginBottom:20}}><div style={lb}>team</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.team.map((p,i)=><div key={i}>{p}</div>)}</div></div>}
+    <div style={{marginBottom:8}}><div style={lb}>place</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pl}</div></div>
+    <div style={{marginBottom:8}}><div style={lb}>tags</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6,textTransform:"uppercase"}}>{ev.t}</div></div>
+    <div><div style={lb}>date</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.d}</div></div>
   </div>
   {ev.poster&&<div style={{padding:"0 clamp(16px,4vw,40px)",paddingBottom:40}}><PosterSlideIn src={ev.poster} credit={ev.pc} alt={ev.n}/></div>}
   </div>{/* close maxWidth:860 container */}
