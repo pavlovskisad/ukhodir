@@ -971,7 +971,7 @@ function PortalsPage(){
         </div>
       </div>}
     </div>
-    {loaded&&<div style={{fontFamily:ARCH,fontSize:48,color:"rgba(255,255,255,0.15)",letterSpacing:"-1px",marginTop:24,position:"relative",overflow:"hidden"}}>coming soon<div style={{position:"absolute",inset:0,background:"#4af626",animation:"evBlink 1.2s step-end infinite 2s",pointerEvents:"none",opacity:0}}/></div>}
+    {loaded&&<div style={{fontFamily:ARCH,fontSize:48,color:"rgba(255,255,255,0.15)",letterSpacing:"-1px",marginTop:24,position:"relative",overflow:"hidden"}}>coming soon<div style={{position:"absolute",inset:0,background:"rgba(255,255,255,0.3)",animation:"evBlink 1.2s step-end infinite 2s",pointerEvents:"none",opacity:0}}/></div>}
   </div>);
 }
 
