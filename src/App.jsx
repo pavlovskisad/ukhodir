@@ -8,7 +8,7 @@ import { PROGRAMS } from './programs.js';
 const FONT="'Satoshi',sans-serif";const MONO="'Geist Mono',monospace";const ARCH="'Archaism','Satoshi',sans-serif";
 const GREEN="#4af626";const BLUE="#0000ff";const HEADER_H=80;const BAR_H=48;
 const FIELD_KEYS=["name","program","performers","place","tags","date"];
-const norm=s=>s.toLowerCase().replace(/[\u2018\u2019\u2032\u0060]/g,"'").replace(/[\u201c\u201d]/g,'"').normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const norm=s=>s.toLowerCase().replace(/[\u00a0\u2002-\u200b]/g," ").replace(/[\u2018\u2019\u2032\u0060]/g,"'").replace(/[\u201c\u201d]/g,'"').normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 const strip=s=>norm(s).replace(/[\u0400-\u04ff]/g,c=>{const m={"\u0430":"a","\u0435":"e","\u043e":"o","\u0440":"p","\u0441":"c","\u0443":"y","\u0445":"x","\u0456":"i","\u0457":"i"};return m[c]||""}).replace(/[^a-z0-9]/g,"");
 const PROG_MAP={"Johann Strauss II / arr. Alban Berg":5,"Johann Strauss II / arr. Anton Webern":5,"Johann Strauss II / arr. Arnold Schoenberg":5,'Carlo Gesualdo — "Mercè" grido piangendo (1611)':52,"Nataliia Polovynka, Slovo i Holos (Word and Voice)":46};
 const ANIM_MS=400;
@@ -277,8 +277,8 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     if(yearFilter!=="all")list=list.filter(e=>e.d.includes(yearFilter));
     if(search.trim()){
       if(progTerms){
-        const{raw}=progTerms;
-        list=list.filter(e=>e.pr.some(p=>p===raw));
+        const{raw}=progTerms;const pn=s=>norm(s).replace(/,\s*/g," ").replace(/\s+/g," ").replace(/[\u2013\u2014]/g,"-").replace(/\s*\d+[''′]\s*$/,"");const core=s=>{const d=s.indexOf(" — ");if(d<0)return pn(s);const a=s.slice(0,d),t=s.slice(d+3).split(/\s*[\(\[]/)[0].trim();return pn(a+" — "+t)};const nr=pn(raw);const cr=core(raw);
+        list=list.filter(e=>e.pr.some(p=>{const np=pn(p);return np===nr||np.includes(nr)||nr.includes(np)||core(p)===cr}));
       }else{
         const q=norm(search);list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q));
       }
