@@ -920,13 +920,11 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
   </div></div>);
 }
 
-let portalsVisited=false;
 function PortalsPage(){
   const mountRef=useRef(null);
-  const skipPreloader=useRef(portalsVisited);
-  const[loadProg,setLoadProg]=useState(skipPreloader.current?1:0);
-  const[loaded,setLoaded]=useState(skipPreloader.current);
-  const[revealed,setRevealed]=useState(skipPreloader.current);
+  const[loadProg,setLoadProg]=useState(0);
+  const[loaded,setLoaded]=useState(false);
+  const[revealed,setRevealed]=useState(false);
   const realLoaded=useRef(false);
   const startTime=useRef(Date.now());
   useEffect(()=>{
@@ -957,29 +955,24 @@ function PortalsPage(){
       if(maxDim>0)group.scale.multiplyScalar(1.5/maxDim);
       scene.add(group);
       realLoaded.current=true;
-      if(skipPreloader.current){setLoaded(true);setRevealed(true)}
     },undefined,(err)=>console.error("USDZ load error:",err));
-    // Animation loop & resize — always needed
     let raf;
     const animate=()=>{raf=requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)};
     animate();
     const onResize=()=>{const ww=el.clientWidth,hh=el.clientHeight;camera.aspect=ww/hh;camera.updateProjectionMatrix();renderer.setSize(ww,hh)};
     window.addEventListener("resize",onResize);
-    // Fake progress — first visit only
-    let fakeRaf;
-    if(!skipPreloader.current){let done=false;const runFake=()=>{if(done)return;fakeRaf=setTimeout(()=>{
+    let fakeRaf;let done=false;const runFake=()=>{if(done)return;fakeRaf=setTimeout(()=>{
       setLoadProg(p=>{
         const elapsed=Date.now()-startTime.current;
-        if(p>=0.95&&realLoaded.current&&elapsed>=2000){
-          done=true;setTimeout(()=>{portalsVisited=true;setLoaded(true);setRevealed(true)},300);return 1;
+        if(p>=0.95&&realLoaded.current&&elapsed>=1000){
+          done=true;setTimeout(()=>{setLoaded(true);setRevealed(true)},200);return 1;
         }
-        const cap=realLoaded.current&&elapsed>=1800?1:0.95;
-        if(p<0.4)return Math.min(p+Math.random()*0.2+0.12,cap);
-        if(p<0.7)return Math.min(p+Math.random()*0.18+0.09,cap);
-        if(p<0.9)return Math.min(p+Math.random()*0.12+0.05,cap);
-        return Math.min(p+Math.random()*0.06+0.03,cap);
+        const cap=realLoaded.current&&elapsed>=800?1:0.95;
+        if(p<0.5)return Math.min(p+Math.random()*0.25+0.15,cap);
+        if(p<0.8)return Math.min(p+Math.random()*0.2+0.1,cap);
+        return Math.min(p+Math.random()*0.1+0.05,cap);
       });runFake();
-    },80+Math.random()*250)};runFake();}
+    },60+Math.random()*180)};runFake();
     return()=>{window.removeEventListener("resize",onResize);cancelAnimationFrame(raf);if(fakeRaf)clearTimeout(fakeRaf);renderer.dispose();controls.dispose();if(el.contains(renderer.domElement))el.removeChild(renderer.domElement)};
   },[]);
   const pct=revealed?100:Math.round(loadProg*100);
