@@ -907,8 +907,8 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
         {/* Number overlay — top left like original */}
         <div className={isMobile?undefined:"ukho-card-label"} style={{
           position:"absolute",top:6,left:8,
-          fontFamily:ARCH,fontSize:isMobile?"clamp(38px,10vw,54px)":"clamp(30px,3.2vw,46px)",letterSpacing:"-1px",
-          fontWeight:700,color:slide.imgs.length>0?"rgba(0,0,255,0.6)":"rgba(0,0,255,0.15)",
+          fontFamily:ARCH,fontSize:isMobile?"clamp(40px,10.5vw,56px)":"clamp(32px,3.4vw,48px)",letterSpacing:"-0.3px",
+          fontWeight:700,color:"rgba(0,0,255,0.6)",
           textShadow:slide.imgs.length>0?"0 1px 6px rgba(0,0,0,0.3)":"none",
           pointerEvents:"none",letterSpacing:-1,lineHeight:1,zIndex:2,
           transformOrigin:"top left",
