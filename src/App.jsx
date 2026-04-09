@@ -46,7 +46,7 @@ function Menu({page,setPage}){
   return (<div id="ukho-menu" style={{...panelStyle,top:0}}>
     <div onClick={scrollPageToTop} style={{position:"absolute",top:0,left:0,right:0,height:12,cursor:"pointer",zIndex:10}}/>
     <div style={{padding:"2px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(52px,13vw,68px)":"clamp(66px,6.5vw,88px)",fontWeight:400}} onClick={()=>setPage("home")}>/dir</TapButton></div>
-    <div style={{display:"flex",justifyContent:"space-between",padding:"0px 14px 2px"}}>{pages.map(p=><TapButton key={p} style={{...bs,fontWeight:page===p?600:400,color:page===p?"rgba(0,0,0,0.25)":BLUE}} onClick={()=>setPage(p)}>/{p}</TapButton>)}</div>
+    <div style={{display:"flex",justifyContent:"space-between",padding:"0px 14px 2px"}}>{pages.map(p=><TapButton key={p} style={{...bs,fontWeight:page===p?600:400,color:page===p?"rgba(0,0,0,0.08)":BLUE}} onClick={()=>setPage(p)}>/{p}</TapButton>)}</div>
   </div>);
 }
 
@@ -924,6 +924,9 @@ function PortalsPage(){
   const mountRef=useRef(null);
   const[loadProg,setLoadProg]=useState(0);
   const[loaded,setLoaded]=useState(false);
+  const[revealed,setRevealed]=useState(false);
+  const realLoaded=useRef(false);
+  const startTime=useRef(Date.now());
   useEffect(()=>{
     const el=mountRef.current;if(!el)return;
     const w=el.clientWidth,h=el.clientHeight;
@@ -951,19 +954,24 @@ function PortalsPage(){
       group.position.sub(center);
       if(maxDim>0)group.scale.multiplyScalar(1.5/maxDim);
       scene.add(group);
-      setLoaded(true);
-    },(xhr)=>{if(xhr.total>0)setLoadProg(Math.min(xhr.loaded/xhr.total,1));else setLoadProg(p=>Math.min(p+0.02,0.95))},(err)=>console.error("USDZ load error:",err));
+      realLoaded.current=true;
+      const elapsed=Date.now()-startTime.current;
+      const remaining=Math.max(0,2000-elapsed);
+      setTimeout(()=>{setLoaded(true);setRevealed(true)},remaining);
+    },(xhr)=>{if(xhr.total>0)setLoadProg(Math.min(xhr.loaded/xhr.total,0.95));else setLoadProg(p=>Math.min(p+0.02,0.9))},(err)=>console.error("USDZ load error:",err));
+    // Fake random progress while loading
+    const fakeTimer=setInterval(()=>{if(realLoaded.current){clearInterval(fakeTimer);return}setLoadProg(p=>{const jump=Math.random()*0.08+0.01;return Math.min(p+jump,0.92)})},200+Math.random()*300);
     let raf;
     const animate=()=>{raf=requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)};
     animate();
     const onResize=()=>{const ww=el.clientWidth,hh=el.clientHeight;camera.aspect=ww/hh;camera.updateProjectionMatrix();renderer.setSize(ww,hh)};
     window.addEventListener("resize",onResize);
-    return()=>{window.removeEventListener("resize",onResize);cancelAnimationFrame(raf);renderer.dispose();controls.dispose();if(el.contains(renderer.domElement))el.removeChild(renderer.domElement)};
+    return()=>{window.removeEventListener("resize",onResize);cancelAnimationFrame(raf);clearInterval(fakeTimer);renderer.dispose();controls.dispose();if(el.contains(renderer.domElement))el.removeChild(renderer.domElement)};
   },[]);
-  const pct=loaded?100:Math.round(loadProg*100);
-  return(<div style={{minHeight:"100vh",background:"#000",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",paddingTop:HEADER_H+20}}>
+  const pct=revealed?100:Math.round(loadProg*100);
+  return(<div style={{minHeight:"100vh",background:"#000",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",paddingTop:HEADER_H-20}}>
     <div ref={mountRef} style={{width:"min(80vw,500px)",height:"min(80vw,500px)",position:"relative"}}>
-      {!loaded&&<div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:10,pointerEvents:"none"}}>
+      {!revealed&&<div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:10,pointerEvents:"none"}}>
         <style>{`@keyframes holo{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}@keyframes barPulse{0%,100%{box-shadow:0 0 8px rgba(74,246,38,0.4),0 0 20px rgba(74,246,38,0.15)}50%{box-shadow:0 0 14px rgba(74,246,38,0.7),0 0 30px rgba(74,246,38,0.25)}}@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}`}</style>
         <div style={{width:"60%",maxWidth:220}}>
           <div style={{height:3,borderRadius:2,background:"rgba(255,255,255,0.06)",position:"relative",overflow:"hidden",animation:"barPulse 2s ease-in-out infinite"}}>
@@ -974,7 +982,7 @@ function PortalsPage(){
         </div>
       </div>}
     </div>
-    {loaded&&<div style={{fontFamily:ARCH,fontSize:48,color:"rgba(255,255,255,0.15)",letterSpacing:"-1px",marginTop:24,position:"relative",overflow:"hidden"}}>under construction<style>{`@keyframes csBlink{0%,90%,100%{opacity:0.5}95%{opacity:0}}`}</style><div style={{position:"absolute",inset:0,background:"rgba(255,60,60,0.6)",animation:"csBlink 4s ease infinite",pointerEvents:"none"}}/></div>}
+    {revealed&&<div style={{fontFamily:ARCH,fontSize:48,color:"rgba(255,255,255,0.15)",letterSpacing:"-1px",marginTop:24,position:"relative",overflow:"hidden"}}>under construction<style>{`@keyframes csBlink{0%,90%,100%{opacity:0.5}95%{opacity:0}}`}</style><div style={{position:"absolute",inset:0,background:"rgba(255,60,60,0.6)",animation:"csBlink 4s ease infinite",pointerEvents:"none"}}/></div>}
   </div>);
 }
 
