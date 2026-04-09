@@ -196,7 +196,7 @@ function CardContent({ev,search,selected,showGreen,onClick}){
     inner.style.transform="scale(1)";inner.style.transformOrigin="top left";
     requestAnimationFrame(()=>{
       const need=inner.scrollHeight;
-      const s=need>avail?Math.max(0.45,avail/need):1;
+      const s=need>avail?Math.max(0.3,avail/need):1;
       setShrink(s);
     });
   },[ev.id,search]);
