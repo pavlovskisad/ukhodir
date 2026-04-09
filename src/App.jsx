@@ -1105,7 +1105,7 @@ function RiddlesPage({onOpenEvent,events}){
       <div style={{width:"100%",maxWidth:600,margin:"0 auto",height:"100%",display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
         {/* Hidden measurer for full text height */}
         <div ref={measureRef} style={{fontFamily:MONO,fontSize:"clamp(14px,3vw,17px)",lineHeight:1.6,letterSpacing:.3,position:"absolute",visibility:"hidden",width:"100%",maxWidth:600,padding:`0 clamp(16px,5vw,40px)`}}>{fullText}</div>
-        <div style={{minHeight:Math.max(textH||0,window.innerHeight*0.35)}}>
+        <div style={{minHeight:Math.max(textH||0,window.innerHeight*0.35),paddingTop:isDesk?0:80}}>
           <div style={{fontFamily:MONO,fontSize:"clamp(14px,3vw,17px)",lineHeight:1.6,letterSpacing:.3,color:"rgba(0,0,0,0.9)"}}>
             {displayed}
             <span style={{display:"inline-block",width:6,height:13,background:"rgba(0,255,65,0.8)",verticalAlign:"middle",marginLeft:2,animation:"rcBlink 0.7s step-end infinite"}}/>
