@@ -900,7 +900,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
         {slide.imgs.length>0 ? (
           <Slideshow imgs={slide.imgs} width={colW} forceLoad={idx>=loadRange[0]&&idx<loadRange[1]} fit={FIT_IDS.has(slide.id)}/>
         ) : <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",padding:"12px 16px"}}>
-          <div style={{fontFamily:ARCH,fontSize:isMobile?"clamp(22px,5vw,30px)":"clamp(16px,1.6vw,22px)",fontWeight:400,color:"rgba(0,0,0,0.4)",textAlign:"center",lineHeight:1.3,letterSpacing:"-1px"}}>{(events.find(e=>e.id===slide.id)||{}).n||""}</div>
+          <div style={{fontFamily:ARCH,fontSize:isMobile?"clamp(28px,6.5vw,38px)":"clamp(20px,2vw,28px)",fontWeight:400,color:"rgba(0,0,0,0.4)",textAlign:"center",lineHeight:1.3,letterSpacing:0}}>{(events.find(e=>e.id===slide.id)||{}).n||""}</div>
         </div>}
         {!isMobile&&<div className="ukho-card-sel"/>}
         </div>
