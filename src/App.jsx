@@ -680,12 +680,12 @@ function Home({setPage}){
       <div style={{fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.6)",lineHeight:1.8,letterSpacing:"0px",margin:"32px 0 0",whiteSpace:"pre-wrap"}}>
         {tw1.displayed}
         {!tw1.done&&<span style={{display:"inline-block",width:6,height:13,background:GREEN,animation:"hCur 0.7s step-end infinite",verticalAlign:"middle",marginLeft:2}}/>}
-        {tw1.done&&<div style={{marginTop:8,marginBottom:64}}><img src="/goethe-cropped.png" alt="Goethe-Institut" style={{height:"clamp(50px,10vw,80px)",display:"block",opacity:0.7}}/></div>}
+        {tw1.done&&<div style={{marginTop:8}}><img src="/goethe-cropped.png" alt="Goethe-Institut" style={{height:"clamp(50px,10vw,80px)",display:"block",opacity:0.7}}/></div>}
       </div>
 
       {/* Upcoming — watermark behind typewriter */}
-      <div style={{position:"relative",margin:"0 0 80px",padding:"20px 0"}}>
-        <div style={{fontFamily:ARCH,fontSize:"clamp(120px,30vw,260px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-2px",position:"absolute",top:"50%",left:0,transform:"translateY(-50%)",pointerEvents:"none",whiteSpace:"nowrap"}}>UPCOMING</div>
+      <div style={{position:"relative",margin:"60px 0",padding:"20px 0"}}>
+        <div style={{fontFamily:ARCH,fontSize:"clamp(80px,20vw,160px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-1px",position:"absolute",top:"50%",left:0,transform:"translateY(-50%)",pointerEvents:"none",whiteSpace:"nowrap"}}>UPCOMING</div>
         <div style={{position:"relative",fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.55)",lineHeight:1.9,letterSpacing:"0px",whiteSpace:"pre-wrap"}}>
           {tw2.displayed}
           {!tw2.done&&<span style={{display:"inline-block",width:6,height:13,background:GREEN,animation:"hCur 0.7s step-end infinite",verticalAlign:"middle",marginLeft:2}}/>}
@@ -693,8 +693,8 @@ function Home({setPage}){
       </div>
 
       {/* Umbrella */}
-      <div style={{position:"relative",margin:"0 0 48px",padding:"20px 0"}}>
-        <div style={{fontFamily:ARCH,fontSize:"clamp(120px,30vw,260px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-2px",position:"absolute",top:"50%",left:0,transform:"translateY(-50%)",pointerEvents:"none",whiteSpace:"nowrap"}}>UMBRELLA</div>
+      <div style={{position:"relative",margin:"60px 0",padding:"20px 0"}}>
+        <div style={{fontFamily:ARCH,fontSize:"clamp(80px,20vw,160px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-1px",position:"absolute",top:"50%",left:0,transform:"translateY(-50%)",pointerEvents:"none",whiteSpace:"nowrap"}}>UMBRELLA</div>
         <div style={{display:"flex",flexDirection:"column",gap:12,position:"relative"}}>
           <TapButton href="https://kyivdispat.ch" style={{fontFamily:ARCH,fontSize:"clamp(56px,14vw,88px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
             kyiv dispatch record label
@@ -706,7 +706,7 @@ function Home({setPage}){
       </div>
 
       {/* Team */}
-      <p style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",fontWeight:400,color:"rgba(0,0,0,0.4)",lineHeight:1.7,...LS,margin:"48px 0 40px"}}>
+      <p style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",fontWeight:400,color:"rgba(0,0,0,0.4)",lineHeight:1.7,...LS,margin:"0 0 40px"}}>
         Ukho's curatorial and production work is sustained by a small core, with collaborators joining for specific periods. At different times, the curatorial team included Sasha Andrusyk, Eugene Shimalsky, Katya Sula, Katya Libkind, Luigi Gaggero, Ian Spektor, and Mykhailo Bogachov.
       </p>
 
