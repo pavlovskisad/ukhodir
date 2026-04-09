@@ -1224,14 +1224,16 @@ function AnalogOverlay(){
   return <canvas ref={canvasRef} style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',pointerEvents:'none',zIndex:99998,opacity:ready?1:0,transition:'opacity 0.3s ease'}}/>;
 }
 
-export default function App(){const[page,setPage]=useState("home");const[openEvent,setOpenEvent]=useState(null);const[prevPage,setPrevPage]=useState(null);
+export default function App(){
+  const initEvent=useMemo(()=>{const m=window.location.pathname.match(/^\/event\/(\d+)$/);return m?EVENTS.find(e=>e.id===+m[1]):null},[]);
+  const[page,setPage]=useState(initEvent?"list":"home");const[openEvent,setOpenEvent]=useState(initEvent||null);const[prevPage,setPrevPage]=useState(initEvent?"list":null);
   const cardScrollRef=useRef(0);
   const listIdxRef=useRef(0);const listSearchRef=useRef("");const listYearRef=useRef("all");const listModeRef=useRef("list");const listScrollRef=useRef(0);
-  const handleOpenEvent=(ev)=>{setPrevPage(page);setOpenEvent(ev);window.history.pushState({event:ev.id},"");window.scrollTo(0,0)};
-  const handleBack=useCallback(()=>{setOpenEvent(null);if(prevPage)setPage(prevPage)},[prevPage]);
+  const handleOpenEvent=(ev)=>{setPrevPage(page);setOpenEvent(ev);window.history.pushState({event:ev.id},"","/event/"+ev.id);window.scrollTo(0,0)};
+  const handleBack=useCallback(()=>{setOpenEvent(null);if(prevPage)setPage(prevPage);window.history.pushState({},"","/")},[prevPage]);
   // Browser back button support
-  useEffect(()=>{const onPop=()=>{if(openEvent){setOpenEvent(null);if(prevPage)setPage(prevPage)}};window.addEventListener("popstate",onPop);return()=>window.removeEventListener("popstate",onPop)},[openEvent,prevPage]);
-  const handleRollEvent=useCallback(()=>{const other=EVENTS.filter(e=>e.id!==openEvent?.id);const ev=other[Math.floor(Math.random()*other.length)];if(ev){setOpenEvent(ev);window.scrollTo(0,0);window.history.pushState({event:ev.id},"")}},[openEvent]);
+  useEffect(()=>{const onPop=()=>{const m=window.location.pathname.match(/^\/event\/(\d+)$/);if(m){const ev=EVENTS.find(e=>e.id===+m[1]);if(ev){setOpenEvent(ev);return}}setOpenEvent(null);if(prevPage)setPage(prevPage)};window.addEventListener("popstate",onPop);return()=>window.removeEventListener("popstate",onPop)},[prevPage]);
+  const handleRollEvent=useCallback(()=>{const other=EVENTS.filter(e=>e.id!==openEvent?.id);const ev=other[Math.floor(Math.random()*other.length)];if(ev){setOpenEvent(ev);window.scrollTo(0,0);window.history.pushState({event:ev.id},"","/event/"+ev.id)}},[openEvent]);
   const globalBtnStyle=`button,a{transition:transform 0.12s ease!important;position:relative!important;overflow:hidden!important}button:hover,a:hover{transform:scale(0.95)!important}button:active,a:active{transform:scale(0.90)!important}button::after,a::after{content:'';position:absolute;inset:0;background:#4af626;opacity:0;pointer-events:none}button:hover::after,a:hover::after{opacity:0.1;transition:opacity 0.12s}`;
   if(openEvent) return (<><style>{globalBtnStyle}</style><EventDetail ev={openEvent} onBack={handleBack}/><FloatingDice onRoll={handleRollEvent}/><AnalogOverlay/></>);
   return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden"}}>
