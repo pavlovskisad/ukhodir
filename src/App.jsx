@@ -959,29 +959,28 @@ function PortalsPage(){
       realLoaded.current=true;
       if(skipPreloader.current){setLoaded(true);setRevealed(true)}
     },undefined,(err)=>console.error("USDZ load error:",err));
-    // Fake progress — runs independently of actual load (first visit only)
-    if(skipPreloader.current)return()=>{window.removeEventListener("resize",onResize);cancelAnimationFrame(raf);renderer.dispose();controls.dispose();if(el.contains(renderer.domElement))el.removeChild(renderer.domElement)};
-    let fakeRaf;let done=false;const runFake=()=>{if(done)return;fakeRaf=setTimeout(()=>{
-      setLoadProg(p=>{
-        const elapsed=Date.now()-startTime.current;
-        // After 2s and model ready, allow finishing
-        if(p>=0.95&&realLoaded.current&&elapsed>=2000){
-          done=true;setTimeout(()=>{portalsVisited=true;setLoaded(true);setRevealed(true)},300);return 1;
-        }
-        // Cap at 95% until model is ready
-        const cap=realLoaded.current&&elapsed>=1800?1:0.95;
-        if(p<0.4)return Math.min(p+Math.random()*0.15+0.08,cap);
-        if(p<0.7)return Math.min(p+Math.random()*0.12+0.06,cap);
-        if(p<0.9)return Math.min(p+Math.random()*0.08+0.03,cap);
-        return Math.min(p+Math.random()*0.04+0.02,cap);
-      });runFake();
-    },120+Math.random()*380)};runFake();
+    // Animation loop & resize — always needed
     let raf;
     const animate=()=>{raf=requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)};
     animate();
     const onResize=()=>{const ww=el.clientWidth,hh=el.clientHeight;camera.aspect=ww/hh;camera.updateProjectionMatrix();renderer.setSize(ww,hh)};
     window.addEventListener("resize",onResize);
-    return()=>{window.removeEventListener("resize",onResize);cancelAnimationFrame(raf);clearTimeout(fakeRaf);renderer.dispose();controls.dispose();if(el.contains(renderer.domElement))el.removeChild(renderer.domElement)};
+    // Fake progress — first visit only
+    let fakeRaf;
+    if(!skipPreloader.current){let done=false;const runFake=()=>{if(done)return;fakeRaf=setTimeout(()=>{
+      setLoadProg(p=>{
+        const elapsed=Date.now()-startTime.current;
+        if(p>=0.95&&realLoaded.current&&elapsed>=2000){
+          done=true;setTimeout(()=>{portalsVisited=true;setLoaded(true);setRevealed(true)},300);return 1;
+        }
+        const cap=realLoaded.current&&elapsed>=1800?1:0.95;
+        if(p<0.4)return Math.min(p+Math.random()*0.2+0.12,cap);
+        if(p<0.7)return Math.min(p+Math.random()*0.18+0.09,cap);
+        if(p<0.9)return Math.min(p+Math.random()*0.12+0.05,cap);
+        return Math.min(p+Math.random()*0.06+0.03,cap);
+      });runFake();
+    },80+Math.random()*250)};runFake();}
+    return()=>{window.removeEventListener("resize",onResize);cancelAnimationFrame(raf);if(fakeRaf)clearTimeout(fakeRaf);renderer.dispose();controls.dispose();if(el.contains(renderer.domElement))el.removeChild(renderer.domElement)};
   },[]);
   const pct=revealed?100:Math.round(loadProg*100);
   return(<div style={{minHeight:"100vh",background:"#000",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",paddingTop:HEADER_H-20}}>
