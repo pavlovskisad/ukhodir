@@ -909,7 +909,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
           position:"absolute",top:6,left:8,
           fontFamily:ARCH,fontSize:isMobile?"clamp(42px,11vw,58px)":"clamp(34px,3.6vw,50px)",letterSpacing:0,
           fontWeight:400,color:"rgba(0,0,255,0.6)",
-          textShadow:slide.imgs.length>0?"0 0 4px rgba(255,255,255,0.6), 0 0 2px rgba(255,255,255,0.5)":"none",
+          textShadow:slide.imgs.length>0?"0 1px 4px rgba(128,128,128,0.5), 0 0 2px rgba(128,128,128,0.3)":"none",
           pointerEvents:"none",letterSpacing:-1,lineHeight:1,zIndex:2,
           transformOrigin:"top left",
         }}>{slide.id}</div>
