@@ -955,20 +955,25 @@ function PortalsPage(){
       if(maxDim>0)group.scale.multiplyScalar(1.5/maxDim);
       scene.add(group);
       realLoaded.current=true;
-      const elapsed=Date.now()-startTime.current;
-      const remaining=Math.max(0,2000-elapsed);
-      setTimeout(()=>{setLoaded(true);setRevealed(true)},remaining);
     },undefined,(err)=>console.error("USDZ load error:",err));
-    // Fake progress with natural feel
-    let fakeRaf;const runFake=()=>{fakeRaf=setTimeout(()=>{if(realLoaded.current){setLoadProg(1);return}
+    // Fake progress — runs independently of actual load
+    let fakeRaf;let done=false;const runFake=()=>{if(done)return;fakeRaf=setTimeout(()=>{
       setLoadProg(p=>{
-        if(p<0.15)return p+Math.random()*0.04+0.01;
-        if(p<0.4)return p+Math.random()*0.06+0.02;
-        if(p<0.65)return Math.random()>0.3?p+Math.random()*0.03+0.005:p;
-        if(p<0.85)return Math.random()>0.5?p+Math.random()*0.02+0.003:p;
-        return Math.random()>0.7?p+Math.random()*0.008:p;
+        const elapsed=Date.now()-startTime.current;
+        // After 2s and model ready, allow finishing
+        if(p>=0.95&&realLoaded.current&&elapsed>=2000){
+          done=true;setTimeout(()=>{setLoaded(true);setRevealed(true)},300);return 1;
+        }
+        // Cap at 95% until model is ready
+        const cap=realLoaded.current&&elapsed>=1800?1:0.95;
+        if(p<0.12)return Math.min(p+Math.random()*0.03+0.008,cap);
+        if(p<0.35)return Math.min(p+Math.random()*0.05+0.015,cap);
+        if(p<0.6)return Math.min(Math.random()>0.3?p+Math.random()*0.025+0.005:p,cap);
+        if(p<0.8)return Math.min(Math.random()>0.4?p+Math.random()*0.015+0.003:p,cap);
+        if(p<0.95)return Math.min(Math.random()>0.5?p+Math.random()*0.01:p,cap);
+        return Math.min(p+Math.random()*0.01,cap);
       });runFake();
-    },150+Math.random()*450)};runFake();
+    },120+Math.random()*380)};runFake();
     let raf;
     const animate=()=>{raf=requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)};
     animate();
