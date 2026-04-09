@@ -277,16 +277,8 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     if(yearFilter!=="all")list=list.filter(e=>e.d.includes(yearFilter));
     if(search.trim()){
       if(progTerms){
-        const{composer,title,names,raw}=progTerms;
-        const hcKey=raw&&Object.keys(PROG_MAP).find(k=>raw===k||raw.startsWith(k));const hcId=hcKey?PROG_MAP[hcKey]:0;
-        if(hcId){list=list.filter(e=>e.id===hcId);}
-        else{const matchEv=e=>{const all=s=>[...e.pr,...e.pe,e.n].some(p=>strip(p).includes(s));
-          if(composer&&title&&e.pr.some(p=>{const s=strip(p);return s.includes(composer)&&s.includes(title)}))return true;
-          if(title&&e.pr.some(p=>strip(p).includes(title))&&(names||[]).some(n=>all(n)))return true;
-          if(composer&&all(composer))return true;
-          if((names||[]).length>1&&names.some(n=>all(n)))return true;
-          return false;};
-        list=list.filter(matchEv);}
+        const{raw}=progTerms;
+        list=list.filter(e=>e.pr.some(p=>p===raw));
       }else{
         const q=norm(search);list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q));
       }
