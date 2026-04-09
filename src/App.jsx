@@ -393,7 +393,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
           <div key={e.id} className="ukho-row" onClick={()=>onOpenEvent?.(e)}>
             <div className="ukho-sel"/>
             <div style={{fontFamily:ARCH,fontSize:16,fontWeight:400,color:"rgba(0,0,0,0.1)",letterSpacing:"-1px"}}>{e.id}</div>
-            <div style={{fontFamily:ARCH,fontSize:26,fontWeight:400,color:"#000",letterSpacing:0,whiteSpace:"pre-line"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
+            <div style={{fontFamily:ARCH,fontSize:22,fontWeight:400,color:"#000",letterSpacing:"0.5px",whiteSpace:"pre-line"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pr.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.2)"}}>{e.pl}</div>
@@ -910,7 +910,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
           position:"absolute",top:6,left:8,
           fontFamily:ARCH,fontSize:isMobile?"clamp(42px,11vw,58px)":"clamp(34px,3.6vw,50px)",
           fontWeight:400,color:"rgba(0,0,255,0.6)",
-          textShadow:"0 1px 8px rgba(180,180,180,0.8), 0 0 16px rgba(180,180,180,0.5)",
+          textShadow:"none",
           pointerEvents:"none",letterSpacing:0,lineHeight:1,zIndex:2,
           transformOrigin:"top left",
         }}>{slide.id}</div>
