@@ -920,11 +920,13 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
   </div></div>);
 }
 
+let portalsVisited=false;
 function PortalsPage(){
   const mountRef=useRef(null);
-  const[loadProg,setLoadProg]=useState(0);
+  const skipPreloader=useRef(portalsVisited);
+  const[loadProg,setLoadProg]=useState(skipPreloader.current?1:0);
   const[loaded,setLoaded]=useState(false);
-  const[revealed,setRevealed]=useState(false);
+  const[revealed,setRevealed]=useState(skipPreloader.current);
   const realLoaded=useRef(false);
   const startTime=useRef(Date.now());
   useEffect(()=>{
@@ -955,22 +957,23 @@ function PortalsPage(){
       if(maxDim>0)group.scale.multiplyScalar(1.5/maxDim);
       scene.add(group);
       realLoaded.current=true;
+      if(skipPreloader.current){setLoaded(true);setRevealed(true)}
     },undefined,(err)=>console.error("USDZ load error:",err));
-    // Fake progress — runs independently of actual load
+    // Fake progress — runs independently of actual load (first visit only)
+    if(skipPreloader.current)return()=>{window.removeEventListener("resize",onResize);cancelAnimationFrame(raf);renderer.dispose();controls.dispose();if(el.contains(renderer.domElement))el.removeChild(renderer.domElement)};
     let fakeRaf;let done=false;const runFake=()=>{if(done)return;fakeRaf=setTimeout(()=>{
       setLoadProg(p=>{
         const elapsed=Date.now()-startTime.current;
         // After 2s and model ready, allow finishing
         if(p>=0.95&&realLoaded.current&&elapsed>=2000){
-          done=true;setTimeout(()=>{setLoaded(true);setRevealed(true)},300);return 1;
+          done=true;setTimeout(()=>{portalsVisited=true;setLoaded(true);setRevealed(true)},300);return 1;
         }
         // Cap at 95% until model is ready
         const cap=realLoaded.current&&elapsed>=1800?1:0.95;
-        if(p<0.2)return Math.min(p+Math.random()*0.06+0.03,cap);
-        if(p<0.5)return Math.min(p+Math.random()*0.08+0.03,cap);
-        if(p<0.75)return Math.min(Math.random()>0.2?p+Math.random()*0.05+0.02:p,cap);
-        if(p<0.9)return Math.min(Math.random()>0.3?p+Math.random()*0.03+0.01:p,cap);
-        return Math.min(p+Math.random()*0.02+0.005,cap);
+        if(p<0.3)return Math.min(p+Math.random()*0.1+0.05,cap);
+        if(p<0.6)return Math.min(p+Math.random()*0.1+0.04,cap);
+        if(p<0.85)return Math.min(p+Math.random()*0.06+0.03,cap);
+        return Math.min(p+Math.random()*0.03+0.01,cap);
       });runFake();
     },120+Math.random()*380)};runFake();
     let raf;
