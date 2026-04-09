@@ -823,6 +823,8 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
   const[colW,setColW]=useState(160);
   const isMobile=typeof window!=="undefined"&&window.innerWidth<=768;
   const cols=isMobile?1:4;
+  const[topPad,setTopPad]=useState(isMobile?HEADER_H+32:130);
+  useEffect(()=>{const el=document.getElementById('ukho-bar');if(el)setTopPad(el.offsetTop+el.offsetHeight+12)},[]);
 
   const scrollContRef=useRef(null);
   const AHEAD=isMobile?20:40,BEHIND=isMobile?10:20;
@@ -884,7 +886,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
     justifyContent:isMobile?"center":undefined,
     gap:isMobile?24:0,
     rowGap:isMobile?24:"2.5vw",
-    padding:isMobile?`${HEADER_H+32}px 12px 12px`:`130px 0 0`,
+    padding:`${topPad}px ${isMobile?"12px":"0"} ${isMobile?"12px":"0"}`,
   }}>
     {!isMobile&&<style>{`.ukho-card-slide{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-slide{transform:scale(0.95)}.ukho-card-label{transition:transform 0.25s ease}.ukho-card-wrap:hover .ukho-card-label{transform:scale(1.15)}.ukho-card-sel{display:none}`}</style>}
     {SLIDES.map((slide,idx)=>(
