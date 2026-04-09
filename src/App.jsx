@@ -384,7 +384,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
         {filtered.map(e=>(
           <div key={e.id} className="ukho-row" onClick={()=>onOpenEvent?.(e)}>
             <div className="ukho-sel"/>
-            <div style={{fontFamily:ARCH,fontSize:22,fontWeight:400,color:"rgba(0,0,0,0.1)",letterSpacing:"-1px"}}>{e.id}</div>
+            <div style={{fontFamily:ARCH,fontSize:28,fontWeight:400,color:"rgba(0,0,0,0.1)",letterSpacing:"-1px"}}>{e.id}</div>
             <div style={{fontFamily:ARCH,fontSize:25,fontWeight:400,color:"#000",letterSpacing:"0.5px",whiteSpace:"pre-line"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
             <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pr.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
             <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
@@ -816,8 +816,8 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
   const[colW,setColW]=useState(160);
   const isMobile=typeof window!=="undefined"&&window.innerWidth<=768;
   const cols=isMobile?1:4;
-  const[topPad,setTopPad]=useState(isMobile?HEADER_H+32:130);
-  useEffect(()=>{const el=document.getElementById('ukho-bar');if(el)setTopPad(el.offsetTop+el.offsetHeight+12)},[]);
+  const[topPad,setTopPad]=useState(isMobile?HEADER_H+32:140);
+  useEffect(()=>{const el=document.getElementById('ukho-bar')||document.getElementById('ukho-menu');if(el)setTopPad(el.offsetTop+el.offsetHeight+12)},[]);
 
   const scrollContRef=useRef(null);
   const AHEAD=isMobile?20:40,BEHIND=isMobile?10:20;
