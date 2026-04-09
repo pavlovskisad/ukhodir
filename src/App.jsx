@@ -907,10 +907,10 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
         {/* Number overlay — top left like original */}
         <div className={isMobile?undefined:"ukho-card-label"} style={{
           position:"absolute",top:6,left:8,
-          fontFamily:ARCH,fontSize:isMobile?"clamp(42px,11vw,58px)":"clamp(34px,3.6vw,50px)",letterSpacing:0,
+          fontFamily:ARCH,fontSize:isMobile?"clamp(42px,11vw,58px)":"clamp(34px,3.6vw,50px)",
           fontWeight:400,color:"rgba(0,0,255,0.6)",
-          textShadow:slide.imgs.length>0?"0 1px 8px rgba(180,180,180,0.8), 0 0 16px rgba(180,180,180,0.5)":"none",
-          pointerEvents:"none",letterSpacing:-1,lineHeight:1,zIndex:2,
+          textShadow:"0 1px 8px rgba(180,180,180,0.8), 0 0 16px rgba(180,180,180,0.5)",
+          pointerEvents:"none",letterSpacing:0,lineHeight:1,zIndex:2,
           transformOrigin:"top left",
         }}>{slide.id}</div>
       </div>
