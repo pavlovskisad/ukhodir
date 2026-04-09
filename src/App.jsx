@@ -214,7 +214,7 @@ function CardContent({ev,search,selected,showGreen,onClick}){
       width:`${100/shrink}%`,
       transition:"transform 0.2s ease",
     }}>
-      <div><div data-field="name" style={{fontFamily:ARCH,fontSize:"clamp(40px,10vw,70px)",color:"rgba(0,0,0,0.08)",letterSpacing:0,lineHeight:0.85,marginBottom:"-0.3em"}}>{ev.id}</div><div style={{fontFamily:ARCH,fontSize:"clamp(36px,8vw,56px)",fontWeight:400,color:"#000",lineHeight:1.15,letterSpacing:"-0.3px",zIndex:1,position:"relative"}}>{hl(ev.n)}</div></div>
+      <div><div data-field="name" style={{fontFamily:ARCH,fontSize:"clamp(40px,10vw,70px)",color:"rgba(0,0,0,0.08)",letterSpacing:0,lineHeight:0.85,marginBottom:"-0.3em"}}>{ev.id}</div><div style={{fontFamily:ARCH,fontSize:"clamp(36px,8vw,56px)",fontWeight:400,color:"#000",lineHeight:1.15,letterSpacing:"-0.3px",zIndex:1,position:"relative",whiteSpace:"pre-line"}}>{hl(ev.n)}</div></div>
       <div data-field="program" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pr.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
       <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.4)",lineHeight:1.35}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
       <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"rgba(0,0,0,0.2)",lineHeight:1.35}}>{hl(ev.pl)}</div>
@@ -393,7 +393,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
           <div key={e.id} className="ukho-row" onClick={()=>onOpenEvent?.(e)}>
             <div className="ukho-sel"/>
             <div style={{fontFamily:ARCH,fontSize:16,fontWeight:400,color:"rgba(0,0,0,0.1)",letterSpacing:"-1px"}}>{e.id}</div>
-            <div style={{fontFamily:ARCH,fontSize:26,fontWeight:400,color:"#000",letterSpacing:0}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
+            <div style={{fontFamily:ARCH,fontSize:26,fontWeight:400,color:"#000",letterSpacing:0,whiteSpace:"pre-line"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pr.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
             <div style={{fontFamily:FONT,fontSize:12,color:"rgba(0,0,0,0.2)"}}>{e.pl}</div>
@@ -543,7 +543,7 @@ function EventDetail({ev,onBack}){
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
     <div style={{fontFamily:ARCH,fontSize:"clamp(65px,16vw,120px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:.85,letterSpacing:"-1px",marginBottom:8}}>{ev.id}</div>
-    <div style={{marginBottom:24}}><div style={{fontFamily:ARCH,fontSize:"clamp(46px,11vw,72px)",fontWeight:400,color:"#000",lineHeight:1.2,letterSpacing:"-1px"}}>{ev.n}</div></div>
+    <div style={{marginBottom:24}}><div style={{fontFamily:ARCH,fontSize:"clamp(46px,11vw,72px)",fontWeight:400,color:"#000",lineHeight:1.2,letterSpacing:"-1px",whiteSpace:"pre-line"}}>{ev.n}</div></div>
     <div style={{marginBottom:20}}><div style={lb}>program</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pr.map((p,i)=><div key={i}>{p}</div>)}</div></div>
     <div style={{marginBottom:20}}><div style={lb}>performers</div><div style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,17px)",color:"rgba(0,0,0,0.4)",lineHeight:1.6}}>{ev.pe.map((p,i)=><div key={i}>{p}</div>)}</div></div>
     {ev.desc&&<div style={{marginBottom:20}}><div style={lb}>description</div><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.2vw,15px)",color:"rgba(0,0,0,0.3)",lineHeight:1.7}}>{ev.desc.map((p,i)=><div key={i} style={{marginBottom:10}}>{p}</div>)}</div></div>}
