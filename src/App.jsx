@@ -966,12 +966,11 @@ function PortalsPage(){
         }
         // Cap at 95% until model is ready
         const cap=realLoaded.current&&elapsed>=1800?1:0.95;
-        if(p<0.12)return Math.min(p+Math.random()*0.03+0.008,cap);
-        if(p<0.35)return Math.min(p+Math.random()*0.05+0.015,cap);
-        if(p<0.6)return Math.min(Math.random()>0.3?p+Math.random()*0.025+0.005:p,cap);
-        if(p<0.8)return Math.min(Math.random()>0.4?p+Math.random()*0.015+0.003:p,cap);
-        if(p<0.95)return Math.min(Math.random()>0.5?p+Math.random()*0.01:p,cap);
-        return Math.min(p+Math.random()*0.01,cap);
+        if(p<0.2)return Math.min(p+Math.random()*0.06+0.03,cap);
+        if(p<0.5)return Math.min(p+Math.random()*0.08+0.03,cap);
+        if(p<0.75)return Math.min(Math.random()>0.2?p+Math.random()*0.05+0.02:p,cap);
+        if(p<0.9)return Math.min(Math.random()>0.3?p+Math.random()*0.03+0.01:p,cap);
+        return Math.min(p+Math.random()*0.02+0.005,cap);
       });runFake();
     },120+Math.random()*380)};runFake();
     let raf;
