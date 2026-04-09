@@ -5,7 +5,7 @@ import { USDLoader } from "three/addons/loaders/USDLoader.js";
 import { EVENTS, SLIDES, MEDIA, PERFORMERS } from './data.js';
 import { PROGRAMS } from './programs.js';
 
-const FONT="'Satoshi',sans-serif";const MONO="'Geist Mono',monospace";const ARCH="'Archaism','Satoshi',sans-serif";
+const FONT="'Satoshi',sans-serif";const MONO="'Commit Mono',monospace";const ARCH="'Archaism','Satoshi',sans-serif";
 const GREEN="#4af626";const BLUE="#0000ff";const HEADER_H=80;const BAR_H=48;
 const FIELD_KEYS=["name","program","performers","place","tags","date"];
 const norm=s=>s.toLowerCase().replace(/[\u00a0\u2002-\u200b]/g," ").replace(/[\u2018\u2019\u2032\u0060]/g,"'").replace(/[\u201c\u201d]/g,'"').normalize("NFD").replace(/[\u0300-\u036f]/g,"");
