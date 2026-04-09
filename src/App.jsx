@@ -676,17 +676,15 @@ function Home({setPage}){
         </TapButton>
       </div>
 
-      {/* Stages + support — typewriter */}
-      <div style={{fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.6)",lineHeight:1.8,letterSpacing:"0px",margin:"32px 0 0",whiteSpace:"pre-wrap"}}>
-        {tw1.displayed}
-        {!tw1.done&&<span style={{display:"inline-block",width:6,height:13,background:GREEN,animation:"hCur 0.7s step-end infinite",verticalAlign:"middle",marginLeft:2}}/>}
-        {tw1.done&&<div style={{marginTop:8,marginBottom:64}}><img src="/goethe-cropped.png" alt="Goethe-Institut" style={{height:"clamp(50px,10vw,80px)",display:"block",opacity:0.7}}/></div>}
-      </div>
-
-      {/* Upcoming */}
-      <div style={{position:"relative",margin:"0 0 48px"}}>
-        <div style={{fontFamily:ARCH,fontSize:"clamp(88px,22vw,176px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:1,letterSpacing:"-1px",position:"absolute",top:-10,left:0,pointerEvents:"none"}}>UPCOMING</div>
-        <div style={{fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.55)",lineHeight:1.9,letterSpacing:"0px",paddingTop:40,whiteSpace:"pre-wrap"}}>
+      {/* Upcoming — typewriter with watermark */}
+      <div style={{position:"relative",margin:"32px 0 48px"}}>
+        <div style={{fontFamily:ARCH,fontSize:"clamp(120px,30vw,260px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:0.85,letterSpacing:"-2px",position:"absolute",top:0,left:"-2%",width:"104%",pointerEvents:"none",overflow:"hidden",whiteSpace:"nowrap"}}>UPCOMING</div>
+        <div style={{position:"relative",fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.6)",lineHeight:1.8,letterSpacing:"0px",whiteSpace:"pre-wrap"}}>
+          {tw1.displayed}
+          {!tw1.done&&<span style={{display:"inline-block",width:6,height:13,background:GREEN,animation:"hCur 0.7s step-end infinite",verticalAlign:"middle",marginLeft:2}}/>}
+          {tw1.done&&<div style={{marginTop:8,marginBottom:24}}><img src="/goethe-cropped.png" alt="Goethe-Institut" style={{height:"clamp(50px,10vw,80px)",display:"block",opacity:0.7}}/></div>}
+        </div>
+        <div style={{position:"relative",fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.55)",lineHeight:1.9,letterSpacing:"0px",whiteSpace:"pre-wrap",marginTop:16}}>
           {tw2.displayed}
           {!tw2.done&&<span style={{display:"inline-block",width:6,height:13,background:GREEN,animation:"hCur 0.7s step-end infinite",verticalAlign:"middle",marginLeft:2}}/>}
         </div>
@@ -694,8 +692,8 @@ function Home({setPage}){
 
       {/* Umbrella */}
       <div style={{position:"relative",margin:"48px 0"}}>
-        <div style={{fontFamily:ARCH,fontSize:"clamp(88px,22vw,176px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:1,letterSpacing:"-1px",position:"absolute",top:-10,left:0,pointerEvents:"none"}}>UMBRELLA</div>
-        <div style={{paddingTop:40,display:"flex",flexDirection:"column",gap:12}}>
+        <div style={{fontFamily:ARCH,fontSize:"clamp(120px,30vw,260px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:0.85,letterSpacing:"-2px",position:"absolute",top:0,left:"-2%",width:"104%",pointerEvents:"none",overflow:"hidden",whiteSpace:"nowrap"}}>UMBRELLA</div>
+        <div style={{paddingTop:0,display:"flex",flexDirection:"column",gap:12,position:"relative"}}>
           <TapButton href="https://kyivdispat.ch" style={{fontFamily:ARCH,fontSize:"clamp(56px,14vw,88px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
             kyiv dispatch record label
           </TapButton>
