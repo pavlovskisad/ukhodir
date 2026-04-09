@@ -925,7 +925,7 @@ function PortalsPage(){
   const mountRef=useRef(null);
   const skipPreloader=useRef(portalsVisited);
   const[loadProg,setLoadProg]=useState(skipPreloader.current?1:0);
-  const[loaded,setLoaded]=useState(false);
+  const[loaded,setLoaded]=useState(skipPreloader.current);
   const[revealed,setRevealed]=useState(skipPreloader.current);
   const realLoaded=useRef(false);
   const startTime=useRef(Date.now());
@@ -970,10 +970,10 @@ function PortalsPage(){
         }
         // Cap at 95% until model is ready
         const cap=realLoaded.current&&elapsed>=1800?1:0.95;
-        if(p<0.3)return Math.min(p+Math.random()*0.1+0.05,cap);
-        if(p<0.6)return Math.min(p+Math.random()*0.1+0.04,cap);
-        if(p<0.85)return Math.min(p+Math.random()*0.06+0.03,cap);
-        return Math.min(p+Math.random()*0.03+0.01,cap);
+        if(p<0.4)return Math.min(p+Math.random()*0.15+0.08,cap);
+        if(p<0.7)return Math.min(p+Math.random()*0.12+0.06,cap);
+        if(p<0.9)return Math.min(p+Math.random()*0.08+0.03,cap);
+        return Math.min(p+Math.random()*0.04+0.02,cap);
       });runFake();
     },120+Math.random()*380)};runFake();
     let raf;
