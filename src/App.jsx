@@ -211,8 +211,9 @@ function FloatingLabels({cardKey}){
   const topOff=barBottom+4;
   const h=typeof window!=="undefined"?window.innerHeight-topOff-8:500;
   useEffect(()=>{
-    // After card animation settles, measure field positions
-    const timer=setTimeout(()=>{
+    // Reset to spread while animating
+    setPositions(null);
+    const measure=()=>{
       const ys=[];
       FIELD_KEYS.forEach(k=>{
         const el=document.querySelector(`[data-field="${k}"]`);
@@ -220,10 +221,12 @@ function FloatingLabels({cardKey}){
         else ys.push(null);
       });
       if(ys.some(y=>y!==null))setPositions(ys);
-    },ANIM_MS+60);
-    // Reset to spread while animating
-    setPositions(null);
-    return ()=>clearTimeout(timer);
+    };
+    // Two passes: one for in-list swipes (~460ms), one after the
+    // fresh-mount intro animation has finished (~1150ms).
+    const t1=setTimeout(measure,ANIM_MS+60);
+    const t2=setTimeout(measure,1150);
+    return ()=>{clearTimeout(t1);clearTimeout(t2)};
   },[cardKey]);
   // Fallback: evenly spaced
   const fallback=FIELD_KEYS.map((_,i)=>topOff+16+(h-32)*((i+0.5)/FIELD_KEYS.length));
