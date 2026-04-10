@@ -32,7 +32,7 @@ function TapButton({children,onClick,style,href,target}){
   </Tag>);
 }
 
-function CountUp({target,duration=400,delay=0}){
+function CountUp({target,duration=300,delay=0}){
   const[n,setN]=useState(0);
   useEffect(()=>{
     let raf,timer;
@@ -92,9 +92,9 @@ function Menu({page,setPage,introRef}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
   const[intro]=useState(()=>!!(introRef&&introRef.current));
-  const delay=intro?1500:100;
+  const delay=intro?1400:80;
   const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(36px,9vw,48px)":"clamp(46px,4.55vw,62px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-2.5px":"-3px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
-  return (<div id="ukho-menu" style={{...panelStyle,top:0,animation:`menuSlideDown 0.55s cubic-bezier(0.34,1.56,0.64,1) ${delay}ms both`}}>
+  return (<div id="ukho-menu" style={{...panelStyle,top:0,animation:`menuSlideDown 0.4s cubic-bezier(0.34,1.56,0.64,1) ${delay}ms both`}}>
     <style>{`@keyframes menuSlideDown{0%{transform:translateY(-110%)}100%{transform:translateY(0)}}`}</style>
     <div onClick={scrollPageToTop} style={{position:"absolute",top:0,left:0,right:0,height:12,cursor:"pointer",zIndex:10}}/>
     <div style={{padding:"2px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(40px,10vw,54px)":"clamp(52px,5.1vw,70px)",fontWeight:400}} onClick={()=>setPage("home")}>/dir</TapButton></div>
@@ -118,7 +118,7 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
     introStart.current=performance.now();
     let last=performance.now();
     const base=dk?18:12;
-    const HOLD=450;const DECAY=1400;const MAX=24;
+    const HOLD=320;const DECAY=1000;const MAX=24;
     const tick=()=>{const now=performance.now(),dt=(now-last)/1000;last=now;const el=now-introStart.current;let mul;if(el<=HOLD){mul=MAX}else{const t=Math.min(1,(el-HOLD)/DECAY);mul=t>=1?1:(1+(MAX-1)*Math.pow(1-t,4.2))}setOffset(o=>{let next=o-dt*base*mul;if(next<-loopW)next+=loopW;if(next>loopW)next-=loopW;return next});rafRef.current=requestAnimationFrame(tick)};
     rafRef.current=requestAnimationFrame(tick);
     return()=>cancelAnimationFrame(rafRef.current);
@@ -150,7 +150,7 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
   </div>);
 }
 
-function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPrev,onNext,matchIdx,matchCount,years,yearFilter,setYearFilter,introDelay=300,skipIntro,filters}){
+function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPrev,onNext,matchIdx,matchCount,years,yearFilter,setYearFilter,introDelay=220,skipIntro,filters}){
   const dk=typeof window!=="undefined"&&window.innerWidth>768;
   const bs={width:dk?42:30,height:dk?42:30,flexShrink:0,border:"1px solid rgba(0,0,0,0.08)",background:"rgba(255,255,255,0.4)",cursor:"pointer",fontFamily:MONO,fontSize:dk?16:12,display:"flex",alignItems:"center",justifyContent:"center",padding:0,color:"#000"};
   const hm=search.trim()&&matchCount>1;
@@ -158,8 +158,8 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
   // Capture animation decisions at mount — never re-run on later re-renders.
   const[animateBar]=useState(()=>!skipIntro);
   const[animateBottom]=useState(()=>!!skipIntro);
-  const barAnim=animateBar?`barSlideIn 0.55s cubic-bezier(0.34,1.4,0.5,1) ${introDelay}ms both`:undefined;
-  const bottomAnim=animateBottom?`bottomSlideIn 0.5s cubic-bezier(0.34,1.4,0.5,1) both`:undefined;
+  const barAnim=animateBar?`barSlideIn 0.4s cubic-bezier(0.34,1.4,0.5,1) ${introDelay}ms both`:undefined;
+  const bottomAnim=animateBottom?`bottomSlideIn 0.38s cubic-bezier(0.34,1.4,0.5,1) both`:undefined;
   return (<div id="ukho-bar" style={{...panelStyle,top:menuH,bottom:"auto",boxShadow:"0 2px 16px rgba(0,0,0,0.04)",padding:dk?"6px 20px":"4px 12px",display:"flex",flexDirection:"column",gap:dk?6:4,animation:barAnim}}>
     <style>{`@keyframes barSlideIn{0%{transform:translateX(110%);opacity:0}60%{opacity:1}100%{transform:translateX(0);opacity:1}}@keyframes bottomSlideIn{0%{transform:translateX(110%);opacity:0}60%{opacity:1}100%{transform:translateX(0);opacity:1}}@keyframes evBlink{0%,100%{opacity:0.18}50%{opacity:0}}@keyframes filterTabPop{0%{opacity:0;transform:translateY(8px) scale(0.7)}60%{opacity:1;transform:translateY(-2px) scale(1.08)}100%{opacity:1;transform:translateY(0) scale(1)}}`}</style>
     <div style={{display:"flex",gap:dk?10:6,alignItems:"center"}}>
@@ -171,19 +171,19 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
       {hm&&<button style={bs} onClick={onPrev}>‹</button>}{hm&&<span style={{fontFamily:MONO,fontSize:dk?15:11,color:"rgba(0,0,0,0.35)",whiteSpace:"nowrap",letterSpacing:0,minWidth:dk?48:36,textAlign:"center"}}>{matchIdx+1}/{matchCount}</span>}{hm&&<button style={bs} onClick={onNext}>›</button>}
       <button onClick={onToggleMode} style={{fontFamily:MONO,fontSize:dk?18:14,fontWeight:700,padding:dk?"8px 36px":"2px 16px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:0.3,whiteSpace:"nowrap",height:dk?46:34,flexShrink:0,position:"relative",overflow:"hidden",textTransform:"lowercase",display:"flex",alignItems:"center",justifyContent:"center"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite 2s",pointerEvents:"none",opacity:0}}/></button>
     </div>
-    {filters&&<div key="filters" style={{display:"flex",gap:dk?8:4,justifyContent:"space-between",alignItems:"flex-start",paddingTop:2,animation:bottomAnim}}>{filters.options.map((s,ti)=>{const tabDelay=(animateBottom?500:0)+ti*80;return(<div key={s} style={{display:"flex",flexDirection:"column",alignItems:"center",animation:`filterTabPop 0.5s cubic-bezier(0.34,1.56,0.64,1) ${tabDelay}ms both`}}><button onClick={()=>filters.setActive(s)} style={{fontFamily:MONO,fontSize:dk?18:12,fontWeight:filters.active===s?700:400,padding:dk?"7px 22px":"4px 6px",background:filters.active===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase",whiteSpace:"nowrap"}}>{s}</button><div style={{fontFamily:MONO,fontSize:dk?15:13,fontWeight:700,color:filters.active===s?"rgba(0,0,0,0.55)":"rgba(0,0,0,0.3)",marginTop:4,height:dk?19:15,lineHeight:1,textAlign:"center",letterSpacing:0.3}}><CountUp target={filters.counts[s]} delay={tabDelay+300}/></div></div>)})}</div>}
+    {filters&&<div key="filters" style={{display:"flex",gap:dk?8:4,justifyContent:"space-between",alignItems:"flex-start",paddingTop:2,animation:bottomAnim}}>{filters.options.map((s,ti)=>{const tabDelay=(animateBottom?380:0)+ti*60;return(<div key={s} style={{display:"flex",flexDirection:"column",alignItems:"center",animation:`filterTabPop 0.38s cubic-bezier(0.34,1.56,0.64,1) ${tabDelay}ms both`}}><button onClick={()=>filters.setActive(s)} style={{fontFamily:MONO,fontSize:dk?18:12,fontWeight:filters.active===s?700:400,padding:dk?"7px 22px":"4px 6px",background:filters.active===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase",whiteSpace:"nowrap"}}>{s}</button><div style={{fontFamily:MONO,fontSize:dk?15:13,fontWeight:700,color:filters.active===s?"rgba(0,0,0,0.55)":"rgba(0,0,0,0.3)",marginTop:4,height:dk?19:15,lineHeight:1,textAlign:"center",letterSpacing:0.3}}><CountUp target={filters.counts[s]} delay={tabDelay+220}/></div></div>)})}</div>}
     {!filters&&years&&years.length>1&&<div key="years" style={{animation:bottomAnim}}><YearCarousel years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} dk={dk}/></div>}
   </div>);
 }
 
 /* ── Dice ── */
-function FloatingDice({onRoll,introDelay=1500}){const[rolling,setRolling]=useState(false);const drag=useRef({active:false,moved:false,sx:0,sy:0,ex:0,ey:0});const[pos,setPos]=useState({x:null,y:null});
+function FloatingDice({onRoll,introDelay=1100}){const[rolling,setRolling]=useState(false);const drag=useRef({active:false,moved:false,sx:0,sy:0,ex:0,ey:0});const[pos,setPos]=useState({x:null,y:null});
   useEffect(()=>{if(pos.x===null){const dk=window.innerWidth>768;setPos({x:window.innerWidth-(dk?120:66),y:window.innerHeight-(dk?320:200)})}},[]);
   const onDown=(cx,cy)=>{drag.current={active:true,moved:false,sx:cx,sy:cy,ex:pos.x,ey:pos.y}};const onMove=(cx,cy)=>{if(!drag.current.active)return;const dx=cx-drag.current.sx,dy=cy-drag.current.sy;if(Math.abs(dx)>3||Math.abs(dy)>3)drag.current.moved=true;if(drag.current.moved)setPos({x:drag.current.ex+dx,y:drag.current.ey+dy})};const onUp=()=>{if(!drag.current.active)return;const w=drag.current.moved;drag.current.active=false;if(!w&&!rolling){setRolling(true);setTimeout(()=>{setRolling(false);onRoll?.()},600)}};
   useEffect(()=>{const mm=e=>onMove(e.clientX,e.clientY),mu=()=>onUp(),tm=e=>onMove(e.touches[0].clientX,e.touches[0].clientY),tu=()=>onUp();window.addEventListener("mousemove",mm);window.addEventListener("mouseup",mu);window.addEventListener("touchmove",tm,{passive:true});window.addEventListener("touchend",tu);return()=>{window.removeEventListener("mousemove",mm);window.removeEventListener("mouseup",mu);window.removeEventListener("touchmove",tm);window.removeEventListener("touchend",tu)}});
   if(pos.x===null)return null;const deskDice=typeof window!=="undefined"&&window.innerWidth>768;const S=36,R=S/2;
   const ds=(t,l)=>({position:"absolute",width:5,height:5,borderRadius:"50%",background:"rgba(0,255,65,0.6)",boxShadow:"0 0 4px rgba(0,255,65,0.3)",top:t,left:l,transform:"translate(-50%,-50%)"});const fs=tr=>({position:"absolute",width:S,height:S,border:"1.5px solid rgba(0,255,65,0.35)",background:"rgba(0,255,65,0.05)",transform:tr});
-  return(<div onMouseDown={e=>{e.preventDefault();onDown(e.clientX,e.clientY)}} onTouchStart={e=>onDown(e.touches[0].clientX,e.touches[0].clientY)} style={{position:"fixed",left:pos.x,top:pos.y,zIndex:99999,cursor:"grab",userSelect:"none",WebkitUserSelect:"none",touchAction:"none",padding:10,transform:deskDice?"scale(1.4)":"none",transformOrigin:"center",animation:`diceGlitch 0.7s steps(12,end) ${introDelay}ms both`}}>
+  return(<div onMouseDown={e=>{e.preventDefault();onDown(e.clientX,e.clientY)}} onTouchStart={e=>onDown(e.touches[0].clientX,e.touches[0].clientY)} style={{position:"fixed",left:pos.x,top:pos.y,zIndex:99999,cursor:"grab",userSelect:"none",WebkitUserSelect:"none",touchAction:"none",padding:10,transform:deskDice?"scale(1.4)":"none",transformOrigin:"center",animation:`diceGlitch 0.5s steps(12,end) ${introDelay}ms both`}}>
     <style>{`@keyframes dF{0%{transform:rotateX(15deg) rotateY(0) translateY(0)}25%{transform:rotateX(20deg) rotateY(90deg) translateY(-4px)}50%{transform:rotateX(10deg) rotateY(180deg) translateY(1px)}75%{transform:rotateX(18deg) rotateY(270deg) translateY(4px)}100%{transform:rotateX(15deg) rotateY(360deg) translateY(0)}}@keyframes dR{0%{transform:rotateX(0) rotateY(0) rotateZ(0)}100%{transform:rotateX(720deg) rotateY(540deg) rotateZ(360deg)}}@keyframes diceGlitch{0%{opacity:0;filter:hue-rotate(0deg) contrast(1) blur(0)}8%{opacity:1;filter:hue-rotate(60deg) contrast(1.3) blur(1px);clip-path:inset(10% 0 40% 0)}16%{opacity:0.3;filter:hue-rotate(30deg) contrast(1.15);clip-path:inset(60% 0 5% 0)}24%{opacity:1;filter:hue-rotate(-40deg) contrast(1.3);clip-path:inset(25% 0 25% 0)}32%{opacity:0.6;filter:hue-rotate(20deg) contrast(1.1);clip-path:inset(0 0 70% 0)}42%{opacity:1;filter:hue-rotate(-20deg) contrast(1.2);clip-path:inset(45% 0 15% 0)}55%{opacity:0.4;filter:hue-rotate(55deg) contrast(1.15);clip-path:inset(0 40% 0 0)}68%{opacity:1;filter:hue-rotate(-10deg) contrast(1.08);clip-path:inset(0 0 0 30%)}82%{opacity:0.7;filter:hue-rotate(5deg) contrast(1.04);clip-path:none}100%{opacity:1;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:none}}`}</style>
     <div style={{perspective:200}}><div style={{width:S,height:S,position:"relative",transformStyle:"preserve-3d",animation:rolling?"dR 0.6s ease-out":"dF 8s ease-in-out infinite"}}>
       <div style={fs(`translateZ(${R}px)`)}><div style={ds("50%","50%")}/></div><div style={fs(`rotateY(180deg) translateZ(${R}px)`)}><div style={ds("20%","20%")}/><div style={ds("80%","80%")}/></div><div style={fs(`rotateY(90deg) translateZ(${R}px)`)}><div style={ds("20%","20%")}/><div style={ds("50%","50%")}/><div style={ds("80%","80%")}/></div><div style={fs(`rotateY(-90deg) translateZ(${R}px)`)}><div style={ds("25%","25%")}/><div style={ds("25%","75%")}/><div style={ds("75%","25%")}/><div style={ds("75%","75%")}/></div><div style={fs(`rotateX(90deg) translateZ(${R}px)`)}><div style={ds("22%","22%")}/><div style={ds("22%","78%")}/><div style={ds("50%","50%")}/><div style={ds("78%","22%")}/><div style={ds("78%","78%")}/></div><div style={fs(`rotateX(-90deg) translateZ(${R}px)`)}><div style={ds("22%","28%")}/><div style={ds("22%","72%")}/><div style={ds("50%","28%")}/><div style={ds("50%","72%")}/><div style={ds("78%","28%")}/><div style={ds("78%","72%")}/></div>
@@ -225,7 +225,7 @@ function FloatingLabels({cardKey}){
     // Two passes: one for in-list swipes (~460ms), one after the
     // fresh-mount intro animation has finished (~1150ms).
     const t1=setTimeout(measure,ANIM_MS+60);
-    const t2=setTimeout(measure,1150);
+    const t2=setTimeout(measure,880);
     return ()=>{clearTimeout(t1);clearTimeout(t2)};
   },[cardKey]);
   // Fallback: evenly spaced
@@ -240,7 +240,7 @@ function FloatingLabels({cardKey}){
       color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase",textAlign:"right",
       transition:positions?"top 0.5s cubic-bezier(0.25,1,0.5,1)":"none",
       transformOrigin:"right center",
-      animation:`labelPop 0.5s cubic-bezier(0.34,1.56,0.64,1) ${800+i*90}ms both`,
+      animation:`labelPop 0.38s cubic-bezier(0.34,1.56,0.64,1) ${580+i*65}ms both`,
     }}>{l}</div>)}
   </div>);
 }
@@ -309,9 +309,9 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const[exiting,setExiting]=useState(null);
   const[enterDir,setEnterDir]=useState("None");
   const[introPlayed,setIntroPlayed]=useState(false);
-  useEffect(()=>{const t=setTimeout(()=>setIntroPlayed(true),1100);return()=>clearTimeout(t)},[]);
+  useEffect(()=>{const t=setTimeout(()=>setIntroPlayed(true),800);return()=>clearTimeout(t)},[]);
   const[barSettled,setBarSettled]=useState(false);
-  useEffect(()=>{const t=setTimeout(()=>setBarSettled(true),1200);return()=>clearTimeout(t)},[]);
+  useEffect(()=>{const t=setTimeout(()=>setBarSettled(true),900);return()=>clearTimeout(t)},[]);
   const skipBarIntro=barSettled;
   const touchRef=useRef({y:0,t:0});const animating=useRef(null);const navKey=useRef(0);
   const isDesk=typeof window!=="undefined"&&window.innerWidth>768;
@@ -434,11 +434,11 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   // ── EVERYTHING mode ──
   const evBarBottom=useBarBottom(mode);
   const filterCounts=useMemo(()=>Object.fromEntries(Object.keys(everything).map(s=>[s,everything[s].length])),[everything]);
-  if(mode==="everything"){const topH=evBarBottom;const items=everything[evSec]||[];const evBase=skipBarIntro?200:700;return(<>
+  if(mode==="everything"){const topH=evBarBottom;const items=everything[evSec]||[];const evBase=skipBarIntro?150:500;return(<>
     <style>{`@keyframes evItemWave{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}`}</style>
     <div data-scroll-container style={{position:"fixed",top:topH,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
       <div key={evSec} style={{padding:"14px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
-        {items.map((item,i)=><div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer",textTransform:evSec==="tags"?"uppercase":"none",animation:`evItemWave 0.4s cubic-bezier(0.25,0.8,0.3,1) ${evBase+Math.min(i,70)*18}ms both`}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
+        {items.map((item,i)=><div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer",textTransform:evSec==="tags"?"uppercase":"none",animation:`evItemWave 0.3s cubic-bezier(0.25,0.8,0.3,1) ${evBase+Math.min(i,70)*13}ms both`}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
       </div></div>
     </div>
     <BottomBar search={search} setSearch={setSearchSwitch} onTop={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:0,behavior:"smooth"})}} onBottom={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:el.scrollHeight,behavior:"smooth"})}} onToggleMode={()=>{setEnterDir("Up");navKey.current++;setMode("list")}} modeLabel="cards" introDelay={300} skipIntro={skipBarIntro} filters={{options:Object.keys(everything),counts:filterCounts,active:evSec,setActive:setEvSec}}/></>)}
@@ -451,13 +451,13 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     return (<div style={{background:"white",minHeight:"100vh"}}>
       <style>{`@keyframes rowWave{0%{opacity:0;transform:translateY(18px)}100%{opacity:1;transform:translateY(0)}}@keyframes colHead{0%{opacity:0;transform:translateY(-8px)}100%{opacity:1;transform:translateY(0)}}`}</style>
       {/* Column headers */}
-      <div style={{position:"fixed",top:deskTopH,left:0,right:0,zIndex:940,background:"rgba(255,255,255,0.7)",backdropFilter:"blur(50px) saturate(180%)",WebkitBackdropFilter:"blur(50px) saturate(180%)",padding:"8px 16px",display:"grid",gridTemplateColumns:COLS,gap:8,boxShadow:"0 1px 8px rgba(0,0,0,0.04)",animation:"colHead 0.45s cubic-bezier(0.34,1.4,0.5,1) 600ms both"}}>
+      <div style={{position:"fixed",top:deskTopH,left:0,right:0,zIndex:940,background:"rgba(255,255,255,0.7)",backdropFilter:"blur(50px) saturate(180%)",WebkitBackdropFilter:"blur(50px) saturate(180%)",padding:"8px 16px",display:"grid",gridTemplateColumns:COLS,gap:8,boxShadow:"0 1px 8px rgba(0,0,0,0.04)",animation:"colHead 0.35s cubic-bezier(0.34,1.4,0.5,1) 450ms both"}}>
         {["#","name","program","performers","place","tags","date"].map(l=><div key={l} style={{fontFamily:FONT,fontSize:12,fontWeight:700,color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase"}}>{l}</div>)}
       </div>
       {/* Rows */}
       <div style={{paddingTop:deskTopH+44,paddingBottom:40}}>
         {filtered.map((e,rowIdx)=>(
-          <div key={e.id} className="ukho-row" onClick={()=>onOpenEvent?.(e)} style={{animation:`rowWave 0.45s cubic-bezier(0.25,0.8,0.3,1) ${800+Math.min(rowIdx,60)*22}ms both`}}>
+          <div key={e.id} className="ukho-row" onClick={()=>onOpenEvent?.(e)} style={{animation:`rowWave 0.35s cubic-bezier(0.25,0.8,0.3,1) ${580+Math.min(rowIdx,60)*16}ms both`}}>
             <div className="ukho-sel"/>
             <div style={{fontFamily:ARCH,fontSize:28,fontWeight:400,color:"rgba(0,0,0,0.1)",letterSpacing:"-0.5px"}}>{e.id}</div>
             <div style={{fontFamily:ARCH,fontSize:25,fontWeight:400,color:"#000",letterSpacing:"-0.3px",whiteSpace:"pre-line"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
@@ -470,7 +470,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
         ))}
       </div>
       <BottomBar search={search} setSearch={setSearch} onTop={()=>window.scrollTo({top:0,behavior:"smooth"})} onBottom={()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})} onToggleMode={()=>setMode("everything")} modeLabel="everything" onPrev={()=>{}} onNext={()=>{}} matchIdx={0} matchCount={0} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} introDelay={300} skipIntro={skipBarIntro}/>
-      <FloatingDice onRoll={()=>{const e=filtered[Math.floor(Math.random()*filtered.length)];if(e)onOpenEvent?.(e)}} introDelay={2700}/>
+      <FloatingDice onRoll={()=>{const e=filtered[Math.floor(Math.random()*filtered.length)];if(e)onOpenEvent?.(e)}} introDelay={2000}/>
     </div>);
   }
 
@@ -488,14 +488,14 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
       {exiting&&<div key={`exit-${navKey.current}`} style={{position:"absolute",inset:0,animation:`exit${exiting.dir} ${ANIM_MS}ms cubic-bezier(0.4,0.0,0.2,0.9) both`}}>
         <CardContent ev={exiting.ev} search={search} selected={false} showGreen={false}/>
       </div>}
-      {ev?<div key={`enter-${navKey.current}`} style={{position:"absolute",inset:0,animation:!introPlayed?`enterUp ${ANIM_MS}ms cubic-bezier(0.4,0.0,0.2,0.9) 600ms both`:(enterDir!=="None"?`enter${enterDir} ${ANIM_MS}ms cubic-bezier(0.4,0.0,0.2,0.9) both`:undefined)}}>
+      {ev?<div key={`enter-${navKey.current}`} style={{position:"absolute",inset:0,animation:!introPlayed?`enterUp ${ANIM_MS}ms cubic-bezier(0.4,0.0,0.2,0.9) 420ms both`:(enterDir!=="None"?`enter${enterDir} ${ANIM_MS}ms cubic-bezier(0.4,0.0,0.2,0.9) both`:undefined)}}>
         <div style={{width:"100%",height:"100%",transform:tapped?"scale(0.90)":"scale(1)",transition:"transform 0.35s cubic-bezier(0.4,0,0.2,1)"}}>
         <CardContent ev={ev} search={search} selected={false} showGreen={tapped} onClick={handleCardTap}/>
       </div></div>:
         <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",fontFamily:FONT,fontSize:16,color:"rgba(0,0,0,0.12)"}}>no events match "{search}"</div>}
     </div>
     <BottomBar search={search} setSearch={setSearch} onTop={()=>{setEnterDir("Down");setIdx(0)}} onBottom={()=>{setEnterDir("Up");setIdx(filtered.length-1)}} onToggleMode={()=>setMode("everything")} modeLabel="everything" onPrev={()=>{const n=idx<=0?filtered.length-1:idx-1;go(n,"Down")}} onNext={()=>{const n=idx>=filtered.length-1?0:idx+1;go(n,"Up")}} matchIdx={idx} matchCount={filtered.length} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} introDelay={300} skipIntro={skipBarIntro}/>
-    <FloatingDice onRoll={goRandom} introDelay={1500}/>
+    <FloatingDice onRoll={goRandom} introDelay={1100}/>
   </div>);
 }
 
@@ -953,7 +953,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
     if(ev)onOpenEvent(ev);
   };
 
-  const cardBase=intro?1700:500;
+  const cardBase=intro?1600:380;
   return (<><style>{`@keyframes cardBuild{0%{opacity:0;transform:translateY(30px) scale(0.88)}60%{opacity:1;transform:translateY(-4px) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}`}</style>
   {!built&&<HoloPreloader onDone={()=>setBuilt(true)}/>}
   <div ref={scrollContRef} data-scroll-container style={{
@@ -975,7 +975,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
         background:"white",
         aspectRatio:"4/3",
         overflow:"hidden",
-        animation:`cardBuild 0.55s cubic-bezier(0.34,1.56,0.64,1) ${cardBase+Math.min(idx,20)*40}ms both`,
+        animation:`cardBuild 0.4s cubic-bezier(0.34,1.56,0.64,1) ${cardBase+Math.min(idx,20)*30}ms both`,
       }}>
         <div className={isMobile?undefined:"ukho-card-slide"} style={{width:"100%",height:"100%",position:"relative"}}>
         {slide.imgs.length>0 ? (
@@ -996,7 +996,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
         }}>{slide.id}</div>
       </div>
     ))}
-    <FloatingDice onRoll={()=>{const i=Math.floor(Math.random()*SLIDES.length);const card=cardRefs.current[i];if(card)card.scrollIntoView({behavior:"smooth",block:"center"})}} introDelay={intro?3100:2000}/>
+    <FloatingDice onRoll={()=>{const i=Math.floor(Math.random()*SLIDES.length);const card=cardRefs.current[i];if(card)card.scrollIntoView({behavior:"smooth",block:"center"})}} introDelay={intro?2700:1400}/>
   </div></div></>);
 }
 
@@ -1220,7 +1220,7 @@ function RiddlesPage({onOpenEvent,events}){
           @keyframes rGlitch{0%{opacity:0;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:inset(10% 0 40% 0)}8%{opacity:1;filter:hue-rotate(60deg) contrast(1.3) blur(1px);clip-path:inset(10% 0 40% 0)}16%{opacity:0.3;filter:hue-rotate(30deg) contrast(1.15);clip-path:inset(60% 0 5% 0)}24%{opacity:1;filter:hue-rotate(-40deg) contrast(1.3);clip-path:inset(25% 0 25% 0)}32%{opacity:0.6;filter:hue-rotate(20deg) contrast(1.1);clip-path:inset(0 0 70% 0)}42%{opacity:1;filter:hue-rotate(-20deg) contrast(1.2);clip-path:inset(45% 0 15% 0)}55%{opacity:0.4;filter:hue-rotate(55deg) contrast(1.15);clip-path:inset(0 40% 0 0)}68%{opacity:1;filter:hue-rotate(-10deg) contrast(1.08);clip-path:inset(0 0 0 30%)}82%{opacity:0.7;filter:hue-rotate(5deg) contrast(1.04);clip-path:none}100%{opacity:1;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:none}}
         `}</style>
         {/* Dice */}
-        <div onClick={nextRiddle} style={{cursor:"pointer",perspective:200,padding:4,animation:"rGlitch 0.7s steps(12,end) 700ms both"}}>
+        <div onClick={nextRiddle} style={{cursor:"pointer",perspective:200,padding:4,animation:"rGlitch 0.5s steps(12,end) 520ms both"}}>
           <div style={{width:S,height:S,position:"relative",transformStyle:"preserve-3d",animation:rolling?"rdRoll 0.5s ease-out":"rdFloat 8s ease-in-out infinite"}}>
             <div style={fs(`translateZ(${R}px)`)}><div style={ds("50%","50%")}/></div>
             <div style={fs(`rotateY(180deg) translateZ(${R}px)`)}><div style={ds("20%","20%")}/><div style={ds("80%","80%")}/></div>
@@ -1232,7 +1232,7 @@ function RiddlesPage({onOpenEvent,events}){
         </div>
         <div style={{width:1,height:14,background:"rgba(255,255,255,0.12)"}}/>
         {/* Door */}
-        <div onClick={enterEvent} style={{cursor:"pointer",perspective:200,padding:4,transform:isDesk?"scale(1.4)":"none",transformOrigin:"center",animation:"rGlitch 0.7s steps(12,end) 1050ms both"}}>
+        <div onClick={enterEvent} style={{cursor:"pointer",perspective:200,padding:4,transform:isDesk?"scale(1.4)":"none",transformOrigin:"center",animation:"rGlitch 0.5s steps(12,end) 780ms both"}}>
           <div style={{width:36,height:42,position:"relative",transformStyle:"preserve-3d",animation:entering?"doorEnter 0.6s ease-out":"doorFloat 8s ease-in-out infinite",pointerEvents:"none"}}>
             <div style={{position:"absolute",width:32,height:40,top:1,left:2,border:"1.5px solid rgba(0,255,65,0.4)",background:"rgba(0,255,65,0.03)",transform:"translateZ(-5px)"}}/>
             <div style={{position:"absolute",width:18,height:38,top:2,right:0,transformOrigin:"right center",transform:"rotateY(-50deg) translateZ(3px)",background:"rgba(0,255,65,0.08)",border:"1.5px solid rgba(0,255,65,0.5)"}}>
