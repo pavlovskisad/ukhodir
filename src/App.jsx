@@ -60,7 +60,7 @@ function scrollPageToTop(){
 function Menu({page,setPage}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
-  const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(36px,9vw,48px)":"clamp(46px,4.55vw,62px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-1.5px":"-2px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
+  const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(36px,9vw,48px)":"clamp(46px,4.55vw,62px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-2.5px":"-3px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
   return (<div id="ukho-menu" style={{...panelStyle,top:0}}>
     <div onClick={scrollPageToTop} style={{position:"absolute",top:0,left:0,right:0,height:12,cursor:"pointer",zIndex:10}}/>
     <div style={{padding:"2px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(40px,10vw,54px)":"clamp(52px,5.1vw,70px)",fontWeight:400}} onClick={()=>setPage("home")}>/dir</TapButton></div>
