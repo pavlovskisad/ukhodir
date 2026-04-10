@@ -32,7 +32,7 @@ function TapButton({children,onClick,style,href,target}){
   </Tag>);
 }
 
-function CountUp({target,duration=300,delay=0}){
+function CountUp({target,duration=500,delay=0}){
   const[n,setN]=useState(0);
   useEffect(()=>{
     let raf,timer;
@@ -1003,6 +1003,8 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
 function PortalsPage(){
   const mountRef=useRef(null);
   const[loaded,setLoaded]=useState(false);
+  const[distorting,setDistorting]=useState(false);
+  useEffect(()=>{if(!loaded)return;setDistorting(true);const t=setTimeout(()=>setDistorting(false),1150);return()=>clearTimeout(t)},[loaded]);
   useEffect(()=>{
     const el=mountRef.current;if(!el)return;
     const w=el.clientWidth,h=el.clientHeight;
@@ -1041,7 +1043,20 @@ function PortalsPage(){
   },[]);
   return(<div style={{minHeight:"100vh",background:"#000",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",paddingTop:HEADER_H-20}}>
     <style>{`@keyframes portalOpen{0%{opacity:0;clip-path:ellipse(0% 0% at 50% 50%);filter:blur(14px) brightness(1.3) contrast(0.9)}8%{opacity:1;clip-path:ellipse(22% 0.6% at 50% 50%);filter:blur(11px) brightness(1.5) contrast(1.35) hue-rotate(55deg)}15%{opacity:0.55;clip-path:ellipse(33% 1% at 50% 50%);filter:blur(10px) contrast(1.2) hue-rotate(-35deg)}22%{opacity:1;clip-path:ellipse(45% 2% at 50% 50%);filter:blur(9px) brightness(1.25) contrast(1.25) hue-rotate(20deg)}30%{opacity:0.7;clip-path:ellipse(54% 6% at 50% 50%);filter:blur(7px) hue-rotate(-15deg) contrast(1.15)}38%{opacity:1;clip-path:ellipse(60% 13% at 50% 50%);filter:blur(6px) hue-rotate(25deg) contrast(1.2)}47%{opacity:0.85;clip-path:ellipse(66% 22% at 50% 50%);filter:blur(5px) hue-rotate(-10deg)}56%{opacity:1;clip-path:ellipse(72% 34% at 50% 50%);filter:blur(4px) contrast(1.12) hue-rotate(15deg)}66%{opacity:0.9;clip-path:ellipse(77% 46% at 50% 50%);filter:blur(3px) hue-rotate(-8deg)}76%{opacity:1;clip-path:ellipse(83% 60% at 50% 50%);filter:blur(2px) contrast(1.06)}86%{opacity:0.96;clip-path:ellipse(92% 75% at 50% 50%);filter:blur(1.5px) hue-rotate(4deg)}94%{opacity:1;clip-path:ellipse(108% 100% at 50% 50%);filter:blur(0.8px)}100%{opacity:1;clip-path:ellipse(140% 140% at 50% 50%);filter:blur(0) brightness(1) contrast(1) hue-rotate(0deg)}}@keyframes captionRise{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}`}</style>
-    <div style={{position:"relative",width:"min(80vw,500px)",height:"min(80vw,500px)"}}>
+    <svg width="0" height="0" aria-hidden="true" style={{position:"absolute"}}>
+      <defs>
+        <filter id="portalDistort" x="-30%" y="-30%" width="160%" height="160%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.04 0.08" numOctaves="3" seed="5" result="noise">
+            <animate attributeName="baseFrequency" values="0.18 0.32;0.12 0.22;0.08 0.16;0.05 0.1;0.03 0.06;0.02 0.04" dur="1.1s" fill="freeze"/>
+            <animate attributeName="seed" values="5;12;3;19;7;2" dur="0.5s" repeatCount="3" fill="freeze"/>
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="55">
+            <animate attributeName="scale" values="55;45;34;24;16;10;6;3;1;0" dur="1.1s" fill="freeze"/>
+          </feDisplacementMap>
+        </filter>
+      </defs>
+    </svg>
+    <div style={{position:"relative",width:"min(80vw,500px)",height:"min(80vw,500px)",filter:distorting?"url(#portalDistort)":undefined}}>
       <div ref={mountRef} style={{width:"100%",height:"100%",position:"relative",opacity:loaded?undefined:0,animation:loaded?"portalOpen 1s steps(16,end) both":undefined}}/>
     </div>
     {loaded&&<div style={{fontFamily:ARCH,fontSize:48,color:"rgba(255,255,255,0.15)",letterSpacing:"-1px",marginTop:24,position:"relative",overflow:"hidden",animation:"captionRise 0.5s cubic-bezier(0.22,1,0.36,1) 700ms both"}}>under construction<style>{`@keyframes csBlink{0%,90%,100%{opacity:0.5}95%{opacity:0}}`}</style><div style={{position:"absolute",inset:0,background:"rgba(255,60,60,0.6)",animation:"csBlink 4s ease infinite",pointerEvents:"none"}}/></div>}
