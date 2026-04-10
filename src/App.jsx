@@ -616,7 +616,7 @@ function PhotoViewer({imgs,startIdx,onClose}){
       onTouchEnd={e=>{e.stopPropagation();const dx=e.changedTouches[0].clientX-touchRef.current.x;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}}}>
       <img src={imgs[idx]} alt="" className="ukho-viewer-img" style={{transition:"opacity 0.2s",userSelect:"none",WebkitUserSelect:"none",pointerEvents:"none"}}/>
     </div>
-    <button onClick={onClose} style={{position:"fixed",top:16,right:16,background:"none",border:"none",color:"rgba(255,255,255,0.6)",fontSize:40,cursor:"pointer",padding:"8px 14px",lineHeight:1,zIndex:1}}>×</button>
+    <button onClick={onClose} style={{position:"fixed",top:16,right:16,background:"rgba(0,0,0,0.45)",border:"1px solid rgba(255,255,255,0.15)",color:"rgba(255,255,255,0.95)",fontSize:24,cursor:"pointer",width:44,height:44,lineHeight:1,zIndex:100001,display:"flex",alignItems:"center",justifyContent:"center",padding:0,backdropFilter:"blur(6px)",WebkitBackdropFilter:"blur(6px)"}}>×</button>
     <div style={{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",fontFamily:MONO,fontSize:12,color:"rgba(255,255,255,0.4)",letterSpacing:1}}>{idx+1} / {imgs.length}</div>
     {idx>0&&<button onClick={e=>{e.stopPropagation();go(-1)}} style={{position:"fixed",left:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:"rgba(255,255,255,0.5)",fontSize:36,cursor:"pointer",padding:12}}>‹</button>}
     {idx<imgs.length-1&&<button onClick={e=>{e.stopPropagation();go(1)}} style={{position:"fixed",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:"rgba(255,255,255,0.5)",fontSize:36,cursor:"pointer",padding:12}}>›</button>}
