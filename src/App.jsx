@@ -455,7 +455,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   useEffect(()=>{if(filtered[idx])prevEvRef.current=filtered[idx]},[filtered,idx]);
 
   const go=useCallback((ni,dir)=>{
-    if(cameFromEv.current&&search.trim()){
+    if(cameFromEv.current&&search.trim()&&filtered.length<=1){
       const curEv=filtered[idx];
       cameFromEv.current=false;swipeClearedRef.current=true;
       const fullList=yearFilter!=="all"?reversed.filter(e=>e.d.includes(yearFilter)):reversed;
