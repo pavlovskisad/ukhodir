@@ -42,7 +42,7 @@ function scrollPageToTop(){
 function Menu({page,setPage}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
-  const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(36px,9vw,48px)":"clamp(46px,4.55vw,62px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-1px":"-1.5px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
+  const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(36px,9vw,48px)":"clamp(46px,4.55vw,62px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-1.5px":"-2px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
   return (<div id="ukho-menu" style={{...panelStyle,top:0}}>
     <div onClick={scrollPageToTop} style={{position:"absolute",top:0,left:0,right:0,height:12,cursor:"pointer",zIndex:10}}/>
     <div style={{padding:"2px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(40px,10vw,54px)":"clamp(52px,5.1vw,70px)",fontWeight:400}} onClick={()=>setPage("home")}>/dir</TapButton></div>
@@ -567,7 +567,7 @@ function EventDetail({ev,onBack}){
     }}>▼</div>
   </>}
   <div style={{position:"fixed",bottom:20,right:20}}>
-    <TapButton onClick={onBack} style={{fontFamily:ARCH,fontSize:"clamp(58px,14vw,88px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",cursor:"pointer",padding:"6px 10px",lineHeight:1,letterSpacing:"-1px"}}>back</TapButton>
+    <TapButton onClick={onBack} style={{fontFamily:ARCH,fontSize:"clamp(36px,8vw,52px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",cursor:"pointer",padding:"6px 10px",lineHeight:1,letterSpacing:"-1.5px"}}>back</TapButton>
   </div></div>)}
 
 /* ── Home canvas background ── */
@@ -674,7 +674,7 @@ function Home({setPage}){
       {/* Enter archive */}
       <div style={{margin:"40px 0"}}>
         <style>{`@keyframes hCur{0%,100%{opacity:1}50%{opacity:0}}`}</style>
-        <TapButton onClick={()=>setPage("cardindex")} style={{fontFamily:ARCH,fontSize:"clamp(72px,18vw,120px)",fontWeight:400,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 16px",textDecoration:"none",letterSpacing:"-2px",display:"inline-block"}}>
+        <TapButton onClick={()=>setPage("cardindex")} style={{fontFamily:ARCH,fontSize:"clamp(72px,18vw,120px)",fontWeight:400,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 16px",textDecoration:"none",letterSpacing:"-3px",display:"inline-block"}}>
           enter archive
         </TapButton>
       </div>
@@ -699,10 +699,10 @@ function Home({setPage}){
       <div style={{position:"relative",margin:"60px 0",padding:"20px 0"}}>
         <div style={{fontFamily:ARCH,fontSize:"clamp(80px,20vw,160px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-1px",position:"absolute",top:"50%",left:0,transform:"translateY(-50%)",pointerEvents:"none",whiteSpace:"nowrap"}}>UMBRELLA</div>
         <div style={{display:"flex",flexDirection:"column",gap:12,position:"relative"}}>
-          <TapButton href="https://kyivdispat.ch" style={{fontFamily:ARCH,fontSize:"clamp(56px,14vw,88px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.5px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
+          <TapButton href="https://kyivdispat.ch" style={{fontFamily:ARCH,fontSize:"clamp(38px,9vw,58px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.5px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
             kyiv dispatch record label
           </TapButton>
-          <TapButton href="https://music.youtube.com/channel/UCOnv8gWUnKFFAC2So6EVS_Q" style={{fontFamily:ARCH,fontSize:"clamp(56px,14vw,88px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.5px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
+          <TapButton href="https://music.youtube.com/channel/UCOnv8gWUnKFFAC2So6EVS_Q" style={{fontFamily:ARCH,fontSize:"clamp(38px,9vw,58px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.5px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
             ukho ensemble kyiv
           </TapButton>
         </div>
@@ -715,8 +715,8 @@ function Home({setPage}){
 
       {/* Social links */}
       <div style={{display:"flex",gap:24,alignItems:"center",margin:"24px 0 40px"}}>
-        <TapButton href="https://www.instagram.com/ukho.music/" style={{fontFamily:ARCH,fontSize:"clamp(44px,11vw,64px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.2px",cursor:"pointer",padding:"4px 8px"}}>inst</TapButton>
-        <TapButton href="https://www.facebook.com/ukhomusic" style={{fontFamily:ARCH,fontSize:"clamp(44px,11vw,64px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.2px",cursor:"pointer",padding:"4px 8px"}}>fb</TapButton>
+        <TapButton href="https://www.instagram.com/ukho.music/" style={{fontFamily:ARCH,fontSize:"clamp(44px,11vw,64px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.5px",cursor:"pointer",padding:"4px 8px"}}>inst</TapButton>
+        <TapButton href="https://www.facebook.com/ukhomusic" style={{fontFamily:ARCH,fontSize:"clamp(44px,11vw,64px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.5px",cursor:"pointer",padding:"4px 8px"}}>fb</TapButton>
       </div>
 
     </div>
