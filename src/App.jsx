@@ -1002,11 +1002,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
 
 function PortalsPage(){
   const mountRef=useRef(null);
-  const[loadProg,setLoadProg]=useState(0);
   const[loaded,setLoaded]=useState(false);
-  const[revealed,setRevealed]=useState(false);
-  const realLoaded=useRef(false);
-  const startTime=useRef(Date.now());
   useEffect(()=>{
     const el=mountRef.current;if(!el)return;
     const w=el.clientWidth,h=el.clientHeight;
@@ -1034,42 +1030,19 @@ function PortalsPage(){
       group.position.sub(center);
       if(maxDim>0)group.scale.multiplyScalar(1.5/maxDim);
       scene.add(group);
-      realLoaded.current=true;
+      setLoaded(true);
     },undefined,(err)=>console.error("USDZ load error:",err));
     let raf;
     const animate=()=>{raf=requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)};
     animate();
     const onResize=()=>{const ww=el.clientWidth,hh=el.clientHeight;camera.aspect=ww/hh;camera.updateProjectionMatrix();renderer.setSize(ww,hh)};
     window.addEventListener("resize",onResize);
-    let fakeRaf;let done=false;const runFake=()=>{if(done)return;fakeRaf=setTimeout(()=>{
-      setLoadProg(p=>{
-        const elapsed=Date.now()-startTime.current;
-        if(p>=0.95&&realLoaded.current&&elapsed>=1000){
-          done=true;setTimeout(()=>{setLoaded(true);setRevealed(true)},200);return 1;
-        }
-        const cap=realLoaded.current&&elapsed>=800?1:0.95;
-        if(p<0.5)return Math.min(p+Math.random()*0.25+0.15,cap);
-        if(p<0.8)return Math.min(p+Math.random()*0.2+0.1,cap);
-        return Math.min(p+Math.random()*0.1+0.05,cap);
-      });runFake();
-    },60+Math.random()*180)};runFake();
-    return()=>{window.removeEventListener("resize",onResize);cancelAnimationFrame(raf);if(fakeRaf)clearTimeout(fakeRaf);renderer.dispose();controls.dispose();if(el.contains(renderer.domElement))el.removeChild(renderer.domElement)};
+    return()=>{window.removeEventListener("resize",onResize);cancelAnimationFrame(raf);renderer.dispose();controls.dispose();if(el.contains(renderer.domElement))el.removeChild(renderer.domElement)};
   },[]);
-  const pct=revealed?100:Math.round(loadProg*100);
   return(<div style={{minHeight:"100vh",background:"#000",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",paddingTop:HEADER_H-20}}>
-    <div ref={mountRef} style={{width:"min(80vw,500px)",height:"min(80vw,500px)",position:"relative"}}>
-      {!revealed&&<><div style={{position:"absolute",inset:0,background:"#000",zIndex:5}}/><div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:10,pointerEvents:"none"}}>
-        <style>{`@keyframes holo{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}@keyframes barPulse{0%,100%{box-shadow:0 0 8px rgba(74,246,38,0.4),0 0 20px rgba(74,246,38,0.15)}50%{box-shadow:0 0 14px rgba(74,246,38,0.7),0 0 30px rgba(74,246,38,0.25)}}@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}`}</style>
-        <div style={{width:"60%",maxWidth:220}}>
-          <div style={{height:3,borderRadius:2,background:"rgba(255,255,255,0.06)",position:"relative",overflow:"hidden",animation:"barPulse 2s ease-in-out infinite"}}>
-            <div style={{position:"absolute",top:0,left:0,height:"100%",width:pct+"%",borderRadius:2,background:"linear-gradient(90deg,#4af626,#00ffd5,#4af626,#00ffd5)",backgroundSize:"200% 100%",animation:"holo 3s ease infinite",transition:"width 0.3s ease"}}/>
-            <div style={{position:"absolute",top:0,left:0,width:pct+"%",height:"100%",overflow:"hidden"}}><div style={{width:"100%",height:"200%",background:"linear-gradient(180deg,transparent 40%,rgba(255,255,255,0.15) 50%,transparent 60%)",animation:"scanline 1.5s linear infinite"}}/></div>
-          </div>
-          <div style={{fontFamily:MONO,fontSize:10,color:"rgba(74,246,38,0.5)",marginTop:6,textAlign:"center",letterSpacing:2}}>{pct}%</div>
-        </div>
-      </div></>}
-    </div>
-    {revealed&&<div style={{fontFamily:ARCH,fontSize:48,color:"rgba(255,255,255,0.15)",letterSpacing:"-1px",marginTop:24,position:"relative",overflow:"hidden"}}>under construction<style>{`@keyframes csBlink{0%,90%,100%{opacity:0.5}95%{opacity:0}}`}</style><div style={{position:"absolute",inset:0,background:"rgba(255,60,60,0.6)",animation:"csBlink 4s ease infinite",pointerEvents:"none"}}/></div>}
+    <style>{`@keyframes portalGlitch{0%{opacity:0;filter:hue-rotate(0deg) contrast(1) blur(0)}7%{opacity:1;filter:hue-rotate(60deg) contrast(1.3) blur(2px);clip-path:inset(10% 0 40% 0)}15%{opacity:0.3;filter:hue-rotate(30deg) contrast(1.15);clip-path:inset(60% 0 5% 0)}24%{opacity:1;filter:hue-rotate(-40deg) contrast(1.3) blur(1px);clip-path:inset(25% 0 25% 0)}33%{opacity:0.6;filter:hue-rotate(20deg) contrast(1.1);clip-path:inset(0 0 70% 0)}44%{opacity:1;filter:hue-rotate(-20deg) contrast(1.2);clip-path:inset(45% 0 15% 0)}55%{opacity:0.4;filter:hue-rotate(55deg) contrast(1.15);clip-path:inset(0 40% 0 0)}68%{opacity:1;filter:hue-rotate(-10deg) contrast(1.08);clip-path:inset(0 0 0 30%)}82%{opacity:0.75;filter:hue-rotate(5deg) contrast(1.04);clip-path:none}100%{opacity:1;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:none}}`}</style>
+    <div ref={mountRef} style={{width:"min(80vw,500px)",height:"min(80vw,500px)",position:"relative",opacity:loaded?undefined:0,animation:loaded?"portalGlitch 0.9s steps(14,end) both":undefined}}/>
+    {loaded&&<div style={{fontFamily:ARCH,fontSize:48,color:"rgba(255,255,255,0.15)",letterSpacing:"-1px",marginTop:24,position:"relative",overflow:"hidden",animation:"portalGlitch 0.7s steps(12,end) 300ms both"}}>under construction<style>{`@keyframes csBlink{0%,90%,100%{opacity:0.5}95%{opacity:0}}`}</style><div style={{position:"absolute",inset:0,background:"rgba(255,60,60,0.6)",animation:"csBlink 4s ease infinite",pointerEvents:"none"}}/></div>}
   </div>);
 }
 
