@@ -32,6 +32,24 @@ function TapButton({children,onClick,style,href,target}){
   </Tag>);
 }
 
+function CountUp({target,duration=400}){
+  const[n,setN]=useState(0);
+  useEffect(()=>{
+    const start=performance.now();
+    let raf;
+    const tick=()=>{
+      const elapsed=performance.now()-start;
+      const t=Math.min(1,elapsed/duration);
+      const eased=1-Math.pow(1-t,3);
+      setN(Math.round(eased*target));
+      if(t<1)raf=requestAnimationFrame(tick);
+    };
+    raf=requestAnimationFrame(tick);
+    return()=>cancelAnimationFrame(raf);
+  },[target,duration]);
+  return n;
+}
+
 function scrollPageToTop(){
   // Find the fixed scroll container used by cardindex/list/events
   const el=document.querySelector('[data-scroll-container]');
@@ -42,11 +60,11 @@ function scrollPageToTop(){
 function Menu({page,setPage}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
-  const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(36px,9vw,48px)":"clamp(46px,4.55vw,62px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-1.5px":"-2px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
+  const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(20px,5vw,32px)":"clamp(36px,4vw,56px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-2px":"-3px",textTransform:"lowercase",zIndex:1,textDecoration:"none",whiteSpace:"nowrap"};
   return (<div id="ukho-menu" style={{...panelStyle,top:0}}>
     <div onClick={scrollPageToTop} style={{position:"absolute",top:0,left:0,right:0,height:12,cursor:"pointer",zIndex:10}}/>
-    <div style={{padding:"2px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(40px,10vw,54px)":"clamp(52px,5.1vw,70px)",fontWeight:400}} onClick={()=>setPage("home")}>/dir</TapButton></div>
-    <div style={{display:"flex",justifyContent:"space-between",padding:"0px 14px 2px"}}>{pages.map(p=><TapButton key={p} style={{...bs,fontWeight:page===p?600:400,color:page===p?"rgba(0,0,0,0.08)":BLUE}} onClick={()=>setPage(p)}>/{p}</TapButton>)}</div>
+    <div style={{padding:"2px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(26px,6.5vw,40px)":"clamp(42px,4.5vw,64px)",fontWeight:400}} onClick={()=>setPage("home")}>/dir</TapButton></div>
+    <div style={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",rowGap:2,padding:"0px 14px 2px"}}>{pages.map(p=><TapButton key={p} style={{...bs,fontWeight:page===p?600:400,color:page===p?"rgba(0,0,0,0.08)":BLUE}} onClick={()=>setPage(p)}>/{p}</TapButton>)}</div>
   </div>);
 }
 
@@ -363,7 +381,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     <div data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
       <div style={{height:topH}}/>
       <div style={{position:"sticky",top:topH,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"6px 20px 4px":"4px 8px 2px"}}>
-        <div style={{display:"flex",gap:isDesk?8:4,flexWrap:"nowrap",justifyContent:isDesk?"flex-start":"space-evenly",alignItems:"flex-start"}}>{Object.keys(everything).map(s=><div key={s} style={{display:"flex",flexDirection:"column",alignItems:"center",flex:isDesk?undefined:"1 1 0",minWidth:0}}><button onClick={()=>setEvSec(s)} style={{fontFamily:MONO,fontSize:isDesk?16:11,fontWeight:evSec===s?700:400,padding:isDesk?"6px 20px":"4px 6px",width:isDesk?"auto":"100%",minWidth:0,background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button><div style={{fontFamily:MONO,fontSize:isDesk?22:16,fontWeight:400,color:"rgba(0,0,0,0.5)",marginTop:4,height:isDesk?26:20,lineHeight:1,textAlign:"center",letterSpacing:0}}>{evSec===s?items.length:""}</div></div>)}</div>
+        <div style={{display:"flex",gap:isDesk?8:4,flexWrap:"nowrap",justifyContent:isDesk?"flex-start":"space-evenly",alignItems:"flex-start"}}>{Object.keys(everything).map(s=><div key={s} style={{display:"flex",flexDirection:"column",alignItems:"center",flex:isDesk?undefined:"1 1 0",minWidth:0}}><button onClick={()=>setEvSec(s)} style={{fontFamily:MONO,fontSize:isDesk?16:11,fontWeight:evSec===s?700:400,padding:isDesk?"6px 20px":"4px 6px",width:isDesk?"auto":"100%",minWidth:0,background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button><div style={{fontFamily:MONO,fontSize:isDesk?14:12,fontWeight:700,color:"rgba(0,0,0,0.55)",marginTop:3,height:isDesk?18:14,lineHeight:1,textAlign:"center",letterSpacing:0.3}}>{evSec===s?<CountUp target={items.length}/>:""}</div></div>)}</div>
       </div>
       <div style={{padding:"12px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
         {items.map((item,i)=><div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer",textTransform:evSec==="tags"?"uppercase":"none"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
@@ -566,7 +584,7 @@ function EventDetail({ev,onBack}){
     }}>▼</div>
   </>}
   <div style={{position:"fixed",bottom:20,right:20}}>
-    <TapButton onClick={onBack} style={{fontFamily:ARCH,fontSize:"clamp(36px,8vw,52px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",cursor:"pointer",padding:"6px 10px",lineHeight:1,letterSpacing:"-1.5px"}}>back</TapButton>
+    <TapButton onClick={onBack} style={{fontFamily:ARCH,fontSize:"clamp(52px,12vw,78px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",cursor:"pointer",padding:"6px 10px",lineHeight:1,letterSpacing:"-2.5px"}}>back</TapButton>
   </div></div>)}
 
 /* ── Home canvas background ── */
@@ -714,8 +732,8 @@ function Home({setPage}){
 
       {/* Social links */}
       <div style={{display:"flex",gap:24,alignItems:"center",margin:"24px 0 40px"}}>
-        <TapButton href="https://www.instagram.com/ukho.music/" style={{fontFamily:ARCH,fontSize:"clamp(44px,11vw,64px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.5px",cursor:"pointer",padding:"4px 8px"}}>inst</TapButton>
-        <TapButton href="https://www.facebook.com/ukhomusic" style={{fontFamily:ARCH,fontSize:"clamp(44px,11vw,64px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.5px",cursor:"pointer",padding:"4px 8px"}}>fb</TapButton>
+        <TapButton href="https://www.instagram.com/ukho.music/" style={{fontFamily:ARCH,fontSize:"clamp(32px,8vw,48px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.2px",cursor:"pointer",padding:"4px 8px"}}>inst</TapButton>
+        <TapButton href="https://www.facebook.com/ukhomusic" style={{fontFamily:ARCH,fontSize:"clamp(32px,8vw,48px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.2px",cursor:"pointer",padding:"4px 8px"}}>fb</TapButton>
       </div>
 
     </div>
