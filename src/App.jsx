@@ -111,13 +111,13 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
   const rafRef=useRef(null);
   const touchRef=useRef({x:0,o:0});
   const introStart=useRef(performance.now());
-  // Auto-scroll the non-selected years (fast ramp-down at intro, waits for bar to settle)
+  // Auto-scroll the non-selected years (max speed during slide-in, then ramp down)
   useEffect(()=>{
     introStart.current=performance.now();
     let last=performance.now();
     const base=dk?18:12;
-    const INTRO_DUR=3200;const INTRO_WAIT=800;
-    const tick=()=>{const now=performance.now(),dt=(now-last)/1000;last=now;const el=now-introStart.current-INTRO_WAIT;let mul;if(el<=0){mul=0}else{const t=Math.min(1,el/INTRO_DUR);mul=t>=1?1:(1+22*Math.pow(1-t,3))}setOffset(o=>{let next=o-dt*base*mul;if(next<-loopW)next+=loopW;if(next>loopW)next-=loopW;return next});rafRef.current=requestAnimationFrame(tick)};
+    const HOLD=900;const DECAY=2800;const MAX=24;
+    const tick=()=>{const now=performance.now(),dt=(now-last)/1000;last=now;const el=now-introStart.current;let mul;if(el<=HOLD){mul=MAX}else{const t=Math.min(1,(el-HOLD)/DECAY);mul=t>=1?1:(1+(MAX-1)*Math.pow(1-t,3))}setOffset(o=>{let next=o-dt*base*mul;if(next<-loopW)next+=loopW;if(next>loopW)next-=loopW;return next});rafRef.current=requestAnimationFrame(tick)};
     rafRef.current=requestAnimationFrame(tick);
     return()=>cancelAnimationFrame(rafRef.current);
   },[loopW,dk]);
@@ -148,13 +148,13 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
   </div>);
 }
 
-function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPrev,onNext,matchIdx,matchCount,years,yearFilter,setYearFilter,introDelay=300}){
+function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPrev,onNext,matchIdx,matchCount,years,yearFilter,setYearFilter,introDelay=300,skipIntro,filters}){
   const dk=typeof window!=="undefined"&&window.innerWidth>768;
   const bs={width:dk?42:30,height:dk?42:30,flexShrink:0,border:"1px solid rgba(0,0,0,0.08)",background:"rgba(255,255,255,0.4)",cursor:"pointer",fontFamily:MONO,fontSize:dk?16:12,display:"flex",alignItems:"center",justifyContent:"center",padding:0,color:"#000"};
   const hm=search.trim()&&matchCount>1;
   const menuH=document.getElementById('ukho-menu')?.offsetHeight||HEADER_H;
-  return (<div id="ukho-bar" style={{...panelStyle,top:menuH,bottom:"auto",boxShadow:"0 2px 16px rgba(0,0,0,0.04)",padding:dk?"6px 20px":"4px 12px",display:"flex",flexDirection:"column",gap:dk?6:4,animation:`barSlideIn 0.55s cubic-bezier(0.34,1.4,0.5,1) ${introDelay}ms both`}}>
-    <style>{`@keyframes barSlideIn{0%{transform:translateX(110%);opacity:0}60%{opacity:1}100%{transform:translateX(0);opacity:1}}`}</style>
+  return (<div id="ukho-bar" style={{...panelStyle,top:menuH,bottom:"auto",boxShadow:"0 2px 16px rgba(0,0,0,0.04)",padding:dk?"6px 20px":"4px 12px",display:"flex",flexDirection:"column",gap:dk?6:4,animation:skipIntro?undefined:`barSlideIn 0.55s cubic-bezier(0.34,1.4,0.5,1) ${introDelay}ms both`}}>
+    <style>{`@keyframes barSlideIn{0%{transform:translateX(110%);opacity:0}60%{opacity:1}100%{transform:translateX(0);opacity:1}}@keyframes evBlink{0%,100%{opacity:0.18}50%{opacity:0}}@keyframes filterTabPop{0%{opacity:0;transform:translateY(8px) scale(0.7)}60%{opacity:1;transform:translateY(-2px) scale(1.08)}100%{opacity:1;transform:translateY(0) scale(1)}}`}</style>
     <div style={{display:"flex",gap:dk?10:6,alignItems:"center"}}>
       <div style={{flex:"1 1 0",position:"relative",minWidth:0}}>
         <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="search..." style={{width:"100%",padding:dk?"8px 36px 8px 14px":"5px 28px 5px 10px",border:search?`2px solid rgba(74,246,38,0.5)`:"1px solid rgba(0,0,0,0.08)",fontFamily:MONO,fontSize:dk?20:16,background:search?"rgba(74,246,38,0.04)":"rgba(255,255,255,0.3)",outline:"none",letterSpacing:0,color:"#000",boxSizing:"border-box"}}/>
@@ -163,9 +163,9 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
       {!hm&&<button style={bs} onClick={onTop}>▲</button>}{!hm&&<button style={bs} onClick={onBottom}>▼</button>}
       {hm&&<button style={bs} onClick={onPrev}>‹</button>}{hm&&<span style={{fontFamily:MONO,fontSize:dk?15:11,color:"rgba(0,0,0,0.35)",whiteSpace:"nowrap",letterSpacing:0,minWidth:dk?48:36,textAlign:"center"}}>{matchIdx+1}/{matchCount}</span>}{hm&&<button style={bs} onClick={onNext}>›</button>}
       <button onClick={onToggleMode} style={{fontFamily:MONO,fontSize:dk?18:14,fontWeight:700,padding:dk?"8px 36px":"2px 16px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:0.3,whiteSpace:"nowrap",height:dk?46:34,flexShrink:0,position:"relative",overflow:"hidden",textTransform:"lowercase",display:"flex",alignItems:"center",justifyContent:"center"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite 2s",pointerEvents:"none",opacity:0}}/></button>
-      <style>{`@keyframes evBlink{0%,100%{opacity:0.18}50%{opacity:0}}`}</style>
     </div>
-    {years&&years.length>1&&<YearCarousel years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} dk={dk}/>}
+    {filters&&<div style={{display:"flex",gap:dk?8:4,justifyContent:"space-between",alignItems:"flex-start",paddingTop:2}}>{filters.options.map((s,ti)=><div key={s} style={{display:"flex",flexDirection:"column",alignItems:"center",animation:`filterTabPop 0.5s cubic-bezier(0.34,1.56,0.64,1) ${ti*80}ms both`}}><button onClick={()=>filters.setActive(s)} style={{fontFamily:MONO,fontSize:dk?18:12,fontWeight:filters.active===s?700:400,padding:dk?"7px 22px":"4px 6px",background:filters.active===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase",whiteSpace:"nowrap"}}>{s}</button><div style={{fontFamily:MONO,fontSize:dk?15:13,fontWeight:700,color:filters.active===s?"rgba(0,0,0,0.55)":"rgba(0,0,0,0.3)",marginTop:4,height:dk?19:15,lineHeight:1,textAlign:"center",letterSpacing:0.3}}><CountUp target={filters.counts[s]}/></div></div>)}</div>}
+    {!filters&&years&&years.length>1&&<YearCarousel years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} dk={dk}/>}
   </div>);
 }
 
@@ -183,17 +183,18 @@ function FloatingDice({onRoll,introDelay=1500}){const[rolling,setRolling]=useSta
     </div></div></div>);
 }
 
-function useBarBottom(){
+function useBarBottom(dep){
   const[bb,setBb]=useState(HEADER_H+BAR_H);
   useEffect(()=>{
+    let currentEl=null;
     const m=()=>{const el=document.getElementById('ukho-bar');if(el)setBb(el.offsetTop+el.offsetHeight)};
-    m();const t1=setTimeout(m,50);const t2=setTimeout(m,200);
-    window.addEventListener("resize",m);
-    // Watch bar size changes (carousel appearing/disappearing)
     const ro=new ResizeObserver(m);
-    const poll=setInterval(()=>{const el=document.getElementById('ukho-bar');if(el){ro.observe(el);clearInterval(poll)}},50);
+    const rebind=()=>{const el=document.getElementById('ukho-bar');if(el&&el!==currentEl){if(currentEl)ro.unobserve(currentEl);ro.observe(el);currentEl=el;m()}};
+    rebind();const t1=setTimeout(rebind,50);const t2=setTimeout(rebind,200);
+    window.addEventListener("resize",m);
+    const poll=setInterval(rebind,150);
     return()=>{clearTimeout(t1);clearTimeout(t2);clearInterval(poll);window.removeEventListener("resize",m);ro.disconnect()};
-  },[]);
+  },[dep]);
   return bb;
 }
 
@@ -299,6 +300,9 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const[enterDir,setEnterDir]=useState("None");
   const[introPlayed,setIntroPlayed]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setIntroPlayed(true),1100);return()=>clearTimeout(t)},[]);
+  const hasAnimatedBarRef=useRef(false);
+  const skipBarIntro=hasAnimatedBarRef.current;
+  useEffect(()=>{hasAnimatedBarRef.current=true},[]);
   const touchRef=useRef({y:0,t:0});const animating=useRef(null);const navKey=useRef(0);
   const isDesk=typeof window!=="undefined"&&window.innerWidth>768;
   const[menuH,setMenuH]=useState(130);
@@ -418,18 +422,16 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   },[isDesk,mode]);
 
   // ── EVERYTHING mode ──
-  const evBarBottom=useBarBottom();
-  if(mode==="everything"){const topH=evBarBottom;const items=everything[evSec]||[];return(<>
-    <style>{`@keyframes evItemWave{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}@keyframes evTabGlitch{0%{opacity:0;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:inset(0 0 100% 0)}10%{opacity:1;filter:hue-rotate(140deg) contrast(1.8) blur(1px);clip-path:inset(0 0 60% 0)}22%{opacity:0.4;filter:hue-rotate(-90deg) contrast(1.4);clip-path:inset(50% 0 0 0)}35%{opacity:1;filter:hue-rotate(80deg) contrast(1.6);clip-path:inset(20% 0 20% 0)}50%{opacity:0.6;filter:hue-rotate(-40deg) contrast(1.3);clip-path:inset(0 40% 0 0)}68%{opacity:1;filter:hue-rotate(20deg) contrast(1.1);clip-path:inset(0 0 0 30%)}85%{opacity:0.8;clip-path:none}100%{opacity:1;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:none}}`}</style>
+  const evBarBottom=useBarBottom(mode);
+  const filterCounts=useMemo(()=>Object.fromEntries(Object.keys(everything).map(s=>[s,everything[s].length])),[everything]);
+  if(mode==="everything"){const topH=evBarBottom;const items=everything[evSec]||[];const evBase=skipBarIntro?200:700;return(<>
+    <style>{`@keyframes evItemWave{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}`}</style>
     <div data-scroll-container style={{position:"fixed",top:topH,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
-      <div className="ukho-ev-tabs" style={{position:"sticky",top:0,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"6px 20px 4px":"4px 6px 2px"}}>
-        <div style={{display:"flex",gap:isDesk?8:4,justifyContent:"space-between",alignItems:"flex-start"}}>{Object.keys(everything).map((s,ti)=><div key={s} style={{display:"flex",flexDirection:"column",alignItems:"center",animation:`evTabGlitch 0.6s steps(12,end) ${500+ti*120}ms both`}}><button onClick={()=>setEvSec(s)} style={{fontFamily:MONO,fontSize:isDesk?18:12,fontWeight:evSec===s?700:400,padding:isDesk?"7px 22px":"4px 6px",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase",whiteSpace:"nowrap"}}>{s}</button><div style={{fontFamily:MONO,fontSize:isDesk?15:13,fontWeight:700,color:evSec===s?"rgba(0,0,0,0.55)":"rgba(0,0,0,0.3)",marginTop:4,height:isDesk?19:15,lineHeight:1,textAlign:"center",letterSpacing:0.3}}><CountUp target={everything[s].length}/></div></div>)}</div>
-      </div>
-      <div style={{padding:"4px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
-        {items.map((item,i)=><div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer",textTransform:evSec==="tags"?"uppercase":"none",animation:`evItemWave 0.4s cubic-bezier(0.25,0.8,0.3,1) ${700+Math.min(i,70)*18}ms both`}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
+      <div key={evSec} style={{padding:"14px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
+        {items.map((item,i)=><div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer",textTransform:evSec==="tags"?"uppercase":"none",animation:`evItemWave 0.4s cubic-bezier(0.25,0.8,0.3,1) ${evBase+Math.min(i,70)*18}ms both`}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
       </div></div>
     </div>
-    <BottomBar search={search} setSearch={setSearchSwitch} onTop={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:0,behavior:"smooth"})}} onBottom={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:el.scrollHeight,behavior:"smooth"})}} onToggleMode={()=>setMode("list")} modeLabel="cards" introDelay={300}/></>)}
+    <BottomBar search={search} setSearch={setSearchSwitch} onTop={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:0,behavior:"smooth"})}} onBottom={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:el.scrollHeight,behavior:"smooth"})}} onToggleMode={()=>setMode("list")} modeLabel="cards" introDelay={300} skipIntro={skipBarIntro} filters={{options:Object.keys(everything),counts:filterCounts,active:evSec,setActive:setEvSec}}/></>)}
 
   // ── DESKTOP: table rows ──
   if(isDesk){
@@ -457,7 +459,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
           </div>
         ))}
       </div>
-      <BottomBar search={search} setSearch={setSearch} onTop={()=>window.scrollTo({top:0,behavior:"smooth"})} onBottom={()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})} onToggleMode={()=>setMode("everything")} modeLabel="everything" onPrev={()=>{}} onNext={()=>{}} matchIdx={0} matchCount={0} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} introDelay={300}/>
+      <BottomBar search={search} setSearch={setSearch} onTop={()=>window.scrollTo({top:0,behavior:"smooth"})} onBottom={()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})} onToggleMode={()=>setMode("everything")} modeLabel="everything" onPrev={()=>{}} onNext={()=>{}} matchIdx={0} matchCount={0} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} introDelay={300} skipIntro={skipBarIntro}/>
       <FloatingDice onRoll={()=>{const e=filtered[Math.floor(Math.random()*filtered.length)];if(e)onOpenEvent?.(e)}} introDelay={2700}/>
     </div>);
   }
@@ -482,7 +484,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
       </div></div>:
         <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",fontFamily:FONT,fontSize:16,color:"rgba(0,0,0,0.12)"}}>no events match "{search}"</div>}
     </div>
-    <BottomBar search={search} setSearch={setSearch} onTop={()=>{setEnterDir("Down");setIdx(0)}} onBottom={()=>{setEnterDir("Up");setIdx(filtered.length-1)}} onToggleMode={()=>setMode("everything")} modeLabel="everything" onPrev={()=>{const n=idx<=0?filtered.length-1:idx-1;go(n,"Down")}} onNext={()=>{const n=idx>=filtered.length-1?0:idx+1;go(n,"Up")}} matchIdx={idx} matchCount={filtered.length} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} introDelay={300}/>
+    <BottomBar search={search} setSearch={setSearch} onTop={()=>{setEnterDir("Down");setIdx(0)}} onBottom={()=>{setEnterDir("Up");setIdx(filtered.length-1)}} onToggleMode={()=>setMode("everything")} modeLabel="everything" onPrev={()=>{const n=idx<=0?filtered.length-1:idx-1;go(n,"Down")}} onNext={()=>{const n=idx>=filtered.length-1?0:idx+1;go(n,"Up")}} matchIdx={idx} matchCount={filtered.length} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} introDelay={300} skipIntro={skipBarIntro}/>
     <FloatingDice onRoll={goRandom} introDelay={1500}/>
   </div>);
 }
