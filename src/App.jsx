@@ -42,10 +42,10 @@ function scrollPageToTop(){
 function Menu({page,setPage}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
-  const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(28px,7vw,36px)":"clamp(36px,3.85vw,52px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-0.5px":"-1px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
+  const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(36px,9vw,48px)":"clamp(46px,4.55vw,62px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-1px":"-1.5px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
   return (<div id="ukho-menu" style={{...panelStyle,top:0}}>
     <div onClick={scrollPageToTop} style={{position:"absolute",top:0,left:0,right:0,height:12,cursor:"pointer",zIndex:10}}/>
-    <div style={{padding:"2px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(36px,9vw,48px)":"clamp(46px,4.55vw,62px)",fontWeight:400}} onClick={()=>setPage("home")}>/dir</TapButton></div>
+    <div style={{padding:"2px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(40px,10vw,54px)":"clamp(52px,5.1vw,70px)",fontWeight:400}} onClick={()=>setPage("home")}>/dir</TapButton></div>
     <div style={{display:"flex",justifyContent:"space-between",padding:"0px 14px 2px"}}>{pages.map(p=><TapButton key={p} style={{...bs,fontWeight:page===p?600:400,color:page===p?"rgba(0,0,0,0.08)":BLUE}} onClick={()=>setPage(p)}>/{p}</TapButton>)}</div>
   </div>);
 }
@@ -362,7 +362,10 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   if(mode==="everything"){const topH=evBarBottom;const items=everything[evSec]||[];return(<>
     <div data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
       <div style={{height:topH}}/>
-      <div style={{position:"sticky",top:topH,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"6px 20px":"4px 8px",display:"flex",gap:isDesk?8:4,flexWrap:"nowrap",justifyContent:isDesk?"flex-start":"space-evenly"}}>{Object.keys(everything).map(s=><button key={s} onClick={()=>setEvSec(s)} style={{fontFamily:MONO,fontSize:isDesk?16:11,fontWeight:evSec===s?700:400,padding:isDesk?"6px 20px":"4px 6px",flex:isDesk?undefined:"1 1 auto",minWidth:0,background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button>)}</div>
+      <div style={{position:"sticky",top:topH,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"6px 20px 2px":"4px 8px 2px"}}>
+        <div style={{display:"flex",gap:isDesk?8:4,flexWrap:"nowrap",justifyContent:isDesk?"flex-start":"space-evenly"}}>{Object.keys(everything).map(s=><button key={s} onClick={()=>setEvSec(s)} style={{fontFamily:MONO,fontSize:isDesk?16:11,fontWeight:evSec===s?700:400,padding:isDesk?"6px 20px":"4px 6px",flex:isDesk?undefined:"1 1 auto",minWidth:0,background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button>)}</div>
+        <div style={{fontFamily:MONO,fontSize:isDesk?11:9,color:"rgba(0,0,0,0.4)",letterSpacing:0.3,textTransform:"lowercase",marginTop:4,textAlign:"right",paddingRight:isDesk?4:2}}>{items.length} {evSec}</div>
+      </div>
       <div style={{padding:"12px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
         {items.map((item,i)=><div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer",textTransform:evSec==="tags"?"uppercase":"none"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
       </div></div>
@@ -671,7 +674,7 @@ function Home({setPage}){
       {/* Enter archive */}
       <div style={{margin:"40px 0"}}>
         <style>{`@keyframes hCur{0%,100%{opacity:1}50%{opacity:0}}`}</style>
-        <TapButton onClick={()=>setPage("cardindex")} style={{fontFamily:ARCH,fontSize:"clamp(72px,18vw,120px)",fontWeight:400,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 16px",textDecoration:"none",letterSpacing:"-1px",display:"inline-block"}}>
+        <TapButton onClick={()=>setPage("cardindex")} style={{fontFamily:ARCH,fontSize:"clamp(72px,18vw,120px)",fontWeight:400,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 16px",textDecoration:"none",letterSpacing:"-2px",display:"inline-block"}}>
           enter archive
         </TapButton>
       </div>
@@ -696,10 +699,10 @@ function Home({setPage}){
       <div style={{position:"relative",margin:"60px 0",padding:"20px 0"}}>
         <div style={{fontFamily:ARCH,fontSize:"clamp(80px,20vw,160px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-1px",position:"absolute",top:"50%",left:0,transform:"translateY(-50%)",pointerEvents:"none",whiteSpace:"nowrap"}}>UMBRELLA</div>
         <div style={{display:"flex",flexDirection:"column",gap:12,position:"relative"}}>
-          <TapButton href="https://kyivdispat.ch" style={{fontFamily:ARCH,fontSize:"clamp(56px,14vw,88px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
+          <TapButton href="https://kyivdispat.ch" style={{fontFamily:ARCH,fontSize:"clamp(56px,14vw,88px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.5px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
             kyiv dispatch record label
           </TapButton>
-          <TapButton href="https://music.youtube.com/channel/UCOnv8gWUnKFFAC2So6EVS_Q" style={{fontFamily:ARCH,fontSize:"clamp(56px,14vw,88px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
+          <TapButton href="https://music.youtube.com/channel/UCOnv8gWUnKFFAC2So6EVS_Q" style={{fontFamily:ARCH,fontSize:"clamp(56px,14vw,88px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.5px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
             ukho ensemble kyiv
           </TapButton>
         </div>
@@ -712,8 +715,8 @@ function Home({setPage}){
 
       {/* Social links */}
       <div style={{display:"flex",gap:24,alignItems:"center",margin:"24px 0 40px"}}>
-        <TapButton href="https://www.instagram.com/ukho.music/" style={{fontFamily:ARCH,fontSize:"clamp(44px,11vw,64px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1px",cursor:"pointer",padding:"4px 8px"}}>inst</TapButton>
-        <TapButton href="https://www.facebook.com/ukhomusic" style={{fontFamily:ARCH,fontSize:"clamp(44px,11vw,64px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1px",cursor:"pointer",padding:"4px 8px"}}>fb</TapButton>
+        <TapButton href="https://www.instagram.com/ukho.music/" style={{fontFamily:ARCH,fontSize:"clamp(44px,11vw,64px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.2px",cursor:"pointer",padding:"4px 8px"}}>inst</TapButton>
+        <TapButton href="https://www.facebook.com/ukhomusic" style={{fontFamily:ARCH,fontSize:"clamp(44px,11vw,64px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.2px",cursor:"pointer",padding:"4px 8px"}}>fb</TapButton>
       </div>
 
     </div>
@@ -900,7 +903,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
         {/* Number overlay — top left like original */}
         <div className={isMobile?undefined:"ukho-card-label"} style={{
           position:"absolute",top:6,left:8,
-          fontFamily:ARCH,fontSize:isMobile?"clamp(42px,11vw,58px)":"clamp(34px,3.6vw,50px)",
+          fontFamily:ARCH,fontSize:isMobile?"clamp(28px,7vw,38px)":"clamp(22px,2.4vw,34px)",
           fontWeight:400,color:"rgba(0,0,255,0.6)",
           textShadow:"none",
           pointerEvents:"none",letterSpacing:"-0.5px",lineHeight:1,zIndex:2,
