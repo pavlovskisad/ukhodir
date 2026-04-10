@@ -149,7 +149,7 @@ function TerminalBoot({onDone}){
     return()=>timers.forEach(clearTimeout);
   },[]);
   const mob=typeof window!=="undefined"&&window.innerWidth<=768;
-  return(<div style={{position:"fixed",inset:0,zIndex:10001,background:"#fff",padding:mob?"14px 12px":"22px 28px",fontFamily:MONO,fontSize:mob?10:14,lineHeight:1.5,color:"rgba(0,0,0,0.78)",whiteSpace:"pre",overflow:"hidden",overscrollBehavior:"none",letterSpacing:0.1}}>
+  return(<div style={{position:"fixed",inset:0,zIndex:10001,background:"transparent",padding:mob?"14px 12px":"22px 28px",fontFamily:MONO,fontSize:mob?10:14,lineHeight:1.5,color:"rgba(0,0,0,0.82)",whiteSpace:"pre",overflow:"hidden",overscrollBehavior:"none",letterSpacing:0.1,pointerEvents:"auto"}}>
     <style>{`@keyframes termBlink{0%,100%{opacity:1}50%{opacity:0}}`}</style>
     {BOOT_LINES.slice(0,shown).map((l,i)=><div key={i}>{l||"\u00a0"}</div>)}
     <span style={{display:"inline-block",width:mob?5:8,height:mob?12:15,background:"rgba(0,0,0,0.78)",verticalAlign:"middle",marginLeft:2,animation:"termBlink 0.7s step-end infinite"}}/>
@@ -167,7 +167,7 @@ function Menu({page,setPage,introRef}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
   const[intro]=useState(()=>!!(introRef&&introRef.current));
-  const delay=intro?2700:80;
+  const delay=intro?500:80;
   const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(36px,9vw,48px)":"clamp(46px,4.55vw,62px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-2.5px":"-3px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
   return (<div id="ukho-menu" style={{...panelStyle,top:0,background:"rgba(255,255,255,0.22)",animation:`menuSlideDown 0.4s cubic-bezier(0.34,1.56,0.64,1) ${delay}ms both`}}>
     <style>{`@keyframes menuSlideDown{0%{transform:translateY(-110%)}100%{transform:translateY(0)}}`}</style>
@@ -808,7 +808,7 @@ function useTypewriter(text,speed=30,startDelay=0){
   return {displayed,done};
 }
 
-function Home({setPage,introRef}){
+function Home({setPage,startBooting}){
   const stagesText="stage 1 — catalogue and essential library (live now)\nstage 2 — full library (jun 2026)\nstage 3 — wiki (dec 2026)\n\n✳ archive created with support from";
   const upcomingText="Cherven vinyl release Kyiv dispatch\nValentin Silvestrov digital + vinyl release Kyiv dispatch\nUkho @ Iskra\nFestival of new music @ Pavilion of culture";
   const tw1=useTypewriter(stagesText,25,2000);
@@ -828,7 +828,7 @@ function Home({setPage,introRef}){
       {/* Enter archive */}
       <div style={{margin:"40px 0"}}>
         <style>{`@keyframes hCur{0%,100%{opacity:1}50%{opacity:0}}`}</style>
-        <TapButton onClick={()=>{if(introRef)introRef.current=true;setPage("cardindex")}} style={{fontFamily:ARCH,fontSize:"clamp(72px,18vw,120px)",fontWeight:700,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 16px",textDecoration:"none",letterSpacing:"-4px",display:"inline-block"}}>
+        <TapButton onClick={()=>startBooting?.()} style={{fontFamily:ARCH,fontSize:"clamp(72px,18vw,120px)",fontWeight:700,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 16px",textDecoration:"none",letterSpacing:"-4px",display:"inline-block"}}>
           enter archive
         </TapButton>
       </div>
@@ -975,7 +975,6 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
   const cols=isMobile?1:4;
   const[topPad,setTopPad]=useState(isMobile?HEADER_H+32:140);
   const[intro]=useState(()=>{const v=!!(introRef&&introRef.current);if(introRef)introRef.current=false;return v});
-  const[bootDone,setBootDone]=useState(!intro);
   const[built,setBuilt]=useState(!intro);
   useEffect(()=>{const el=document.getElementById('ukho-bar')||document.getElementById('ukho-menu');if(el)setTopPad(el.offsetTop+el.offsetHeight+12)},[]);
 
@@ -1029,10 +1028,9 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
     if(ev)onOpenEvent(ev);
   };
 
-  const cardBase=intro?2900:380;
+  const cardBase=intro?800:380;
   return (<><style>{`@keyframes cardBuild{0%{opacity:0;transform:translateY(30px) scale(0.88)}60%{opacity:1;transform:translateY(-4px) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}`}</style>
-  {!bootDone&&<TerminalBoot onDone={()=>setBootDone(true)}/>}
-  {bootDone&&!built&&<HoloPreloader onDone={()=>setBuilt(true)}/>}
+  {!built&&<HoloPreloader onDone={()=>setBuilt(true)}/>}
   <div ref={scrollContRef} data-scroll-container style={{
     position:"fixed",top:0,left:0,right:0,bottom:0,
     overflowY:"auto",WebkitOverflowScrolling:"touch",
@@ -1073,7 +1071,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
         }}>{slide.id}</div>
       </div>
     ))}
-    <FloatingDice onRoll={()=>{const i=Math.floor(Math.random()*SLIDES.length);const card=cardRefs.current[i];if(card)card.scrollIntoView({behavior:"smooth",block:"center"})}} introDelay={intro?3900:1400}/>
+    <FloatingDice onRoll={()=>{const i=Math.floor(Math.random()*SLIDES.length);const card=cardRefs.current[i];if(card)card.scrollIntoView({behavior:"smooth",block:"center"})}} introDelay={intro?1800:1400}/>
   </div></div></>);
 }
 
@@ -1377,6 +1375,8 @@ export default function App(){
   const[page,setPage]=useState(initEvent?"list":"home");const[openEvent,setOpenEvent]=useState(initEvent||null);const[prevPage,setPrevPage]=useState(initEvent?"list":null);
   const cardScrollRef=useRef(0);
   const cardIntroRef=useRef(false);
+  const[bootingCard,setBootingCard]=useState(false);
+  const finishBooting=useCallback(()=>{cardIntroRef.current=true;setBootingCard(false);setPage("cardindex")},[]);
   const listIdxRef=useRef(0);const listSearchRef=useRef("");const listYearRef=useRef("all");const listModeRef=useRef("list");const listScrollRef=useRef(0);
   const handleOpenEvent=(ev)=>{setPrevPage(page);setOpenEvent(ev);window.history.pushState({event:ev.id},"","/event/"+ev.id);window.scrollTo(0,0)};
   const handleBack=useCallback(()=>{setOpenEvent(null);if(prevPage)setPage(prevPage);window.history.pushState({},"","/")},[prevPage]);
@@ -1388,10 +1388,11 @@ export default function App(){
   return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden"}}>
     <style>{globalBtnStyle}</style>
     {page!=="home"&&<Menu page={page} setPage={setPage} introRef={cardIntroRef}/>}
-    {page==="home"&&<Home setPage={setPage} introRef={cardIntroRef}/>}
+    {page==="home"&&<Home setPage={setPage} startBooting={()=>setBootingCard(true)}/>}
     {page==="list"&&<ListPage events={EVENTS} onOpenEvent={handleOpenEvent} idxRef={listIdxRef} searchRef={listSearchRef} yearRef={listYearRef} modeRef={listModeRef} scrollRef={listScrollRef}/>}
     {page==="cardindex"&&<CardIndexPage events={EVENTS} onOpenEvent={handleOpenEvent} scrollRef={cardScrollRef} introRef={cardIntroRef}/>}
     {page==="riddles"&&<RiddlesPage events={EVENTS} onOpenEvent={handleOpenEvent}/>}
     {page==="portals"&&<PortalsPage/>}
+    {bootingCard&&<TerminalBoot onDone={finishBooting}/>}
     <AnalogOverlay/>
   </div>)}
