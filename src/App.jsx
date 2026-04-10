@@ -52,29 +52,30 @@ function CountUp({target,duration=500,delay=0}){
   return n;
 }
 
-function HoloPreloader({onDone,duration=700}){
+function HoloPreloader({onDone,duration=1000}){
   const[prog,setProg]=useState(0);
   const doneRef=useRef(onDone);doneRef.current=onDone;
+  const progDur=Math.max(300,duration-280);
   useEffect(()=>{
     const start=performance.now();
     let raf,timer;
     const tick=()=>{
-      const t=Math.min(1,(performance.now()-start)/duration);
+      const t=Math.min(1,(performance.now()-start)/progDur);
       const eased=1-Math.pow(1-t,2);
       setProg(eased);
       if(t<1)raf=requestAnimationFrame(tick);
-      else timer=setTimeout(()=>doneRef.current&&doneRef.current(),80);
     };
     raf=requestAnimationFrame(tick);
+    timer=setTimeout(()=>doneRef.current&&doneRef.current(),duration);
     return()=>{cancelAnimationFrame(raf);if(timer)clearTimeout(timer)};
-  },[duration]);
+  },[duration,progDur]);
   const pct=Math.round(prog*100);
-  const fadeStart=Math.max(0,duration-280);
-  return(<div style={{position:"fixed",inset:0,zIndex:10000,background:"transparent",display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",animation:`holoFadeOut 0.28s ease ${fadeStart}ms both`}}>
+  const fadeStart=Math.max(0,duration-220);
+  return(<div style={{position:"fixed",inset:0,zIndex:10000,background:"transparent",display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",animation:`holoFadeOut 0.22s ease ${fadeStart}ms both`}}>
     <style>{`@keyframes holo{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}@keyframes barPulse{0%,100%{box-shadow:0 0 8px rgba(74,246,38,0.4),0 0 20px rgba(74,246,38,0.15)}50%{box-shadow:0 0 14px rgba(74,246,38,0.7),0 0 30px rgba(74,246,38,0.25)}}@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}@keyframes holoFadeOut{0%{opacity:1}100%{opacity:0}}`}</style>
     <div style={{width:"60%",maxWidth:220}}>
       <div style={{height:3,borderRadius:2,background:"rgba(255,255,255,0.06)",position:"relative",overflow:"hidden",animation:"barPulse 2s ease-in-out infinite"}}>
-        <div style={{position:"absolute",top:0,left:0,height:"100%",width:pct+"%",borderRadius:2,background:"linear-gradient(90deg,#4af626,#00ffd5,#4af626,#00ffd5)",backgroundSize:"200% 100%",animation:"holo 3s ease infinite",transition:"width 0.2s ease"}}/>
+        <div style={{position:"absolute",top:0,left:0,height:"100%",width:pct+"%",borderRadius:2,background:"linear-gradient(90deg,#4af626,#00ffd5,#4af626,#00ffd5)",backgroundSize:"200% 100%",animation:"holo 3s ease infinite",transition:"width 0.1s linear"}}/>
         <div style={{position:"absolute",top:0,left:0,width:pct+"%",height:"100%",overflow:"hidden"}}><div style={{width:"100%",height:"200%",background:"linear-gradient(180deg,transparent 40%,rgba(255,255,255,0.15) 50%,transparent 60%)",animation:"scanline 1.5s linear infinite"}}/></div>
       </div>
       <div style={{fontFamily:MONO,fontSize:10,color:"rgba(74,246,38,0.5)",marginTop:6,textAlign:"center",letterSpacing:2}}>{pct}%</div>
@@ -167,7 +168,7 @@ function Menu({page,setPage,introRef}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
   const[intro]=useState(()=>!!(introRef&&introRef.current));
-  const delay=intro?500:80;
+  const delay=intro?800:80;
   const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(36px,9vw,48px)":"clamp(46px,4.55vw,62px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-2.5px":"-3px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
   return (<div id="ukho-menu" style={{...panelStyle,top:0,background:"rgba(255,255,255,0.22)",animation:`menuSlideDown 0.4s cubic-bezier(0.34,1.56,0.64,1) ${delay}ms both`}}>
     <style>{`@keyframes menuSlideDown{0%{transform:translateY(-110%)}100%{transform:translateY(0)}}`}</style>
@@ -1028,7 +1029,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
     if(ev)onOpenEvent(ev);
   };
 
-  const cardBase=intro?800:380;
+  const cardBase=intro?1100:380;
   return (<><style>{`@keyframes cardBuild{0%{opacity:0;transform:translateY(30px) scale(0.88)}60%{opacity:1;transform:translateY(-4px) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}`}</style>
   {!built&&<HoloPreloader onDone={()=>setBuilt(true)}/>}
   <div ref={scrollContRef} data-scroll-container style={{
@@ -1071,7 +1072,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
         }}>{slide.id}</div>
       </div>
     ))}
-    <FloatingDice onRoll={()=>{const i=Math.floor(Math.random()*SLIDES.length);const card=cardRefs.current[i];if(card)card.scrollIntoView({behavior:"smooth",block:"center"})}} introDelay={intro?1800:1400}/>
+    <FloatingDice onRoll={()=>{const i=Math.floor(Math.random()*SLIDES.length);const card=cardRefs.current[i];if(card)card.scrollIntoView({behavior:"smooth",block:"center"})}} introDelay={intro?2100:1400}/>
   </div></div></>);
 }
 
