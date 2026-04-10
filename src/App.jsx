@@ -32,21 +32,23 @@ function TapButton({children,onClick,style,href,target}){
   </Tag>);
 }
 
-function CountUp({target,duration=400}){
+function CountUp({target,duration=400,delay=0}){
   const[n,setN]=useState(0);
   useEffect(()=>{
-    const start=performance.now();
-    let raf;
-    const tick=()=>{
-      const elapsed=performance.now()-start;
-      const t=Math.min(1,elapsed/duration);
-      const eased=1-Math.pow(1-t,3);
-      setN(Math.round(eased*target));
-      if(t<1)raf=requestAnimationFrame(tick);
-    };
-    raf=requestAnimationFrame(tick);
-    return()=>cancelAnimationFrame(raf);
-  },[target,duration]);
+    let raf,timer;
+    timer=setTimeout(()=>{
+      const start=performance.now();
+      const tick=()=>{
+        const elapsed=performance.now()-start;
+        const t=Math.min(1,elapsed/duration);
+        const eased=1-Math.pow(1-t,3);
+        setN(Math.round(eased*target));
+        if(t<1)raf=requestAnimationFrame(tick);
+      };
+      raf=requestAnimationFrame(tick);
+    },delay);
+    return()=>{clearTimeout(timer);if(raf)cancelAnimationFrame(raf)};
+  },[target,duration,delay]);
   return n;
 }
 
@@ -153,8 +155,11 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
   const bs={width:dk?42:30,height:dk?42:30,flexShrink:0,border:"1px solid rgba(0,0,0,0.08)",background:"rgba(255,255,255,0.4)",cursor:"pointer",fontFamily:MONO,fontSize:dk?16:12,display:"flex",alignItems:"center",justifyContent:"center",padding:0,color:"#000"};
   const hm=search.trim()&&matchCount>1;
   const menuH=document.getElementById('ukho-menu')?.offsetHeight||HEADER_H;
-  const barAnim=skipIntro?undefined:`barSlideIn 0.55s cubic-bezier(0.34,1.4,0.5,1) ${introDelay}ms both`;
-  const bottomAnim=skipIntro?`bottomSlideIn 0.5s cubic-bezier(0.34,1.4,0.5,1) both`:undefined;
+  // Capture animation decisions at mount — never re-run on later re-renders.
+  const[animateBar]=useState(()=>!skipIntro);
+  const[animateBottom]=useState(()=>!!skipIntro);
+  const barAnim=animateBar?`barSlideIn 0.55s cubic-bezier(0.34,1.4,0.5,1) ${introDelay}ms both`:undefined;
+  const bottomAnim=animateBottom?`bottomSlideIn 0.5s cubic-bezier(0.34,1.4,0.5,1) both`:undefined;
   return (<div id="ukho-bar" style={{...panelStyle,top:menuH,bottom:"auto",boxShadow:"0 2px 16px rgba(0,0,0,0.04)",padding:dk?"6px 20px":"4px 12px",display:"flex",flexDirection:"column",gap:dk?6:4,animation:barAnim}}>
     <style>{`@keyframes barSlideIn{0%{transform:translateX(110%);opacity:0}60%{opacity:1}100%{transform:translateX(0);opacity:1}}@keyframes bottomSlideIn{0%{transform:translateX(110%);opacity:0}60%{opacity:1}100%{transform:translateX(0);opacity:1}}@keyframes evBlink{0%,100%{opacity:0.18}50%{opacity:0}}@keyframes filterTabPop{0%{opacity:0;transform:translateY(8px) scale(0.7)}60%{opacity:1;transform:translateY(-2px) scale(1.08)}100%{opacity:1;transform:translateY(0) scale(1)}}`}</style>
     <div style={{display:"flex",gap:dk?10:6,alignItems:"center"}}>
@@ -166,7 +171,7 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
       {hm&&<button style={bs} onClick={onPrev}>‹</button>}{hm&&<span style={{fontFamily:MONO,fontSize:dk?15:11,color:"rgba(0,0,0,0.35)",whiteSpace:"nowrap",letterSpacing:0,minWidth:dk?48:36,textAlign:"center"}}>{matchIdx+1}/{matchCount}</span>}{hm&&<button style={bs} onClick={onNext}>›</button>}
       <button onClick={onToggleMode} style={{fontFamily:MONO,fontSize:dk?18:14,fontWeight:700,padding:dk?"8px 36px":"2px 16px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:0.3,whiteSpace:"nowrap",height:dk?46:34,flexShrink:0,position:"relative",overflow:"hidden",textTransform:"lowercase",display:"flex",alignItems:"center",justifyContent:"center"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite 2s",pointerEvents:"none",opacity:0}}/></button>
     </div>
-    {filters&&<div key="filters" style={{display:"flex",gap:dk?8:4,justifyContent:"space-between",alignItems:"flex-start",paddingTop:2,animation:bottomAnim}}>{filters.options.map((s,ti)=><div key={s} style={{display:"flex",flexDirection:"column",alignItems:"center",animation:`filterTabPop 0.5s cubic-bezier(0.34,1.56,0.64,1) ${(skipIntro?500:0)+ti*80}ms both`}}><button onClick={()=>filters.setActive(s)} style={{fontFamily:MONO,fontSize:dk?18:12,fontWeight:filters.active===s?700:400,padding:dk?"7px 22px":"4px 6px",background:filters.active===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase",whiteSpace:"nowrap"}}>{s}</button><div style={{fontFamily:MONO,fontSize:dk?15:13,fontWeight:700,color:filters.active===s?"rgba(0,0,0,0.55)":"rgba(0,0,0,0.3)",marginTop:4,height:dk?19:15,lineHeight:1,textAlign:"center",letterSpacing:0.3}}><CountUp target={filters.counts[s]}/></div></div>)}</div>}
+    {filters&&<div key="filters" style={{display:"flex",gap:dk?8:4,justifyContent:"space-between",alignItems:"flex-start",paddingTop:2,animation:bottomAnim}}>{filters.options.map((s,ti)=>{const tabDelay=(animateBottom?500:0)+ti*80;return(<div key={s} style={{display:"flex",flexDirection:"column",alignItems:"center",animation:`filterTabPop 0.5s cubic-bezier(0.34,1.56,0.64,1) ${tabDelay}ms both`}}><button onClick={()=>filters.setActive(s)} style={{fontFamily:MONO,fontSize:dk?18:12,fontWeight:filters.active===s?700:400,padding:dk?"7px 22px":"4px 6px",background:filters.active===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase",whiteSpace:"nowrap"}}>{s}</button><div style={{fontFamily:MONO,fontSize:dk?15:13,fontWeight:700,color:filters.active===s?"rgba(0,0,0,0.55)":"rgba(0,0,0,0.3)",marginTop:4,height:dk?19:15,lineHeight:1,textAlign:"center",letterSpacing:0.3}}><CountUp target={filters.counts[s]} delay={tabDelay+300}/></div></div>)})}</div>}
     {!filters&&years&&years.length>1&&<div key="years" style={{animation:bottomAnim}}><YearCarousel years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} dk={dk}/></div>}
   </div>);
 }
@@ -179,7 +184,7 @@ function FloatingDice({onRoll,introDelay=1500}){const[rolling,setRolling]=useSta
   if(pos.x===null)return null;const deskDice=typeof window!=="undefined"&&window.innerWidth>768;const S=36,R=S/2;
   const ds=(t,l)=>({position:"absolute",width:5,height:5,borderRadius:"50%",background:"rgba(0,255,65,0.6)",boxShadow:"0 0 4px rgba(0,255,65,0.3)",top:t,left:l,transform:"translate(-50%,-50%)"});const fs=tr=>({position:"absolute",width:S,height:S,border:"1.5px solid rgba(0,255,65,0.35)",background:"rgba(0,255,65,0.05)",transform:tr});
   return(<div onMouseDown={e=>{e.preventDefault();onDown(e.clientX,e.clientY)}} onTouchStart={e=>onDown(e.touches[0].clientX,e.touches[0].clientY)} style={{position:"fixed",left:pos.x,top:pos.y,zIndex:99999,cursor:"grab",userSelect:"none",WebkitUserSelect:"none",touchAction:"none",padding:10,transform:deskDice?"scale(1.4)":"none",transformOrigin:"center",animation:`diceGlitch 0.7s steps(12,end) ${introDelay}ms both`}}>
-    <style>{`@keyframes dF{0%{transform:rotateX(15deg) rotateY(0) translateY(0)}25%{transform:rotateX(20deg) rotateY(90deg) translateY(-4px)}50%{transform:rotateX(10deg) rotateY(180deg) translateY(1px)}75%{transform:rotateX(18deg) rotateY(270deg) translateY(4px)}100%{transform:rotateX(15deg) rotateY(360deg) translateY(0)}}@keyframes dR{0%{transform:rotateX(0) rotateY(0) rotateZ(0)}100%{transform:rotateX(720deg) rotateY(540deg) rotateZ(360deg)}}@keyframes diceGlitch{0%{opacity:0;filter:hue-rotate(0deg) contrast(1) blur(0)}8%{opacity:1;filter:hue-rotate(180deg) contrast(2) blur(1px);clip-path:inset(10% 0 40% 0)}16%{opacity:0.3;filter:hue-rotate(90deg) contrast(1.5);clip-path:inset(60% 0 5% 0)}24%{opacity:1;filter:hue-rotate(-120deg) contrast(2);clip-path:inset(25% 0 25% 0)}32%{opacity:0.6;filter:hue-rotate(60deg) contrast(1.3);clip-path:inset(0 0 70% 0)}42%{opacity:1;filter:hue-rotate(-60deg) contrast(1.8);clip-path:inset(45% 0 15% 0)}55%{opacity:0.4;filter:hue-rotate(200deg) contrast(1.5);clip-path:inset(0 40% 0 0)}68%{opacity:1;filter:hue-rotate(-30deg) contrast(1.2);clip-path:inset(0 0 0 30%)}82%{opacity:0.7;filter:hue-rotate(15deg) contrast(1.1);clip-path:none}100%{opacity:1;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:none}}`}</style>
+    <style>{`@keyframes dF{0%{transform:rotateX(15deg) rotateY(0) translateY(0)}25%{transform:rotateX(20deg) rotateY(90deg) translateY(-4px)}50%{transform:rotateX(10deg) rotateY(180deg) translateY(1px)}75%{transform:rotateX(18deg) rotateY(270deg) translateY(4px)}100%{transform:rotateX(15deg) rotateY(360deg) translateY(0)}}@keyframes dR{0%{transform:rotateX(0) rotateY(0) rotateZ(0)}100%{transform:rotateX(720deg) rotateY(540deg) rotateZ(360deg)}}@keyframes diceGlitch{0%{opacity:0;filter:hue-rotate(0deg) contrast(1) blur(0)}8%{opacity:1;filter:hue-rotate(60deg) contrast(1.3) blur(1px);clip-path:inset(10% 0 40% 0)}16%{opacity:0.3;filter:hue-rotate(30deg) contrast(1.15);clip-path:inset(60% 0 5% 0)}24%{opacity:1;filter:hue-rotate(-40deg) contrast(1.3);clip-path:inset(25% 0 25% 0)}32%{opacity:0.6;filter:hue-rotate(20deg) contrast(1.1);clip-path:inset(0 0 70% 0)}42%{opacity:1;filter:hue-rotate(-20deg) contrast(1.2);clip-path:inset(45% 0 15% 0)}55%{opacity:0.4;filter:hue-rotate(55deg) contrast(1.15);clip-path:inset(0 40% 0 0)}68%{opacity:1;filter:hue-rotate(-10deg) contrast(1.08);clip-path:inset(0 0 0 30%)}82%{opacity:0.7;filter:hue-rotate(5deg) contrast(1.04);clip-path:none}100%{opacity:1;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:none}}`}</style>
     <div style={{perspective:200}}><div style={{width:S,height:S,position:"relative",transformStyle:"preserve-3d",animation:rolling?"dR 0.6s ease-out":"dF 8s ease-in-out infinite"}}>
       <div style={fs(`translateZ(${R}px)`)}><div style={ds("50%","50%")}/></div><div style={fs(`rotateY(180deg) translateZ(${R}px)`)}><div style={ds("20%","20%")}/><div style={ds("80%","80%")}/></div><div style={fs(`rotateY(90deg) translateZ(${R}px)`)}><div style={ds("20%","20%")}/><div style={ds("50%","50%")}/><div style={ds("80%","80%")}/></div><div style={fs(`rotateY(-90deg) translateZ(${R}px)`)}><div style={ds("25%","25%")}/><div style={ds("25%","75%")}/><div style={ds("75%","25%")}/><div style={ds("75%","75%")}/></div><div style={fs(`rotateX(90deg) translateZ(${R}px)`)}><div style={ds("22%","22%")}/><div style={ds("22%","78%")}/><div style={ds("50%","50%")}/><div style={ds("78%","22%")}/><div style={ds("78%","78%")}/></div><div style={fs(`rotateX(-90deg) translateZ(${R}px)`)}><div style={ds("22%","28%")}/><div style={ds("22%","72%")}/><div style={ds("50%","28%")}/><div style={ds("50%","72%")}/><div style={ds("78%","28%")}/><div style={ds("78%","72%")}/></div>
     </div></div></div>);
@@ -433,7 +438,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
         {items.map((item,i)=><div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer",textTransform:evSec==="tags"?"uppercase":"none",animation:`evItemWave 0.4s cubic-bezier(0.25,0.8,0.3,1) ${evBase+Math.min(i,70)*18}ms both`}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
       </div></div>
     </div>
-    <BottomBar search={search} setSearch={setSearchSwitch} onTop={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:0,behavior:"smooth"})}} onBottom={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:el.scrollHeight,behavior:"smooth"})}} onToggleMode={()=>setMode("list")} modeLabel="cards" introDelay={300} skipIntro={skipBarIntro} filters={{options:Object.keys(everything),counts:filterCounts,active:evSec,setActive:setEvSec}}/></>)}
+    <BottomBar search={search} setSearch={setSearchSwitch} onTop={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:0,behavior:"smooth"})}} onBottom={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:el.scrollHeight,behavior:"smooth"})}} onToggleMode={()=>{setEnterDir("Up");navKey.current++;setMode("list")}} modeLabel="cards" introDelay={300} skipIntro={skipBarIntro} filters={{options:Object.keys(everything),counts:filterCounts,active:evSec,setActive:setEvSec}}/></>)}
 
   // ── DESKTOP: table rows ──
   if(isDesk){
@@ -604,7 +609,7 @@ function EventDetail({ev,onBack}){
     @keyframes evFlashNum{0%{transform:scale(0.92);filter:blur(14px)}65%{transform:scale(1);filter:blur(6px)}100%{transform:scale(1.05);filter:blur(18px)}}
   `}</style>
   {flashing&&<div style={{position:"fixed",inset:0,zIndex:9999,background:"white",display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",animation:"evFlash 0.52s ease-out both"}}>
-    <div style={{fontFamily:ARCH,fontSize:"min(72vw,58vh)",color:"rgba(0,0,0,0.18)",lineHeight:0.85,letterSpacing:"-0.06em",animation:"evFlashNum 0.52s ease-out both",willChange:"filter,transform"}}>{ev.id}</div>
+    <div style={{fontFamily:ARCH,fontSize:"min(72vw,58vh)",color:"rgba(0,0,0,0.08)",lineHeight:0.85,letterSpacing:"-0.06em",animation:"evFlashNum 0.52s ease-out both",willChange:"filter,transform"}}>{ev.id}</div>
   </div>}
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
@@ -1209,7 +1214,7 @@ function RiddlesPage({onOpenEvent,events}){
           @keyframes rdRoll{0%{transform:rotateX(0) rotateY(0) rotateZ(0)}100%{transform:rotateX(720deg) rotateY(540deg) rotateZ(360deg)}}
           @keyframes doorFloat{0%{transform:rotateX(5deg) rotateY(0) translateY(0)}25%{transform:rotateX(8deg) rotateY(15deg) translateY(-3px)}50%{transform:rotateX(3deg) rotateY(0) translateY(0)}75%{transform:rotateX(6deg) rotateY(-15deg) translateY(3px)}100%{transform:rotateX(5deg) rotateY(0) translateY(0)}}
           @keyframes doorEnter{0%{transform:rotateX(5deg) rotateY(0) scale(1)}40%{transform:rotateX(0) rotateY(0) scale(1.15)}70%{transform:rotateX(0) rotateY(0) scale(0.9);opacity:0.5}100%{transform:rotateX(5deg) rotateY(0) scale(1);opacity:1}}
-          @keyframes rGlitch{0%{opacity:0;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:inset(10% 0 40% 0)}8%{opacity:1;filter:hue-rotate(180deg) contrast(2) blur(1px);clip-path:inset(10% 0 40% 0)}16%{opacity:0.3;filter:hue-rotate(90deg) contrast(1.5);clip-path:inset(60% 0 5% 0)}24%{opacity:1;filter:hue-rotate(-120deg) contrast(2);clip-path:inset(25% 0 25% 0)}32%{opacity:0.6;filter:hue-rotate(60deg) contrast(1.3);clip-path:inset(0 0 70% 0)}42%{opacity:1;filter:hue-rotate(-60deg) contrast(1.8);clip-path:inset(45% 0 15% 0)}55%{opacity:0.4;filter:hue-rotate(200deg) contrast(1.5);clip-path:inset(0 40% 0 0)}68%{opacity:1;filter:hue-rotate(-30deg) contrast(1.2);clip-path:inset(0 0 0 30%)}82%{opacity:0.7;filter:hue-rotate(15deg) contrast(1.1);clip-path:none}100%{opacity:1;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:none}}
+          @keyframes rGlitch{0%{opacity:0;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:inset(10% 0 40% 0)}8%{opacity:1;filter:hue-rotate(60deg) contrast(1.3) blur(1px);clip-path:inset(10% 0 40% 0)}16%{opacity:0.3;filter:hue-rotate(30deg) contrast(1.15);clip-path:inset(60% 0 5% 0)}24%{opacity:1;filter:hue-rotate(-40deg) contrast(1.3);clip-path:inset(25% 0 25% 0)}32%{opacity:0.6;filter:hue-rotate(20deg) contrast(1.1);clip-path:inset(0 0 70% 0)}42%{opacity:1;filter:hue-rotate(-20deg) contrast(1.2);clip-path:inset(45% 0 15% 0)}55%{opacity:0.4;filter:hue-rotate(55deg) contrast(1.15);clip-path:inset(0 40% 0 0)}68%{opacity:1;filter:hue-rotate(-10deg) contrast(1.08);clip-path:inset(0 0 0 30%)}82%{opacity:0.7;filter:hue-rotate(5deg) contrast(1.04);clip-path:none}100%{opacity:1;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:none}}
         `}</style>
         {/* Dice */}
         <div onClick={nextRiddle} style={{cursor:"pointer",perspective:200,padding:4,animation:"rGlitch 0.7s steps(12,end) 700ms both"}}>
