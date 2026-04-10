@@ -118,7 +118,7 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
     introStart.current=performance.now();
     let last=performance.now();
     const base=dk?18:12;
-    const HOLD=900;const DECAY=2800;const MAX=24;
+    const HOLD=450;const DECAY=1400;const MAX=24;
     const tick=()=>{const now=performance.now(),dt=(now-last)/1000;last=now;const el=now-introStart.current;let mul;if(el<=HOLD){mul=MAX}else{const t=Math.min(1,(el-HOLD)/DECAY);mul=t>=1?1:(1+(MAX-1)*Math.pow(1-t,4.2))}setOffset(o=>{let next=o-dt*base*mul;if(next<-loopW)next+=loopW;if(next>loopW)next-=loopW;return next});rafRef.current=requestAnimationFrame(tick)};
     rafRef.current=requestAnimationFrame(tick);
     return()=>cancelAnimationFrame(rafRef.current);
