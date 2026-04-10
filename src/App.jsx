@@ -514,7 +514,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     <style>{`@keyframes evItemWave{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}`}</style>
     <div data-scroll-container style={{position:"fixed",top:topH,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
       <div key={evSec} style={{padding:"14px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
-        {items.map((item,i)=><div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer",textTransform:evSec==="tags"?"uppercase":"none",animation:`evItemWave 0.3s cubic-bezier(0.25,0.8,0.3,1) ${evBase+Math.min(i,70)*13}ms both`}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
+        {items.map((item,i)=><div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer",textTransform:evSec==="tags"?"uppercase":"none",transition:"transform 0.12s ease,background 0.12s ease",transformOrigin:"left center",animation:`evItemWave 0.3s cubic-bezier(0.25,0.8,0.3,1) ${evBase+Math.min(i,70)*13}ms backwards`}} onMouseEnter={e=>{e.currentTarget.style.background="rgba(74,246,38,0.06)";e.currentTarget.style.transform="scale(0.985)"}} onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.transform="none"}}>{item}</div>)}
       </div></div>
     </div>
     <BottomBar search={search} setSearch={setSearchSwitch} onTop={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:0,behavior:"smooth"})}} onBottom={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:el.scrollHeight,behavior:"smooth"})}} onToggleMode={()=>{setEnterDir("Up");navKey.current++;setMode("list")}} modeLabel="cards" introDelay={300} skipIntro={skipBarIntro} filters={{options:Object.keys(everything),counts:filterCounts,active:evSec,setActive:setEvSec}}/></>)}
@@ -533,7 +533,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
       {/* Rows */}
       <div style={{paddingTop:deskTopH+44,paddingBottom:40}}>
         {filtered.map((e,rowIdx)=>(
-          <div key={e.id} className="ukho-row" onClick={()=>onOpenEvent?.(e)} style={{animation:`rowWave 0.35s cubic-bezier(0.25,0.8,0.3,1) ${580+Math.min(rowIdx,60)*16}ms both`}}>
+          <div key={e.id} className="ukho-row" onClick={()=>onOpenEvent?.(e)} style={{animation:`rowWave 0.35s cubic-bezier(0.25,0.8,0.3,1) ${580+Math.min(rowIdx,60)*16}ms backwards`}}>
             <div className="ukho-sel"/>
             <div style={{fontFamily:ARCH,fontSize:28,fontWeight:400,color:"rgba(0,0,0,0.1)",letterSpacing:"-0.5px"}}>{e.id}</div>
             <div style={{fontFamily:ARCH,fontSize:25,fontWeight:400,color:"#000",letterSpacing:"-0.3px",whiteSpace:"pre-line"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
