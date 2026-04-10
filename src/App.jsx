@@ -67,7 +67,7 @@ function HoloPreloader({onDone,duration=1400}){
     return()=>{cancelAnimationFrame(raf);if(timer)clearTimeout(timer)};
   },[duration]);
   const pct=Math.round(prog*100);
-  return(<div style={{position:"fixed",inset:0,zIndex:10000,background:"#000",display:"flex",alignItems:"center",justifyContent:"center",animation:"holoFadeOut 0.35s ease 1.4s both"}}>
+  return(<div style={{position:"fixed",inset:0,zIndex:10000,background:"transparent",display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",animation:"holoFadeOut 0.35s ease 1.4s both"}}>
     <style>{`@keyframes holo{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}@keyframes barPulse{0%,100%{box-shadow:0 0 8px rgba(74,246,38,0.4),0 0 20px rgba(74,246,38,0.15)}50%{box-shadow:0 0 14px rgba(74,246,38,0.7),0 0 30px rgba(74,246,38,0.25)}}@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}@keyframes holoFadeOut{0%{opacity:1}100%{opacity:0}}`}</style>
     <div style={{width:"60%",maxWidth:220}}>
       <div style={{height:3,borderRadius:2,background:"rgba(255,255,255,0.06)",position:"relative",overflow:"hidden",animation:"barPulse 2s ease-in-out infinite"}}>
