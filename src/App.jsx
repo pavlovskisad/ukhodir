@@ -753,7 +753,7 @@ function Home({setPage,introRef}){
       {/* Enter archive */}
       <div style={{margin:"40px 0"}}>
         <style>{`@keyframes hCur{0%,100%{opacity:1}50%{opacity:0}}`}</style>
-        <TapButton onClick={()=>{if(introRef)introRef.current=true;setPage("cardindex")}} style={{fontFamily:ARCH,fontSize:"clamp(72px,18vw,120px)",fontWeight:400,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 16px",textDecoration:"none",letterSpacing:"-3px",display:"inline-block"}}>
+        <TapButton onClick={()=>{if(introRef)introRef.current=true;setPage("cardindex")}} style={{fontFamily:ARCH,fontSize:"clamp(72px,18vw,120px)",fontWeight:700,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 16px",textDecoration:"none",letterSpacing:"-4px",display:"inline-block"}}>
           enter archive
         </TapButton>
       </div>
