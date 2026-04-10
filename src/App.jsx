@@ -50,6 +50,35 @@ function CountUp({target,duration=400}){
   return n;
 }
 
+function HoloPreloader({onDone,duration=1400}){
+  const[prog,setProg]=useState(0);
+  const doneRef=useRef(onDone);doneRef.current=onDone;
+  useEffect(()=>{
+    const start=performance.now();
+    let raf,timer;
+    const tick=()=>{
+      const t=Math.min(1,(performance.now()-start)/duration);
+      const eased=1-Math.pow(1-t,2);
+      setProg(eased);
+      if(t<1)raf=requestAnimationFrame(tick);
+      else timer=setTimeout(()=>doneRef.current&&doneRef.current(),200);
+    };
+    raf=requestAnimationFrame(tick);
+    return()=>{cancelAnimationFrame(raf);if(timer)clearTimeout(timer)};
+  },[duration]);
+  const pct=Math.round(prog*100);
+  return(<div style={{position:"fixed",inset:0,zIndex:10000,background:"#000",display:"flex",alignItems:"center",justifyContent:"center",animation:"holoFadeOut 0.35s ease 1.4s both"}}>
+    <style>{`@keyframes holo{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}@keyframes barPulse{0%,100%{box-shadow:0 0 8px rgba(74,246,38,0.4),0 0 20px rgba(74,246,38,0.15)}50%{box-shadow:0 0 14px rgba(74,246,38,0.7),0 0 30px rgba(74,246,38,0.25)}}@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}@keyframes holoFadeOut{0%{opacity:1}100%{opacity:0}}`}</style>
+    <div style={{width:"60%",maxWidth:220}}>
+      <div style={{height:3,borderRadius:2,background:"rgba(255,255,255,0.06)",position:"relative",overflow:"hidden",animation:"barPulse 2s ease-in-out infinite"}}>
+        <div style={{position:"absolute",top:0,left:0,height:"100%",width:pct+"%",borderRadius:2,background:"linear-gradient(90deg,#4af626,#00ffd5,#4af626,#00ffd5)",backgroundSize:"200% 100%",animation:"holo 3s ease infinite",transition:"width 0.2s ease"}}/>
+        <div style={{position:"absolute",top:0,left:0,width:pct+"%",height:"100%",overflow:"hidden"}}><div style={{width:"100%",height:"200%",background:"linear-gradient(180deg,transparent 40%,rgba(255,255,255,0.15) 50%,transparent 60%)",animation:"scanline 1.5s linear infinite"}}/></div>
+      </div>
+      <div style={{fontFamily:MONO,fontSize:10,color:"rgba(74,246,38,0.5)",marginTop:6,textAlign:"center",letterSpacing:2}}>{pct}%</div>
+    </div>
+  </div>);
+}
+
 function scrollPageToTop(){
   // Find the fixed scroll container used by cardindex/list/events
   const el=document.querySelector('[data-scroll-container]');
@@ -670,7 +699,7 @@ function useTypewriter(text,speed=30,startDelay=0){
   return {displayed,done};
 }
 
-function Home({setPage}){
+function Home({setPage,introRef}){
   const stagesText="stage 1 — catalogue and essential library (live now)\nstage 2 — full library (jun 2026)\nstage 3 — wiki (dec 2026)\n\n✳ archive created with support from";
   const upcomingText="Cherven vinyl release Kyiv dispatch\nValentin Silvestrov digital + vinyl release Kyiv dispatch\nUkho @ Iskra\nFestival of new music @ Pavilion of culture";
   const tw1=useTypewriter(stagesText,25,2000);
@@ -690,7 +719,7 @@ function Home({setPage}){
       {/* Enter archive */}
       <div style={{margin:"40px 0"}}>
         <style>{`@keyframes hCur{0%,100%{opacity:1}50%{opacity:0}}`}</style>
-        <TapButton onClick={()=>setPage("cardindex")} style={{fontFamily:ARCH,fontSize:"clamp(72px,18vw,120px)",fontWeight:400,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 16px",textDecoration:"none",letterSpacing:"-3px",display:"inline-block"}}>
+        <TapButton onClick={()=>{if(introRef)introRef.current=true;setPage("cardindex")}} style={{fontFamily:ARCH,fontSize:"clamp(72px,18vw,120px)",fontWeight:400,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 16px",textDecoration:"none",letterSpacing:"-3px",display:"inline-block"}}>
           enter archive
         </TapButton>
       </div>
@@ -831,11 +860,13 @@ function Slideshow({imgs,width,forceLoad,fit}){
 const FIT_IDS=new Set([1,22,31,35,37,38,39,42,43,54,71,81,84,102,105,143,146,162,163,173,180]);
 
 /* ── CardIndex page ── */
-function CardIndexPage({onOpenEvent,events,scrollRef}){
+function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
   const[colW,setColW]=useState(160);
   const isMobile=typeof window!=="undefined"&&window.innerWidth<=768;
   const cols=isMobile?1:4;
   const[topPad,setTopPad]=useState(isMobile?HEADER_H+32:140);
+  const[intro]=useState(()=>{const v=!!(introRef&&introRef.current);if(introRef)introRef.current=false;return v});
+  const[built,setBuilt]=useState(!intro);
   useEffect(()=>{const el=document.getElementById('ukho-bar')||document.getElementById('ukho-menu');if(el)setTopPad(el.offsetTop+el.offsetHeight+12)},[]);
 
   const scrollContRef=useRef(null);
@@ -888,7 +919,9 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
     if(ev)onOpenEvent(ev);
   };
 
-  return (<div ref={scrollContRef} data-scroll-container style={{
+  return (<><style>{`@keyframes cardBuild{0%{opacity:0;transform:translateY(30px) scale(0.88)}60%{opacity:1;transform:translateY(-4px) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}`}</style>
+  {!built&&<HoloPreloader onDone={()=>setBuilt(true)}/>}
+  <div ref={scrollContRef} data-scroll-container style={{
     position:"fixed",top:0,left:0,right:0,bottom:0,
     overflowY:"auto",WebkitOverflowScrolling:"touch",
     background:"white",
@@ -907,6 +940,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
         background:"white",
         aspectRatio:"4/3",
         overflow:"hidden",
+        animation:intro?`cardBuild 0.55s cubic-bezier(0.34,1.56,0.64,1) ${1600+Math.min(idx,20)*40}ms both`:undefined,
       }}>
         <div className={isMobile?undefined:"ukho-card-slide"} style={{width:"100%",height:"100%",position:"relative"}}>
         {slide.imgs.length>0 ? (
@@ -928,7 +962,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef}){
       </div>
     ))}
     <FloatingDice onRoll={()=>{const i=Math.floor(Math.random()*SLIDES.length);const card=cardRefs.current[i];if(card)card.scrollIntoView({behavior:"smooth",block:"center"})}}/>
-  </div></div>);
+  </div></div></>);
 }
 
 function PortalsPage(){
@@ -1239,6 +1273,7 @@ export default function App(){
   const initEvent=useMemo(()=>{const m=window.location.pathname.match(/^\/event\/(\d+)$/);return m?EVENTS.find(e=>e.id===+m[1]):null},[]);
   const[page,setPage]=useState(initEvent?"list":"home");const[openEvent,setOpenEvent]=useState(initEvent||null);const[prevPage,setPrevPage]=useState(initEvent?"list":null);
   const cardScrollRef=useRef(0);
+  const cardIntroRef=useRef(false);
   const listIdxRef=useRef(0);const listSearchRef=useRef("");const listYearRef=useRef("all");const listModeRef=useRef("list");const listScrollRef=useRef(0);
   const handleOpenEvent=(ev)=>{setPrevPage(page);setOpenEvent(ev);window.history.pushState({event:ev.id},"","/event/"+ev.id);window.scrollTo(0,0)};
   const handleBack=useCallback(()=>{setOpenEvent(null);if(prevPage)setPage(prevPage);window.history.pushState({},"","/")},[prevPage]);
@@ -1250,9 +1285,9 @@ export default function App(){
   return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden"}}>
     <style>{globalBtnStyle}</style>
     {page!=="home"&&<Menu page={page} setPage={setPage}/>}
-    {page==="home"&&<Home setPage={setPage}/>}
+    {page==="home"&&<Home setPage={setPage} introRef={cardIntroRef}/>}
     {page==="list"&&<ListPage events={EVENTS} onOpenEvent={handleOpenEvent} idxRef={listIdxRef} searchRef={listSearchRef} yearRef={listYearRef} modeRef={listModeRef} scrollRef={listScrollRef}/>}
-    {page==="cardindex"&&<CardIndexPage events={EVENTS} onOpenEvent={handleOpenEvent} scrollRef={cardScrollRef}/>}
+    {page==="cardindex"&&<CardIndexPage events={EVENTS} onOpenEvent={handleOpenEvent} scrollRef={cardScrollRef} introRef={cardIntroRef}/>}
     {page==="riddles"&&<RiddlesPage events={EVENTS} onOpenEvent={handleOpenEvent}/>}
     {page==="portals"&&<PortalsPage/>}
     <AnalogOverlay/>
