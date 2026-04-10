@@ -52,7 +52,7 @@ function CountUp({target,duration=500,delay=0}){
   return n;
 }
 
-function HoloPreloader({onDone,duration=1400}){
+function HoloPreloader({onDone,duration=700}){
   const[prog,setProg]=useState(0);
   const doneRef=useRef(onDone);doneRef.current=onDone;
   useEffect(()=>{
@@ -63,13 +63,14 @@ function HoloPreloader({onDone,duration=1400}){
       const eased=1-Math.pow(1-t,2);
       setProg(eased);
       if(t<1)raf=requestAnimationFrame(tick);
-      else timer=setTimeout(()=>doneRef.current&&doneRef.current(),200);
+      else timer=setTimeout(()=>doneRef.current&&doneRef.current(),80);
     };
     raf=requestAnimationFrame(tick);
     return()=>{cancelAnimationFrame(raf);if(timer)clearTimeout(timer)};
   },[duration]);
   const pct=Math.round(prog*100);
-  return(<div style={{position:"fixed",inset:0,zIndex:10000,background:"transparent",display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",animation:"holoFadeOut 0.35s ease 1.4s both"}}>
+  const fadeStart=Math.max(0,duration-280);
+  return(<div style={{position:"fixed",inset:0,zIndex:10000,background:"transparent",display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",animation:`holoFadeOut 0.28s ease ${fadeStart}ms both`}}>
     <style>{`@keyframes holo{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}@keyframes barPulse{0%,100%{box-shadow:0 0 8px rgba(74,246,38,0.4),0 0 20px rgba(74,246,38,0.15)}50%{box-shadow:0 0 14px rgba(74,246,38,0.7),0 0 30px rgba(74,246,38,0.25)}}@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}@keyframes holoFadeOut{0%{opacity:1}100%{opacity:0}}`}</style>
     <div style={{width:"60%",maxWidth:220}}>
       <div style={{height:3,borderRadius:2,background:"rgba(255,255,255,0.06)",position:"relative",overflow:"hidden",animation:"barPulse 2s ease-in-out infinite"}}>
@@ -130,26 +131,28 @@ const BOOT_LINES=[
   "[allocated] 180 cards",
 ];
 
-function TerminalBoot({onDone,duration=1400}){
+const BOOT_SCRIPT=[
+  [90,1],[185,2],[290,3],[395,4],[500,5],
+  [660,14],
+  [795,15],[880,16],[970,17],[1060,18],
+  [1215,30],
+  [1310,31],[1395,32],[1485,33],
+  [1640,43],
+  [1740,44],[1830,45],[1920,46],
+];
+function TerminalBoot({onDone}){
   const[shown,setShown]=useState(0);
   const doneRef=useRef(onDone);doneRef.current=onDone;
   useEffect(()=>{
-    const perLine=Math.max(20,Math.floor(duration/BOOT_LINES.length));
-    let i=0;
-    const iv=setInterval(()=>{
-      i++;
-      setShown(i);
-      if(i>=BOOT_LINES.length){clearInterval(iv);setTimeout(()=>doneRef.current&&doneRef.current(),180)}
-    },perLine);
-    return()=>clearInterval(iv);
-  },[duration]);
+    const timers=BOOT_SCRIPT.map(([at,count])=>setTimeout(()=>setShown(count),at));
+    timers.push(setTimeout(()=>doneRef.current&&doneRef.current(),2100));
+    return()=>timers.forEach(clearTimeout);
+  },[]);
   const mob=typeof window!=="undefined"&&window.innerWidth<=768;
-  return(<div style={{position:"fixed",inset:0,zIndex:10001,background:"#fff",padding:mob?"14px 12px":"18px 24px",fontFamily:MONO,fontSize:mob?9.5:11.5,lineHeight:1.45,color:"rgba(0,0,0,0.72)",whiteSpace:"pre",overflow:"hidden",overscrollBehavior:"none",letterSpacing:0.1}}>
-    <style>{`@keyframes termBlink{0%,100%{opacity:1}50%{opacity:0}}@keyframes termFade{0%{opacity:1}100%{opacity:0}}`}</style>
-    <div style={{animation:"termFade 0.3s ease 1.25s both"}}>
-      {BOOT_LINES.slice(0,shown).map((l,i)=><div key={i}>{l||"\u00a0"}</div>)}
-      <span style={{display:"inline-block",width:mob?5:7,height:mob?11:13,background:"rgba(0,0,0,0.75)",verticalAlign:"middle",marginLeft:2,animation:"termBlink 0.7s step-end infinite"}}/>
-    </div>
+  return(<div style={{position:"fixed",inset:0,zIndex:10001,background:"#fff",padding:mob?"14px 12px":"22px 28px",fontFamily:MONO,fontSize:mob?10:14,lineHeight:1.5,color:"rgba(0,0,0,0.78)",whiteSpace:"pre",overflow:"hidden",overscrollBehavior:"none",letterSpacing:0.1}}>
+    <style>{`@keyframes termBlink{0%,100%{opacity:1}50%{opacity:0}}`}</style>
+    {BOOT_LINES.slice(0,shown).map((l,i)=><div key={i}>{l||"\u00a0"}</div>)}
+    <span style={{display:"inline-block",width:mob?5:8,height:mob?12:15,background:"rgba(0,0,0,0.78)",verticalAlign:"middle",marginLeft:2,animation:"termBlink 0.7s step-end infinite"}}/>
   </div>);
 }
 
@@ -164,7 +167,7 @@ function Menu({page,setPage,introRef}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
   const[intro]=useState(()=>!!(introRef&&introRef.current));
-  const delay=intro?2900:80;
+  const delay=intro?2700:80;
   const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(36px,9vw,48px)":"clamp(46px,4.55vw,62px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-2.5px":"-3px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
   return (<div id="ukho-menu" style={{...panelStyle,top:0,background:"rgba(255,255,255,0.22)",animation:`menuSlideDown 0.4s cubic-bezier(0.34,1.56,0.64,1) ${delay}ms both`}}>
     <style>{`@keyframes menuSlideDown{0%{transform:translateY(-110%)}100%{transform:translateY(0)}}`}</style>
@@ -1026,7 +1029,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
     if(ev)onOpenEvent(ev);
   };
 
-  const cardBase=intro?3100:380;
+  const cardBase=intro?2900:380;
   return (<><style>{`@keyframes cardBuild{0%{opacity:0;transform:translateY(30px) scale(0.88)}60%{opacity:1;transform:translateY(-4px) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}`}</style>
   {!bootDone&&<TerminalBoot onDone={()=>setBootDone(true)}/>}
   {bootDone&&!built&&<HoloPreloader onDone={()=>setBuilt(true)}/>}
@@ -1070,7 +1073,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
         }}>{slide.id}</div>
       </div>
     ))}
-    <FloatingDice onRoll={()=>{const i=Math.floor(Math.random()*SLIDES.length);const card=cardRefs.current[i];if(card)card.scrollIntoView({behavior:"smooth",block:"center"})}} introDelay={intro?4100:1400}/>
+    <FloatingDice onRoll={()=>{const i=Math.floor(Math.random()*SLIDES.length);const card=cardRefs.current[i];if(card)card.scrollIntoView({behavior:"smooth",block:"center"})}} introDelay={intro?3900:1400}/>
   </div></div></>);
 }
 
