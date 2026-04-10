@@ -60,11 +60,11 @@ function scrollPageToTop(){
 function Menu({page,setPage}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
-  const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(20px,5vw,32px)":"clamp(36px,4vw,56px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-2px":"-3px",textTransform:"lowercase",zIndex:1,textDecoration:"none",whiteSpace:"nowrap"};
+  const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(32px,8vw,44px)":"clamp(42px,4.2vw,58px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-2px":"-3px",textTransform:"lowercase",zIndex:1,textDecoration:"none",whiteSpace:"nowrap"};
   return (<div id="ukho-menu" style={{...panelStyle,top:0}}>
     <div onClick={scrollPageToTop} style={{position:"absolute",top:0,left:0,right:0,height:12,cursor:"pointer",zIndex:10}}/>
-    <div style={{padding:"2px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(26px,6.5vw,40px)":"clamp(42px,4.5vw,64px)",fontWeight:400}} onClick={()=>setPage("home")}>/dir</TapButton></div>
-    <div style={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",rowGap:2,padding:"0px 14px 2px"}}>{pages.map(p=><TapButton key={p} style={{...bs,fontWeight:page===p?600:400,color:page===p?"rgba(0,0,0,0.08)":BLUE}} onClick={()=>setPage(p)}>/{p}</TapButton>)}</div>
+    <div style={{padding:"2px 14px 0"}}><TapButton style={{...bs,fontSize:isMob?"clamp(38px,9.5vw,50px)":"clamp(48px,4.8vw,66px)",fontWeight:400}} onClick={()=>setPage("home")}>/dir</TapButton></div>
+    <div style={isMob?{display:"grid",gridTemplateColumns:"1fr 1fr",columnGap:10,rowGap:0,padding:"0 14px 2px"}:{display:"flex",justifyContent:"space-between",padding:"0 14px 2px"}}>{pages.map(p=><TapButton key={p} style={{...bs,fontWeight:page===p?600:400,color:page===p?"rgba(0,0,0,0.08)":BLUE,textAlign:isMob?"center":"left"}} onClick={()=>setPage(p)}>/{p}</TapButton>)}</div>
   </div>);
 }
 
@@ -378,12 +378,11 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   // ── EVERYTHING mode ──
   const evBarBottom=useBarBottom();
   if(mode==="everything"){const topH=evBarBottom;const items=everything[evSec]||[];return(<>
-    <div data-scroll-container style={{position:"fixed",top:0,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
-      <div style={{height:topH}}/>
-      <div style={{position:"sticky",top:topH,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"6px 20px 4px":"4px 8px 2px"}}>
-        <div style={{display:"flex",gap:isDesk?8:4,flexWrap:"nowrap",justifyContent:isDesk?"flex-start":"space-evenly",alignItems:"flex-start"}}>{Object.keys(everything).map(s=><div key={s} style={{display:"flex",flexDirection:"column",alignItems:"center",flex:isDesk?undefined:"1 1 0",minWidth:0}}><button onClick={()=>setEvSec(s)} style={{fontFamily:MONO,fontSize:isDesk?16:11,fontWeight:evSec===s?700:400,padding:isDesk?"6px 20px":"4px 6px",width:isDesk?"auto":"100%",minWidth:0,background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase"}}>{s}</button><div style={{fontFamily:MONO,fontSize:isDesk?14:12,fontWeight:700,color:"rgba(0,0,0,0.55)",marginTop:3,height:isDesk?18:14,lineHeight:1,textAlign:"center",letterSpacing:0.3}}>{evSec===s?<CountUp target={items.length}/>:""}</div></div>)}</div>
+    <div data-scroll-container style={{position:"fixed",top:topH,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
+      <div className="ukho-ev-tabs" style={{position:"sticky",top:0,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"6px 20px 4px":"4px 6px 2px"}}>
+        <div style={{display:"flex",gap:isDesk?8:4,flexWrap:"wrap",justifyContent:"center",alignItems:"flex-start"}}>{Object.keys(everything).map(s=><div key={s} style={{display:"flex",flexDirection:"column",alignItems:"center"}}><button onClick={()=>setEvSec(s)} style={{fontFamily:MONO,fontSize:isDesk?16:11,fontWeight:evSec===s?700:400,padding:isDesk?"6px 20px":"4px 5px",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase",whiteSpace:"nowrap"}}>{s}</button><div style={{fontFamily:MONO,fontSize:isDesk?14:12,fontWeight:700,color:"rgba(0,0,0,0.55)",marginTop:3,height:isDesk?18:14,lineHeight:1,textAlign:"center",letterSpacing:0.3}}>{evSec===s?<CountUp target={items.length}/>:""}</div></div>)}</div>
       </div>
-      <div style={{padding:"12px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
+      <div style={{padding:"4px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
         {items.map((item,i)=><div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer",textTransform:evSec==="tags"?"uppercase":"none"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
       </div></div>
     </div>
@@ -1246,7 +1245,7 @@ export default function App(){
   // Browser back button support
   useEffect(()=>{const onPop=()=>{const m=window.location.pathname.match(/^\/event\/(\d+)$/);if(m){const ev=EVENTS.find(e=>e.id===+m[1]);if(ev){setOpenEvent(ev);return}}setOpenEvent(null);if(prevPage)setPage(prevPage)};window.addEventListener("popstate",onPop);return()=>window.removeEventListener("popstate",onPop)},[prevPage]);
   const handleRollEvent=useCallback(()=>{const other=EVENTS.filter(e=>e.id!==openEvent?.id);const ev=other[Math.floor(Math.random()*other.length)];if(ev){setOpenEvent(ev);window.scrollTo(0,0);window.history.pushState({event:ev.id},"","/event/"+ev.id)}},[openEvent]);
-  const globalBtnStyle=`button,a{transition:transform 0.12s ease!important;position:relative!important;overflow:hidden!important}button:hover,a:hover{transform:scale(0.95)!important}button:active,a:active{transform:scale(0.90)!important}button::after,a::after{content:'';position:absolute;inset:0;background:#4af626;opacity:0;pointer-events:none}button:hover::after,a:hover::after{opacity:0.1;transition:opacity 0.12s}`;
+  const globalBtnStyle=`button,a{transition:transform 0.12s ease!important;position:relative!important;overflow:hidden!important}button:hover,a:hover{transform:scale(0.95)!important}button:active,a:active{transform:scale(0.90)!important}button::after,a::after{content:'';position:absolute;inset:0;background:#4af626;opacity:0;pointer-events:none}button:hover::after,a:hover::after{opacity:0.1;transition:opacity 0.12s}#ukho-menu button,#ukho-menu a,.ukho-ev-tabs button{overflow:visible!important;flex-shrink:0!important}`;
   if(openEvent) return (<><style>{globalBtnStyle}</style><EventDetail ev={openEvent} onBack={handleBack}/><FloatingDice onRoll={handleRollEvent}/><AnalogOverlay/></>);
   return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden"}}>
     <style>{globalBtnStyle}</style>
