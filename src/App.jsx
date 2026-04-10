@@ -81,6 +81,78 @@ function HoloPreloader({onDone,duration=1400}){
   </div>);
 }
 
+const BOOT_LINES=[
+  "import {useState,useEffect,useRef,useCallback,useMemo} from 'react'",
+  "import * as THREE from 'three'",
+  "import {EVENTS,SLIDES,MEDIA,PERFORMERS,PROGRAMS} from './data.js'",
+  "",
+  "const EVENTS     = Array(180)",
+  "const SLIDES     = Array(180)",
+  "const MEDIA      = Array(180)",
+  "const PERFORMERS = Array(292)",
+  "const PROGRAMS   = Array(293)",
+  "const PIECE_EV   = Object(293)",
+  "",
+  "const norm = s => s.toLowerCase().replace(/[\\u00a0\\u2002-\\u200b]/g,' ').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'')",
+  "",
+  "function App(){",
+  "  const [page,setPage] = useState('home')",
+  "  const [openEvent,setOpenEvent] = useState(null)",
+  "  const cardIntroRef = useRef(false)",
+  "  const cardScrollRef = useRef(0)",
+  "  ...",
+  "}",
+  "",
+  "> click #enter-archive",
+  "> cardIntroRef.current = true",
+  "> setPage('cardindex')",
+  "",
+  "<div style={{minHeight:'100vh',background:'white',overflow:'hidden'}}>",
+  "  <style>{globalBtnStyle}</style>",
+  "  <Menu page='cardindex' setPage={setPage} introRef={cardIntroRef}/>",
+  "  <CardIndexPage events={EVENTS} scrollRef={cardScrollRef} introRef={cardIntroRef}>",
+  "    <HoloPreloader onDone={()=>setBuilt(true)}/>",
+  "    <div ref={scrollContRef} data-scroll-container style={{position:'fixed',inset:0,overflowY:'auto'}}>",
+  "      <div style={{display:'grid',gridTemplateColumns:`repeat(${cols},1fr)`}}>",
+  "        {SLIDES.map((slide,idx)=>(",
+  "          <div key={slide.id} ref={el=>cardRefs.current[idx]=el} style={{aspectRatio:'4/3',animation:`cardBuild 0.4s ${cardBase+idx*30}ms both`}}>",
+  "            <Slideshow imgs={slide.imgs} width={colW}/>",
+  "            <div className='ukho-card-label'>{slide.id}</div>",
+  "          </div>",
+  "        ))}",
+  "      </div>",
+  "    </div>",
+  "    <FloatingDice onRoll={rollRandom} introDelay={2700}/>",
+  "  </CardIndexPage>",
+  "  <AnalogOverlay/>",
+  "</div>",
+  "",
+  "[allocated] 180 cards",
+];
+
+function TerminalBoot({onDone,duration=1400}){
+  const[shown,setShown]=useState(0);
+  const doneRef=useRef(onDone);doneRef.current=onDone;
+  useEffect(()=>{
+    const perLine=Math.max(20,Math.floor(duration/BOOT_LINES.length));
+    let i=0;
+    const iv=setInterval(()=>{
+      i++;
+      setShown(i);
+      if(i>=BOOT_LINES.length){clearInterval(iv);setTimeout(()=>doneRef.current&&doneRef.current(),180)}
+    },perLine);
+    return()=>clearInterval(iv);
+  },[duration]);
+  const mob=typeof window!=="undefined"&&window.innerWidth<=768;
+  return(<div style={{position:"fixed",inset:0,zIndex:10001,background:"#fff",padding:mob?"14px 12px":"18px 24px",fontFamily:MONO,fontSize:mob?9.5:11.5,lineHeight:1.45,color:"rgba(0,0,0,0.72)",whiteSpace:"pre",overflow:"hidden",overscrollBehavior:"none",letterSpacing:0.1}}>
+    <style>{`@keyframes termBlink{0%,100%{opacity:1}50%{opacity:0}}@keyframes termFade{0%{opacity:1}100%{opacity:0}}`}</style>
+    <div style={{animation:"termFade 0.3s ease 1.25s both"}}>
+      {BOOT_LINES.slice(0,shown).map((l,i)=><div key={i}>{l||"\u00a0"}</div>)}
+      <span style={{display:"inline-block",width:mob?5:7,height:mob?11:13,background:"rgba(0,0,0,0.75)",verticalAlign:"middle",marginLeft:2,animation:"termBlink 0.7s step-end infinite"}}/>
+    </div>
+  </div>);
+}
+
 function scrollPageToTop(){
   // Find the fixed scroll container used by cardindex/list/events
   const el=document.querySelector('[data-scroll-container]');
@@ -92,7 +164,7 @@ function Menu({page,setPage,introRef}){
   const pages=["cardindex","list","riddles","portals"];
   const isMob=typeof window!=="undefined"&&window.innerWidth<=768;
   const[intro]=useState(()=>!!(introRef&&introRef.current));
-  const delay=intro?1400:80;
+  const delay=intro?2900:80;
   const bs={position:"relative",fontFamily:ARCH,fontWeight:400,fontSize:isMob?"clamp(36px,9vw,48px)":"clamp(46px,4.55vw,62px)",color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"2px 0",letterSpacing:isMob?"-2.5px":"-3px",textTransform:"lowercase",zIndex:1,textDecoration:"none"};
   return (<div id="ukho-menu" style={{...panelStyle,top:0,background:"rgba(255,255,255,0.22)",animation:`menuSlideDown 0.4s cubic-bezier(0.34,1.56,0.64,1) ${delay}ms both`}}>
     <style>{`@keyframes menuSlideDown{0%{transform:translateY(-110%)}100%{transform:translateY(0)}}`}</style>
@@ -900,6 +972,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
   const cols=isMobile?1:4;
   const[topPad,setTopPad]=useState(isMobile?HEADER_H+32:140);
   const[intro]=useState(()=>{const v=!!(introRef&&introRef.current);if(introRef)introRef.current=false;return v});
+  const[bootDone,setBootDone]=useState(!intro);
   const[built,setBuilt]=useState(!intro);
   useEffect(()=>{const el=document.getElementById('ukho-bar')||document.getElementById('ukho-menu');if(el)setTopPad(el.offsetTop+el.offsetHeight+12)},[]);
 
@@ -953,9 +1026,10 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
     if(ev)onOpenEvent(ev);
   };
 
-  const cardBase=intro?1600:380;
+  const cardBase=intro?3100:380;
   return (<><style>{`@keyframes cardBuild{0%{opacity:0;transform:translateY(30px) scale(0.88)}60%{opacity:1;transform:translateY(-4px) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}`}</style>
-  {!built&&<HoloPreloader onDone={()=>setBuilt(true)}/>}
+  {!bootDone&&<TerminalBoot onDone={()=>setBootDone(true)}/>}
+  {bootDone&&!built&&<HoloPreloader onDone={()=>setBuilt(true)}/>}
   <div ref={scrollContRef} data-scroll-container style={{
     position:"fixed",top:0,left:0,right:0,bottom:0,
     overflowY:"auto",WebkitOverflowScrolling:"touch",
@@ -996,7 +1070,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
         }}>{slide.id}</div>
       </div>
     ))}
-    <FloatingDice onRoll={()=>{const i=Math.floor(Math.random()*SLIDES.length);const card=cardRefs.current[i];if(card)card.scrollIntoView({behavior:"smooth",block:"center"})}} introDelay={intro?2700:1400}/>
+    <FloatingDice onRoll={()=>{const i=Math.floor(Math.random()*SLIDES.length);const card=cardRefs.current[i];if(card)card.scrollIntoView({behavior:"smooth",block:"center"})}} introDelay={intro?4100:1400}/>
   </div></div></>);
 }
 
