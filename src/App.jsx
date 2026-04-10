@@ -1377,6 +1377,8 @@ export default function App(){
   const cardScrollRef=useRef(0);
   const cardIntroRef=useRef(false);
   const[bootingCard,setBootingCard]=useState(false);
+  const[screenGlitch,setScreenGlitch]=useState(false);
+  const startBooting=useCallback(()=>{setScreenGlitch(true);setBootingCard(true);setTimeout(()=>setScreenGlitch(false),520)},[]);
   const finishBooting=useCallback(()=>{cardIntroRef.current=true;setBootingCard(false);setPage("cardindex")},[]);
   const listIdxRef=useRef(0);const listSearchRef=useRef("");const listYearRef=useRef("all");const listModeRef=useRef("list");const listScrollRef=useRef(0);
   const handleOpenEvent=(ev)=>{setPrevPage(page);setOpenEvent(ev);window.history.pushState({event:ev.id},"","/event/"+ev.id);window.scrollTo(0,0)};
@@ -1386,10 +1388,10 @@ export default function App(){
   const handleRollEvent=useCallback(()=>{const other=EVENTS.filter(e=>e.id!==openEvent?.id);const ev=other[Math.floor(Math.random()*other.length)];if(ev){setOpenEvent(ev);window.scrollTo(0,0);window.history.pushState({event:ev.id},"","/event/"+ev.id)}},[openEvent]);
   const globalBtnStyle=`button,a{transition:transform 0.12s ease!important;position:relative!important;overflow:hidden!important}button:hover,a:hover{transform:scale(0.95)!important}button:active,a:active{transform:scale(0.90)!important}button::after,a::after{content:'';position:absolute;inset:0;background:#4af626;opacity:0;pointer-events:none}button:hover::after,a:hover::after{opacity:0.1;transition:opacity 0.12s}#ukho-menu button,#ukho-menu a,.ukho-ev-tabs button{overflow:visible!important;flex-shrink:0!important}`;
   if(openEvent) return (<><style>{globalBtnStyle}</style><EventDetail ev={openEvent} onBack={handleBack}/><FloatingDice onRoll={handleRollEvent}/><AnalogOverlay/></>);
-  return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden"}}>
-    <style>{globalBtnStyle}</style>
+  return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden",animation:screenGlitch?"screenGlitch 0.5s steps(12,end) both":undefined}}>
+    <style>{globalBtnStyle}{`@keyframes screenGlitch{0%{filter:none;transform:translate(0,0)}8%{filter:hue-rotate(28deg) contrast(1.35) brightness(1.18);transform:translate(-4px,2px)}18%{filter:hue-rotate(-40deg) contrast(1.4) brightness(0.94);transform:translate(5px,-2px)}28%{filter:hue-rotate(18deg) contrast(1.22) brightness(1.05);transform:translate(-3px,1px)}40%{filter:hue-rotate(-22deg) contrast(1.28);transform:translate(3px,-1px)}52%{filter:hue-rotate(12deg) contrast(1.14) brightness(1.08);transform:translate(-2px,2px)}65%{filter:hue-rotate(-9deg) contrast(1.08);transform:translate(2px,-1px)}78%{filter:hue-rotate(5deg);transform:translate(-1px,1px)}90%{filter:hue-rotate(-3deg);transform:translate(1px,0)}100%{filter:none;transform:translate(0,0)}}`}</style>
     {page!=="home"&&<Menu page={page} setPage={setPage} introRef={cardIntroRef}/>}
-    {page==="home"&&<Home setPage={setPage} startBooting={()=>setBootingCard(true)}/>}
+    {page==="home"&&<Home setPage={setPage} startBooting={startBooting}/>}
     {page==="list"&&<ListPage events={EVENTS} onOpenEvent={handleOpenEvent} idxRef={listIdxRef} searchRef={listSearchRef} yearRef={listYearRef} modeRef={listModeRef} scrollRef={listScrollRef}/>}
     {page==="cardindex"&&<CardIndexPage events={EVENTS} onOpenEvent={handleOpenEvent} scrollRef={cardScrollRef} introRef={cardIntroRef}/>}
     {page==="riddles"&&<RiddlesPage events={EVENTS} onOpenEvent={handleOpenEvent}/>}
