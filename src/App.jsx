@@ -111,12 +111,13 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
   const rafRef=useRef(null);
   const touchRef=useRef({x:0,o:0});
   const introStart=useRef(performance.now());
-  // Auto-scroll the non-selected years (fast ramp-down at intro)
+  // Auto-scroll the non-selected years (fast ramp-down at intro, waits for bar to settle)
   useEffect(()=>{
     introStart.current=performance.now();
     let last=performance.now();
     const base=dk?18:12;
-    const tick=()=>{const now=performance.now(),dt=(now-last)/1000;last=now;const t=(now-introStart.current)/1600;const mul=t>=1?1:(1+18*Math.pow(1-t,3));setOffset(o=>{let next=o-dt*base*mul;if(next<-loopW)next+=loopW;if(next>loopW)next-=loopW;return next});rafRef.current=requestAnimationFrame(tick)};
+    const INTRO_DUR=3200;const INTRO_WAIT=800;
+    const tick=()=>{const now=performance.now(),dt=(now-last)/1000;last=now;const el=now-introStart.current-INTRO_WAIT;let mul;if(el<=0){mul=0}else{const t=Math.min(1,el/INTRO_DUR);mul=t>=1?1:(1+22*Math.pow(1-t,3))}setOffset(o=>{let next=o-dt*base*mul;if(next<-loopW)next+=loopW;if(next>loopW)next-=loopW;return next});rafRef.current=requestAnimationFrame(tick)};
     rafRef.current=requestAnimationFrame(tick);
     return()=>cancelAnimationFrame(rafRef.current);
   },[loopW,dk]);
@@ -153,7 +154,7 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
   const hm=search.trim()&&matchCount>1;
   const menuH=document.getElementById('ukho-menu')?.offsetHeight||HEADER_H;
   return (<div id="ukho-bar" style={{...panelStyle,top:menuH,bottom:"auto",boxShadow:"0 2px 16px rgba(0,0,0,0.04)",padding:dk?"6px 20px":"4px 12px",display:"flex",flexDirection:"column",gap:dk?6:4,animation:`barSlideIn 0.55s cubic-bezier(0.34,1.4,0.5,1) ${introDelay}ms both`}}>
-    <style>{`@keyframes barSlideIn{0%{transform:translateX(-110%);opacity:0}60%{opacity:1}100%{transform:translateX(0);opacity:1}}`}</style>
+    <style>{`@keyframes barSlideIn{0%{transform:translateX(110%);opacity:0}60%{opacity:1}100%{transform:translateX(0);opacity:1}}`}</style>
     <div style={{display:"flex",gap:dk?10:6,alignItems:"center"}}>
       <div style={{flex:"1 1 0",position:"relative",minWidth:0}}>
         <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="search..." style={{width:"100%",padding:dk?"8px 36px 8px 14px":"5px 28px 5px 10px",border:search?`2px solid rgba(74,246,38,0.5)`:"1px solid rgba(0,0,0,0.08)",fontFamily:MONO,fontSize:dk?20:16,background:search?"rgba(74,246,38,0.04)":"rgba(255,255,255,0.3)",outline:"none",letterSpacing:0,color:"#000",boxSizing:"border-box"}}/>
@@ -419,10 +420,10 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   // ── EVERYTHING mode ──
   const evBarBottom=useBarBottom();
   if(mode==="everything"){const topH=evBarBottom;const items=everything[evSec]||[];return(<>
-    <style>{`@keyframes evItemWave{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}@keyframes evTabsFade{0%{opacity:0;transform:translateY(-6px)}100%{opacity:1;transform:translateY(0)}}`}</style>
+    <style>{`@keyframes evItemWave{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}@keyframes evTabGlitch{0%{opacity:0;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:inset(0 0 100% 0)}10%{opacity:1;filter:hue-rotate(140deg) contrast(1.8) blur(1px);clip-path:inset(0 0 60% 0)}22%{opacity:0.4;filter:hue-rotate(-90deg) contrast(1.4);clip-path:inset(50% 0 0 0)}35%{opacity:1;filter:hue-rotate(80deg) contrast(1.6);clip-path:inset(20% 0 20% 0)}50%{opacity:0.6;filter:hue-rotate(-40deg) contrast(1.3);clip-path:inset(0 40% 0 0)}68%{opacity:1;filter:hue-rotate(20deg) contrast(1.1);clip-path:inset(0 0 0 30%)}85%{opacity:0.8;clip-path:none}100%{opacity:1;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:none}}`}</style>
     <div data-scroll-container style={{position:"fixed",top:topH,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
-      <div className="ukho-ev-tabs" style={{position:"sticky",top:0,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"6px 20px 4px":"4px 6px 2px",animation:"evTabsFade 0.45s cubic-bezier(0.34,1.4,0.5,1) 550ms both"}}>
-        <div style={{display:"flex",gap:isDesk?8:4,justifyContent:"space-between",alignItems:"flex-start"}}>{Object.keys(everything).map(s=><div key={s} style={{display:"flex",flexDirection:"column",alignItems:"center"}}><button onClick={()=>setEvSec(s)} style={{fontFamily:MONO,fontSize:isDesk?18:12,fontWeight:evSec===s?700:400,padding:isDesk?"7px 22px":"4px 6px",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase",whiteSpace:"nowrap"}}>{s}</button><div style={{fontFamily:MONO,fontSize:isDesk?15:13,fontWeight:700,color:evSec===s?"rgba(0,0,0,0.55)":"rgba(0,0,0,0.3)",marginTop:4,height:isDesk?19:15,lineHeight:1,textAlign:"center",letterSpacing:0.3}}><CountUp target={everything[s].length}/></div></div>)}</div>
+      <div className="ukho-ev-tabs" style={{position:"sticky",top:0,zIndex:10,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(36px) saturate(150%)",WebkitBackdropFilter:"blur(36px) saturate(150%)",padding:isDesk?"6px 20px 4px":"4px 6px 2px"}}>
+        <div style={{display:"flex",gap:isDesk?8:4,justifyContent:"space-between",alignItems:"flex-start"}}>{Object.keys(everything).map((s,ti)=><div key={s} style={{display:"flex",flexDirection:"column",alignItems:"center",animation:`evTabGlitch 0.6s steps(12,end) ${500+ti*120}ms both`}}><button onClick={()=>setEvSec(s)} style={{fontFamily:MONO,fontSize:isDesk?18:12,fontWeight:evSec===s?700:400,padding:isDesk?"7px 22px":"4px 6px",background:evSec===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase",whiteSpace:"nowrap"}}>{s}</button><div style={{fontFamily:MONO,fontSize:isDesk?15:13,fontWeight:700,color:evSec===s?"rgba(0,0,0,0.55)":"rgba(0,0,0,0.3)",marginTop:4,height:isDesk?19:15,lineHeight:1,textAlign:"center",letterSpacing:0.3}}><CountUp target={everything[s].length}/></div></div>)}</div>
       </div>
       <div style={{padding:"4px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
         {items.map((item,i)=><div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer",textTransform:evSec==="tags"?"uppercase":"none",animation:`evItemWave 0.4s cubic-bezier(0.25,0.8,0.3,1) ${700+Math.min(i,70)*18}ms both`}} onMouseEnter={e=>e.currentTarget.style.background="rgba(74,246,38,0.06)"} onMouseLeave={e=>e.currentTarget.style.background="none"}>{item}</div>)}
@@ -565,6 +566,8 @@ function EventDetail({ev,onBack}){
   const[disperse,setDisperse]=useState(false);
   const[showHint,setShowHint]=useState(false);
   const[viewerIdx,setViewerIdx]=useState(null);
+  const[flashing,setFlashing]=useState(true);
+  useEffect(()=>{setFlashing(true);const t=setTimeout(()=>setFlashing(false),520);return()=>clearTimeout(t)},[ev.id]);
   useEffect(()=>{
     if(scrollRef.current)scrollRef.current.scrollTop=0;
     setShowHint(false);
@@ -593,7 +596,12 @@ function EventDetail({ev,onBack}){
   <style>{`
     .ukho-viewer-img{width:96vw;height:96vh;object-fit:contain}
     @media(min-width:769px){.ukho-viewer-img{width:67vw;height:67vh}}
+    @keyframes evFlash{0%{opacity:1}65%{opacity:1}100%{opacity:0}}
+    @keyframes evFlashNum{0%{transform:scale(0.92);filter:blur(14px)}65%{transform:scale(1);filter:blur(6px)}100%{transform:scale(1.05);filter:blur(18px)}}
   `}</style>
+  {flashing&&<div style={{position:"fixed",inset:0,zIndex:9999,background:"white",display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",animation:"evFlash 0.52s ease-out both"}}>
+    <div style={{fontFamily:ARCH,fontSize:"min(72vw,58vh)",color:"rgba(0,0,0,0.18)",lineHeight:0.85,letterSpacing:"-0.06em",animation:"evFlashNum 0.52s ease-out both",willChange:"filter,transform"}}>{ev.id}</div>
+  </div>}
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
     <div style={{fontFamily:ARCH,fontSize:"clamp(65px,16vw,120px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:.85,letterSpacing:"-1px",marginBottom:8}}>{ev.id}</div>
@@ -1197,9 +1205,10 @@ function RiddlesPage({onOpenEvent,events}){
           @keyframes rdRoll{0%{transform:rotateX(0) rotateY(0) rotateZ(0)}100%{transform:rotateX(720deg) rotateY(540deg) rotateZ(360deg)}}
           @keyframes doorFloat{0%{transform:rotateX(5deg) rotateY(0) translateY(0)}25%{transform:rotateX(8deg) rotateY(15deg) translateY(-3px)}50%{transform:rotateX(3deg) rotateY(0) translateY(0)}75%{transform:rotateX(6deg) rotateY(-15deg) translateY(3px)}100%{transform:rotateX(5deg) rotateY(0) translateY(0)}}
           @keyframes doorEnter{0%{transform:rotateX(5deg) rotateY(0) scale(1)}40%{transform:rotateX(0) rotateY(0) scale(1.15)}70%{transform:rotateX(0) rotateY(0) scale(0.9);opacity:0.5}100%{transform:rotateX(5deg) rotateY(0) scale(1);opacity:1}}
+          @keyframes rGlitch{0%{opacity:0;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:inset(10% 0 40% 0)}8%{opacity:1;filter:hue-rotate(180deg) contrast(2) blur(1px);clip-path:inset(10% 0 40% 0)}16%{opacity:0.3;filter:hue-rotate(90deg) contrast(1.5);clip-path:inset(60% 0 5% 0)}24%{opacity:1;filter:hue-rotate(-120deg) contrast(2);clip-path:inset(25% 0 25% 0)}32%{opacity:0.6;filter:hue-rotate(60deg) contrast(1.3);clip-path:inset(0 0 70% 0)}42%{opacity:1;filter:hue-rotate(-60deg) contrast(1.8);clip-path:inset(45% 0 15% 0)}55%{opacity:0.4;filter:hue-rotate(200deg) contrast(1.5);clip-path:inset(0 40% 0 0)}68%{opacity:1;filter:hue-rotate(-30deg) contrast(1.2);clip-path:inset(0 0 0 30%)}82%{opacity:0.7;filter:hue-rotate(15deg) contrast(1.1);clip-path:none}100%{opacity:1;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:none}}
         `}</style>
         {/* Dice */}
-        <div onClick={nextRiddle} style={{cursor:"pointer",perspective:200,padding:4}}>
+        <div onClick={nextRiddle} style={{cursor:"pointer",perspective:200,padding:4,animation:"rGlitch 0.7s steps(12,end) 700ms both"}}>
           <div style={{width:S,height:S,position:"relative",transformStyle:"preserve-3d",animation:rolling?"rdRoll 0.5s ease-out":"rdFloat 8s ease-in-out infinite"}}>
             <div style={fs(`translateZ(${R}px)`)}><div style={ds("50%","50%")}/></div>
             <div style={fs(`rotateY(180deg) translateZ(${R}px)`)}><div style={ds("20%","20%")}/><div style={ds("80%","80%")}/></div>
@@ -1211,7 +1220,7 @@ function RiddlesPage({onOpenEvent,events}){
         </div>
         <div style={{width:1,height:14,background:"rgba(255,255,255,0.12)"}}/>
         {/* Door */}
-        <div onClick={enterEvent} style={{cursor:"pointer",perspective:200,padding:4,transform:isDesk?"scale(1.4)":"none",transformOrigin:"center"}}>
+        <div onClick={enterEvent} style={{cursor:"pointer",perspective:200,padding:4,transform:isDesk?"scale(1.4)":"none",transformOrigin:"center",animation:"rGlitch 0.7s steps(12,end) 1050ms both"}}>
           <div style={{width:36,height:42,position:"relative",transformStyle:"preserve-3d",animation:entering?"doorEnter 0.6s ease-out":"doorFloat 8s ease-in-out infinite",pointerEvents:"none"}}>
             <div style={{position:"absolute",width:32,height:40,top:1,left:2,border:"1.5px solid rgba(0,255,65,0.4)",background:"rgba(0,255,65,0.03)",transform:"translateZ(-5px)"}}/>
             <div style={{position:"absolute",width:18,height:38,top:2,right:0,transformOrigin:"right center",transform:"rotateY(-50deg) translateZ(3px)",background:"rgba(0,255,65,0.08)",border:"1.5px solid rgba(0,255,65,0.5)"}}>
