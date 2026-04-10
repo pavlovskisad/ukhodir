@@ -612,7 +612,7 @@ function EventDetail({ev,onBack}){
     @keyframes evFlashNum{0%{transform:scale(0.92);filter:blur(14px)}65%{transform:scale(1);filter:blur(6px)}100%{transform:scale(1.05);filter:blur(18px)}}
   `}</style>
   {flashing&&<div style={{position:"fixed",inset:0,zIndex:9999,background:"white",display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",animation:"evFlash 0.52s ease-out both"}}>
-    <div style={{fontFamily:ARCH,fontSize:"min(72vw,58vh)",color:"rgba(0,0,0,0.08)",lineHeight:0.85,letterSpacing:"-0.06em",animation:"evFlashNum 0.52s ease-out both",willChange:"filter,transform"}}>{ev.id}</div>
+    <div style={{fontFamily:ARCH,fontSize:"min(72vw,58vh)",color:"rgba(0,0,0,0.13)",lineHeight:0.85,letterSpacing:"-0.06em",animation:"evFlashNum 0.52s ease-out both",willChange:"filter,transform"}}>{ev.id}</div>
   </div>}
   <div style={{maxWidth:860,margin:"0 auto"}}>
   <div ref={infoRef} style={{minHeight:"100%",padding:"clamp(20px,5vw,60px) clamp(16px,4vw,40px)",paddingBottom:40,...(disperse?{display:"flex",flexDirection:"column",justifyContent:"space-between",minHeight:"100dvh"}:{})}}>
