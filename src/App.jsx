@@ -952,12 +952,12 @@ function Slideshow({imgs,width,forceLoad,fit}){
     return()=>clearTimeout(timerRef.current);
   },[shouldLoad,loaded,imgs.length,isMob,w]);
 
-  if(imgs.length===0) return <div ref={ref} style={{width:"100%",height:"100%"}}/>;
-  if(!shouldLoad||!loaded) return <div ref={ref} style={{width:"100%",height:"100%",background:"#eee"}}/>;
   const bgSize=fit?"contain":"cover";
-  if(imgs.length===1) return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden"}}>
-    <div style={{width:"100%",height:"100%",backgroundImage:`url(${imgs[0]})`,backgroundSize:bgSize,backgroundPosition:"center",backgroundRepeat:"no-repeat"}}/>
-  </div>);
+  if(imgs.length===0) return <div ref={ref} style={{width:"100%",height:"100%"}}/>;
+  // Always paint the first image (browser will fetch it natively), so dice-rolls
+  // to remote cards never land on a gray placeholder. Rotation + prefetch of the
+  // rest still waits for shouldLoad.
+  if(!shouldLoad||!loaded||imgs.length===1) return <div ref={ref} style={{width:"100%",height:"100%",backgroundColor:"#eee",backgroundImage:`url(${imgs[0]})`,backgroundSize:bgSize,backgroundPosition:"center",backgroundRepeat:"no-repeat"}}/>;
 
   return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden",background:"white"}}>
     <div ref={stripRef} style={{display:"flex",height:"100%",willChange:"transform"}}>
