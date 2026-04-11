@@ -954,15 +954,15 @@ function Slideshow({imgs,width,forceLoad,fit}){
 
   const bgSize=fit?"contain":"cover";
   if(imgs.length===0) return <div ref={ref} style={{width:"100%",height:"100%"}}/>;
-  // Always paint the first image (browser will fetch it natively), so dice-rolls
-  // to remote cards never land on a gray placeholder. Rotation + prefetch of the
-  // rest still waits for shouldLoad.
-  if(!shouldLoad||!loaded||imgs.length===1) return <div ref={ref} style={{width:"100%",height:"100%",backgroundColor:"white",backgroundImage:`url(${imgs[0]})`,backgroundSize:bgSize,backgroundPosition:"center",backgroundRepeat:"no-repeat"}}/>;
-
-  return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden",background:"white"}}>
+  const showExtras=shouldLoad&&loaded&&imgs.length>1;
+  // Outer/strip/first-image always mounted so toggling shouldLoad just appends
+  // more children to the existing strip — the first image element is never
+  // replaced, so no repaint blink as cards scroll into the load range.
+  return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden",backgroundColor:"white"}}>
     <div ref={stripRef} style={{display:"flex",height:"100%",willChange:"transform"}}>
-      {imgs.map((u,i)=><div key={i} style={{flexShrink:0,width:w,height:"100%",backgroundImage:`url(${u})`,backgroundSize:bgSize,backgroundPosition:"center",backgroundRepeat:"no-repeat"}}/>)}
       <div style={{flexShrink:0,width:w,height:"100%",backgroundImage:`url(${imgs[0]})`,backgroundSize:bgSize,backgroundPosition:"center",backgroundRepeat:"no-repeat"}}/>
+      {showExtras&&imgs.slice(1).map((u,i)=><div key={i+1} style={{flexShrink:0,width:w,height:"100%",backgroundImage:`url(${u})`,backgroundSize:bgSize,backgroundPosition:"center",backgroundRepeat:"no-repeat"}}/>)}
+      {showExtras&&<div key="dup" style={{flexShrink:0,width:w,height:"100%",backgroundImage:`url(${imgs[0]})`,backgroundSize:bgSize,backgroundPosition:"center",backgroundRepeat:"no-repeat"}}/>}
     </div>
   </div>);
 }
