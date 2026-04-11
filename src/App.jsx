@@ -372,10 +372,11 @@ function CardContent({ev,search,selected,showGreen,onClick}){
 function hlMatch(text,q){const i=text.toLowerCase().indexOf(q);if(i===-1)return text;return <span>{text.slice(0,i)}<span style={{background:"rgba(74,246,38,0.3)",padding:"0 1px"}}>{text.slice(i,i+q.length)}</span>{text.slice(i+q.length)}</span>}
 
 /* ── List Page — dual card transitions ── */
-function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef}){
+function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef,progTermsRef}){
   const reversed=useMemo(()=>[...events].reverse(),[events]);
   const[search,_setSearch]=useState(searchRef?.current||"");const[idx,_setIdx]=useState(idxRef?.current||0);const[mode,_setMode]=useState(modeRef?.current||"list");
-  const[progTerms,setProgTerms]=useState(null);
+  const[progTerms,_setProgTerms]=useState(()=>progTermsRef?.current||null);
+  const setProgTerms=v=>{_setProgTerms(v);if(progTermsRef)progTermsRef.current=v};
   const setSearch=v=>{setProgTerms(null);_setSearch(v);if(searchRef)searchRef.current=v};
   const setIdx=v=>{_setIdx(v);if(idxRef)idxRef.current=v};
   const setMode=v=>{_setMode(v);if(modeRef)modeRef.current=v};
@@ -1386,7 +1387,7 @@ export default function App(){
   const[bootingCard,setBootingCard]=useState(false);
   const startBooting=useCallback(()=>{setBootingCard(true)},[]);
   const finishBooting=useCallback(()=>{cardIntroRef.current=true;setBootingCard(false);setPage("cardindex")},[]);
-  const listIdxRef=useRef(0);const listSearchRef=useRef("");const listYearRef=useRef("all");const listModeRef=useRef("list");const listScrollRef=useRef(0);
+  const listIdxRef=useRef(0);const listSearchRef=useRef("");const listYearRef=useRef("all");const listModeRef=useRef("list");const listScrollRef=useRef(0);const listProgTermsRef=useRef(null);
   const handleOpenEvent=(ev)=>{setPrevPage(page);setOpenEvent(ev);window.history.pushState({event:ev.id},"","/event/"+ev.id);window.scrollTo(0,0)};
   const handleBack=useCallback(()=>{setOpenEvent(null);if(prevPage)setPage(prevPage);window.history.pushState({},"","/")},[prevPage]);
   // Browser back button support
@@ -1399,7 +1400,7 @@ export default function App(){
     <style>{globalBtnStyle}</style>
     {page!=="home"&&<Menu page={page} setPage={setPage} introRef={cardIntroRef}/>}
     {page==="home"&&<Home setPage={setPage} startBooting={startBooting}/>}
-    {page==="list"&&<ListPage events={EVENTS} onOpenEvent={handleOpenEvent} idxRef={listIdxRef} searchRef={listSearchRef} yearRef={listYearRef} modeRef={listModeRef} scrollRef={listScrollRef}/>}
+    {page==="list"&&<ListPage events={EVENTS} onOpenEvent={handleOpenEvent} idxRef={listIdxRef} searchRef={listSearchRef} yearRef={listYearRef} modeRef={listModeRef} scrollRef={listScrollRef} progTermsRef={listProgTermsRef}/>}
     {page==="cardindex"&&<CardIndexPage events={EVENTS} onOpenEvent={handleOpenEvent} scrollRef={cardScrollRef} introRef={cardIntroRef}/>}
     {page==="riddles"&&<RiddlesPage events={EVENTS} onOpenEvent={handleOpenEvent}/>}
     {page==="portals"&&<PortalsPage/>}
