@@ -1378,7 +1378,7 @@ export default function App(){
   const cardIntroRef=useRef(false);
   const[bootingCard,setBootingCard]=useState(false);
   const[vhsFlash,setVhsFlash]=useState(false);
-  const startBooting=useCallback(()=>{setVhsFlash(true);setBootingCard(true);setTimeout(()=>setVhsFlash(false),580)},[]);
+  const startBooting=useCallback(()=>{setVhsFlash(true);setBootingCard(true);setTimeout(()=>setVhsFlash(false),600)},[]);
   const finishBooting=useCallback(()=>{cardIntroRef.current=true;setBootingCard(false);setPage("cardindex")},[]);
   const listIdxRef=useRef(0);const listSearchRef=useRef("");const listYearRef=useRef("all");const listModeRef=useRef("list");const listScrollRef=useRef(0);
   const handleOpenEvent=(ev)=>{setPrevPage(page);setOpenEvent(ev);window.history.pushState({event:ev.id},"","/event/"+ev.id);window.scrollTo(0,0)};
@@ -1388,23 +1388,33 @@ export default function App(){
   const handleRollEvent=useCallback(()=>{const other=EVENTS.filter(e=>e.id!==openEvent?.id);const ev=other[Math.floor(Math.random()*other.length)];if(ev){setOpenEvent(ev);window.scrollTo(0,0);window.history.pushState({event:ev.id},"","/event/"+ev.id)}},[openEvent]);
   const globalBtnStyle=`button,a{transition:transform 0.12s ease!important;position:relative!important;overflow:hidden!important}button:hover,a:hover{transform:scale(0.95)!important}button:active,a:active{transform:scale(0.90)!important}button::after,a::after{content:'';position:absolute;inset:0;background:#4af626;opacity:0;pointer-events:none}button:hover::after,a:hover::after{opacity:0.1;transition:opacity 0.12s}#ukho-menu button,#ukho-menu a,.ukho-ev-tabs button{overflow:visible!important;flex-shrink:0!important}`;
   if(openEvent) return (<><style>{globalBtnStyle}</style><EventDetail ev={openEvent} onBack={handleBack}/><FloatingDice onRoll={handleRollEvent}/><AnalogOverlay/></>);
-  const rootFilter=bootingCard?(vhsFlash?"invert(1) url(#vhsGlitchFilter) drop-shadow(2px 0 rgba(255,20,80,0.55)) drop-shadow(-2px 0 rgba(0,200,255,0.55))":"invert(1)"):undefined;
+  const rootFilter=bootingCard?(vhsFlash?"invert(1) url(#vhsGlitchFilter) drop-shadow(3px 0 rgba(255,20,80,0.55)) drop-shadow(-3px 0 rgba(0,200,255,0.55))":"invert(1)"):undefined;
   return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden",filter:rootFilter,transition:"filter 0.18s ease"}}>
     <style>{globalBtnStyle}</style>
     {vhsFlash&&<svg width="0" height="0" aria-hidden="true" style={{position:"absolute",pointerEvents:"none"}}>
-      <filter id="vhsGlitchFilter" x="-10%" y="-10%" width="120%" height="120%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.008 0.8" numOctaves="1" seed="5" result="noise">
-          <animate attributeName="baseFrequency" values="0.012 0.9;0.008 0.75;0.005 0.55;0.003 0.35;0.002 0.2;0.001 0.1" dur="0.58s" fill="freeze"/>
-          <animate attributeName="seed" values="5;17;8;22;3;11;6" dur="0.58s" fill="freeze"/>
+      <filter id="vhsGlitchFilter" x="-15%" y="-15%" width="130%" height="130%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.0008 1.6" numOctaves="1" seed="5" result="slices">
+          <animate attributeName="baseFrequency" values="0.001 2.2;0.0008 1.8;0.0006 1.3;0.0004 0.9;0.0003 0.5;0.0002 0.25;0.0001 0.1" dur="0.6s" fill="freeze"/>
+          <animate attributeName="seed" values="5;17;9;23;4;12;6" dur="0.6s" fill="freeze"/>
         </feTurbulence>
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="32" xChannelSelector="R" yChannelSelector="G">
-          <animate attributeName="scale" values="36;26;18;11;6;2;0" dur="0.58s" fill="freeze"/>
+        <feComponentTransfer in="slices" result="slicesHard">
+          <feFuncR type="discrete" tableValues="0 0.2 0.35 0.5 0.65 0.8 1"/>
+          <feFuncG type="table" tableValues="0.5 0.5"/>
+        </feComponentTransfer>
+        <feDisplacementMap in="SourceGraphic" in2="slicesHard" scale="60" xChannelSelector="R" yChannelSelector="G" result="sliced">
+          <animate attributeName="scale" values="70;55;38;24;14;6;0" dur="0.6s" fill="freeze"/>
+        </feDisplacementMap>
+        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="2" seed="11" result="wave">
+          <animate attributeName="baseFrequency" values="0.02 0.028;0.015 0.022;0.01 0.015;0.006 0.009;0.003 0.005" dur="0.6s" fill="freeze"/>
+          <animate attributeName="seed" values="11;3;19;7;14" dur="0.6s" fill="freeze"/>
+        </feTurbulence>
+        <feDisplacementMap in="sliced" in2="wave" scale="24">
+          <animate attributeName="scale" values="28;20;13;7;3;0" dur="0.6s" fill="freeze"/>
         </feDisplacementMap>
       </filter>
     </svg>}
-    {vhsFlash&&<div style={{position:"fixed",inset:0,zIndex:10002,pointerEvents:"none",background:"repeating-linear-gradient(0deg,rgba(255,255,255,0.09) 0px,rgba(255,255,255,0.09) 1px,transparent 1px,transparent 3px)",mixBlendMode:"overlay",animation:"vhsScanFade 0.58s steps(10,end) both"}}/>}
-    {vhsFlash&&<div style={{position:"fixed",left:0,right:0,height:28,zIndex:10003,pointerEvents:"none",background:"linear-gradient(180deg,transparent 0%,rgba(255,255,255,0.22) 30%,rgba(255,255,255,0.32) 50%,rgba(255,255,255,0.22) 70%,transparent 100%)",mixBlendMode:"overlay",animation:"vhsBandRoll 0.58s cubic-bezier(0.4,0,0.8,0.6) both"}}/>}
-    <style>{`@keyframes vhsScanFade{0%{opacity:1}80%{opacity:0.6}100%{opacity:0}}@keyframes vhsBandRoll{0%{top:-40px;opacity:0}8%{opacity:0.9}35%{top:40%;opacity:1}60%{top:75%;opacity:0.85}100%{top:110%;opacity:0}}`}</style>
+    {vhsFlash&&<div style={{position:"fixed",left:0,right:0,height:36,zIndex:10003,pointerEvents:"none",background:"linear-gradient(180deg,transparent 0%,rgba(255,255,255,0.22) 30%,rgba(255,255,255,0.35) 50%,rgba(255,255,255,0.22) 70%,transparent 100%)",mixBlendMode:"overlay",filter:"blur(2px)",animation:"vhsBandRoll 0.6s cubic-bezier(0.4,0,0.75,0.7) both"}}/>}
+    <style>{`@keyframes vhsBandRoll{0%{top:-50px;opacity:0}10%{opacity:0.85}40%{top:42%;opacity:1}72%{top:80%;opacity:0.7}100%{top:115%;opacity:0}}`}</style>
     {page!=="home"&&<Menu page={page} setPage={setPage} introRef={cardIntroRef}/>}
     {page==="home"&&<Home setPage={setPage} startBooting={startBooting}/>}
     {page==="list"&&<ListPage events={EVENTS} onOpenEvent={handleOpenEvent} idxRef={listIdxRef} searchRef={listSearchRef} yearRef={listYearRef} modeRef={listModeRef} scrollRef={listScrollRef}/>}
