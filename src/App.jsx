@@ -1377,8 +1377,7 @@ export default function App(){
   const cardScrollRef=useRef(0);
   const cardIntroRef=useRef(false);
   const[bootingCard,setBootingCard]=useState(false);
-  const[screenGlitch,setScreenGlitch]=useState(false);
-  const startBooting=useCallback(()=>{setScreenGlitch(true);setBootingCard(true);setTimeout(()=>setScreenGlitch(false),520)},[]);
+  const startBooting=useCallback(()=>{setBootingCard(true)},[]);
   const finishBooting=useCallback(()=>{cardIntroRef.current=true;setBootingCard(false);setPage("cardindex")},[]);
   const listIdxRef=useRef(0);const listSearchRef=useRef("");const listYearRef=useRef("all");const listModeRef=useRef("list");const listScrollRef=useRef(0);
   const handleOpenEvent=(ev)=>{setPrevPage(page);setOpenEvent(ev);window.history.pushState({event:ev.id},"","/event/"+ev.id);window.scrollTo(0,0)};
@@ -1388,20 +1387,9 @@ export default function App(){
   const handleRollEvent=useCallback(()=>{const other=EVENTS.filter(e=>e.id!==openEvent?.id);const ev=other[Math.floor(Math.random()*other.length)];if(ev){setOpenEvent(ev);window.scrollTo(0,0);window.history.pushState({event:ev.id},"","/event/"+ev.id)}},[openEvent]);
   const globalBtnStyle=`button,a{transition:transform 0.12s ease!important;position:relative!important;overflow:hidden!important}button:hover,a:hover{transform:scale(0.95)!important}button:active,a:active{transform:scale(0.90)!important}button::after,a::after{content:'';position:absolute;inset:0;background:#4af626;opacity:0;pointer-events:none}button:hover::after,a:hover::after{opacity:0.1;transition:opacity 0.12s}#ukho-menu button,#ukho-menu a,.ukho-ev-tabs button{overflow:visible!important;flex-shrink:0!important}`;
   if(openEvent) return (<><style>{globalBtnStyle}</style><EventDetail ev={openEvent} onBack={handleBack}/><FloatingDice onRoll={handleRollEvent}/><AnalogOverlay/></>);
-  const rootFilter=bootingCard?(screenGlitch?"invert(1) url(#screenGlitchFilter) drop-shadow(0.6px 0 rgba(255,30,70,0.18)) drop-shadow(-0.6px 0 rgba(60,180,255,0.18))":"invert(1)"):undefined;
+  const rootFilter=bootingCard?"invert(1)":undefined;
   return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden",filter:rootFilter,transition:"filter 0.18s ease"}}>
     <style>{globalBtnStyle}</style>
-    {screenGlitch&&<svg width="0" height="0" aria-hidden="true" style={{position:"absolute",pointerEvents:"none"}}>
-      <filter id="screenGlitchFilter" x="-10%" y="-10%" width="120%" height="120%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.02 0.05" numOctaves="2" seed="7" result="noise">
-          <animate attributeName="baseFrequency" values="0.05 0.1;0.03 0.06;0.015 0.03;0.008 0.015;0.004 0.008" dur="0.5s" fill="freeze"/>
-          <animate attributeName="seed" values="7;14;3;11;5" dur="0.5s" fill="freeze"/>
-        </feTurbulence>
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="14">
-          <animate attributeName="scale" values="14;10;6;3;1;0" dur="0.5s" fill="freeze"/>
-        </feDisplacementMap>
-      </filter>
-    </svg>}
     {page!=="home"&&<Menu page={page} setPage={setPage} introRef={cardIntroRef}/>}
     {page==="home"&&<Home setPage={setPage} startBooting={startBooting}/>}
     {page==="list"&&<ListPage events={EVENTS} onOpenEvent={handleOpenEvent} idxRef={listIdxRef} searchRef={listSearchRef} yearRef={listYearRef} modeRef={listModeRef} scrollRef={listScrollRef}/>}
