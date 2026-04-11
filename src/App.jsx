@@ -1398,4 +1398,6 @@ export default function App(){
     {page==="portals"&&<PortalsPage/>}
     {bootingCard&&<TerminalBoot onDone={finishBooting}/>}
     <AnalogOverlay/>
+    {bootingCard&&<div style={{position:"fixed",inset:0,zIndex:10100,pointerEvents:"none",animation:"bootGreen 0.35s ease-out forwards"}}/>}
+    <style>{`@keyframes bootGreen{0%{background-color:rgba(181,9,217,0.55)}20%{background-color:rgba(181,9,217,0.32)}50%{background-color:rgba(181,9,217,0.16)}100%{background-color:rgba(181,9,217,0.09)}}`}</style>
   </div>)}
