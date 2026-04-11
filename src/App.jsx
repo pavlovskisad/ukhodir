@@ -957,7 +957,7 @@ function Slideshow({imgs,width,forceLoad,fit}){
   // Always paint the first image (browser will fetch it natively), so dice-rolls
   // to remote cards never land on a gray placeholder. Rotation + prefetch of the
   // rest still waits for shouldLoad.
-  if(!shouldLoad||!loaded||imgs.length===1) return <div ref={ref} style={{width:"100%",height:"100%",backgroundColor:"#eee",backgroundImage:`url(${imgs[0]})`,backgroundSize:bgSize,backgroundPosition:"center",backgroundRepeat:"no-repeat"}}/>;
+  if(!shouldLoad||!loaded||imgs.length===1) return <div ref={ref} style={{width:"100%",height:"100%",backgroundColor:"white",backgroundImage:`url(${imgs[0]})`,backgroundSize:bgSize,backgroundPosition:"center",backgroundRepeat:"no-repeat"}}/>;
 
   return (<div ref={ref} style={{width:"100%",height:"100%",overflow:"hidden",background:"white"}}>
     <div ref={stripRef} style={{display:"flex",height:"100%",willChange:"transform"}}>
