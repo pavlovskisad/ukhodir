@@ -1212,6 +1212,13 @@ function RiddlesPage({onOpenEvent,events}){
   const timerRef=useRef(null);
   const measureRef=useRef(null);
   const[textH,setTextH]=useState(0);
+  const[menuH,setMenuH]=useState(HEADER_H+8);
+  useEffect(()=>{
+    const m=()=>{const el=document.getElementById('ukho-menu');if(el)setMenuH(el.offsetHeight+8)};
+    m();const t=setTimeout(m,60);
+    window.addEventListener("resize",m);
+    return()=>{clearTimeout(t);window.removeEventListener("resize",m)};
+  },[]);
 
   const riddle=RIDDLES[order[pos]];
   const fullText=riddle[1];
@@ -1263,11 +1270,11 @@ function RiddlesPage({onOpenEvent,events}){
 
   return (<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"white",display:"flex",flexDirection:"column"}}>
     {/* Riddle text — stretches from menu to buttons */}
-    <div style={{flex:1,padding:`${HEADER_H+20}px clamp(16px,5vw,40px) 12px`,overflow:"hidden"}}>
+    <div style={{flex:1,padding:`${menuH}px clamp(16px,5vw,40px) 12px`,overflow:"hidden",minHeight:0}}>
       <div style={{width:"100%",maxWidth:600,margin:"0 auto",height:"100%",display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
         {/* Hidden measurer for full text height */}
         <div ref={measureRef} style={{fontFamily:MONO,fontSize:"clamp(14px,3vw,17px)",lineHeight:1.6,letterSpacing:.3,position:"absolute",visibility:"hidden",width:"100%",maxWidth:600,padding:`0 clamp(16px,5vw,40px)`}}>{fullText}</div>
-        <div style={{minHeight:Math.max(textH||0,window.innerHeight*(isDesk?0.35:0.45)),paddingTop:isDesk?0:80}}>
+        <div style={{minHeight:Math.max(textH||0,window.innerHeight*(isDesk?0.35:0.4)),maxHeight:"100%",overflow:"hidden"}}>
           <div style={{fontFamily:MONO,fontSize:"clamp(14px,3vw,17px)",lineHeight:1.6,letterSpacing:.3,color:"rgba(0,0,0,0.9)"}}>
             {displayed}
             <span style={{display:"inline-block",width:6,height:13,background:"rgba(0,255,65,0.8)",verticalAlign:"middle",marginLeft:2,animation:"rcBlink 0.7s step-end infinite"}}/>
