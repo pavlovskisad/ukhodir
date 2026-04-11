@@ -427,8 +427,27 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     if(yearFilter!=="all")list=list.filter(e=>e.d.includes(yearFilter));
     if(search.trim()){
       if(progTerms){
-        const hc=PIECE_EV[progTerms.raw];
-        if(hc)list=list.filter(e=>e.id===hc);
+        const{raw}=progTerms;const hc=PIECE_EV[raw];
+        if(hc){list=list.filter(e=>e.id===hc)}
+        else{
+          // Fuzzy match for pieces tapped from the everything tab. Handles two
+          // directions + loose punctuation:
+          //   (a) pr row contains the query (canonical longer than event text
+          //       plus formatting differences)
+          //   (b) query contains a pr row that's a 60%+ prefix of the query
+          //       (event lists a shorter form — e.g. 'Cage — Dream (1948)' vs
+          //       canonical 'Cage — Dream (1948) for piano')
+          // Loose normalization strips punctuation so hyphen-vs-endash, comma
+          // annotations, etc. don't break matching.
+          const loose=s=>norm(s).replace(/[^a-z0-9\u0400-\u04ff ]+/g," ").replace(/\s+/g," ").trim();
+          const nq=norm(raw),lq=loose(raw);
+          list=list.filter(e=>e.pr.some(p=>{
+            const np=norm(p);
+            if(np.includes(nq)||(np.length>nq.length*0.6&&nq.includes(np)))return true;
+            const lp=loose(p);
+            return lp.includes(lq)||(lp.length>lq.length*0.6&&lq.includes(lp));
+          }));
+        }
       }else{
         const q=norm(search);list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q));
       }
@@ -495,7 +514,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const cameFromEv=useRef(false);
   const setSearchSwitch=useCallback(v=>{setSearch(v);if(mode==="everything"&&v.trim().length>0){cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
   const jumpFrom=useCallback(t=>{setYearFilter("all");setSearch(t);cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
-  const jumpFromProgram=useCallback(t=>{setYearFilter("all");_setSearch(t);if(searchRef)searchRef.current=t;setProgTerms(PIECE_EV[t]?{raw:t}:null);cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
+  const jumpFromProgram=useCallback(t=>{setYearFilter("all");_setSearch(t);if(searchRef)searchRef.current=t;setProgTerms({raw:t});cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
 
   const ev=filtered[idx];
   // Restore & save desktop scroll position
