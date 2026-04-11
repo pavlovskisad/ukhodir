@@ -1388,33 +1388,12 @@ export default function App(){
   const handleRollEvent=useCallback(()=>{const other=EVENTS.filter(e=>e.id!==openEvent?.id);const ev=other[Math.floor(Math.random()*other.length)];if(ev){setOpenEvent(ev);window.scrollTo(0,0);window.history.pushState({event:ev.id},"","/event/"+ev.id)}},[openEvent]);
   const globalBtnStyle=`button,a{transition:transform 0.12s ease!important;position:relative!important;overflow:hidden!important}button:hover,a:hover{transform:scale(0.95)!important}button:active,a:active{transform:scale(0.90)!important}button::after,a::after{content:'';position:absolute;inset:0;background:#4af626;opacity:0;pointer-events:none}button:hover::after,a:hover::after{opacity:0.1;transition:opacity 0.12s}#ukho-menu button,#ukho-menu a,.ukho-ev-tabs button{overflow:visible!important;flex-shrink:0!important}`;
   if(openEvent) return (<><style>{globalBtnStyle}</style><EventDetail ev={openEvent} onBack={handleBack}/><FloatingDice onRoll={handleRollEvent}/><AnalogOverlay/></>);
-  const rootFilter=bootingCard?(vhsFlash?"invert(1) url(#vhsGlitchFilter) drop-shadow(3px 0 rgba(255,20,80,0.55)) drop-shadow(-3px 0 rgba(0,200,255,0.55))":"invert(1)"):undefined;
-  return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden",filter:rootFilter,transition:"filter 0.18s ease"}}>
+  const rootFilter=bootingCard?"invert(1)":undefined;
+  return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden",filter:rootFilter,transition:"filter 0.18s ease",animation:vhsFlash?"vhsKick 0.55s steps(10,end) both":undefined}}>
     <style>{globalBtnStyle}</style>
-    {vhsFlash&&<svg width="0" height="0" aria-hidden="true" style={{position:"absolute",pointerEvents:"none"}}>
-      <filter id="vhsGlitchFilter" x="-15%" y="-15%" width="130%" height="130%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.0008 1.6" numOctaves="1" seed="5" result="slices">
-          <animate attributeName="baseFrequency" values="0.001 2.2;0.0008 1.8;0.0006 1.3;0.0004 0.9;0.0003 0.5;0.0002 0.25;0.0001 0.1" dur="0.6s" fill="freeze"/>
-          <animate attributeName="seed" values="5;17;9;23;4;12;6" dur="0.6s" fill="freeze"/>
-        </feTurbulence>
-        <feComponentTransfer in="slices" result="slicesHard">
-          <feFuncR type="discrete" tableValues="0 0.2 0.35 0.5 0.65 0.8 1"/>
-          <feFuncG type="table" tableValues="0.5 0.5"/>
-        </feComponentTransfer>
-        <feDisplacementMap in="SourceGraphic" in2="slicesHard" scale="60" xChannelSelector="R" yChannelSelector="G" result="sliced">
-          <animate attributeName="scale" values="70;55;38;24;14;6;0" dur="0.6s" fill="freeze"/>
-        </feDisplacementMap>
-        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="2" seed="11" result="wave">
-          <animate attributeName="baseFrequency" values="0.02 0.028;0.015 0.022;0.01 0.015;0.006 0.009;0.003 0.005" dur="0.6s" fill="freeze"/>
-          <animate attributeName="seed" values="11;3;19;7;14" dur="0.6s" fill="freeze"/>
-        </feTurbulence>
-        <feDisplacementMap in="sliced" in2="wave" scale="24">
-          <animate attributeName="scale" values="28;20;13;7;3;0" dur="0.6s" fill="freeze"/>
-        </feDisplacementMap>
-      </filter>
-    </svg>}
+    <style>{`@keyframes vhsKick{0%{transform:translate(0,0);filter:invert(1) blur(0)}8%{transform:translate(-7px,1px);filter:invert(1) drop-shadow(5px 0 rgba(255,40,90,0.55)) drop-shadow(-5px 0 rgba(30,180,255,0.55)) blur(1.4px) contrast(1.08)}18%{transform:translate(6px,-1px);filter:invert(1) drop-shadow(4px 0.5px rgba(255,50,100,0.5)) drop-shadow(-4px -0.5px rgba(40,190,255,0.5)) blur(1px) contrast(1.06)}30%{transform:translate(-4px,0);filter:invert(1) drop-shadow(3.5px 0 rgba(255,60,110,0.45)) drop-shadow(-3.5px 0 rgba(50,200,255,0.45)) blur(0.7px)}42%{transform:translate(3px,0);filter:invert(1) drop-shadow(3px 0 rgba(255,70,120,0.4)) drop-shadow(-3px 0 rgba(60,210,255,0.4)) blur(0.5px)}55%{transform:translate(-2px,0);filter:invert(1) drop-shadow(2.5px 0 rgba(255,90,130,0.35)) drop-shadow(-2.5px 0 rgba(80,220,255,0.35)) blur(0.3px)}68%{transform:translate(1px,0);filter:invert(1) drop-shadow(1.8px 0 rgba(255,110,140,0.28)) drop-shadow(-1.8px 0 rgba(100,225,255,0.28))}82%{transform:translate(0,0);filter:invert(1) drop-shadow(1px 0 rgba(255,130,150,0.18)) drop-shadow(-1px 0 rgba(120,230,255,0.18))}100%{transform:translate(0,0);filter:invert(1) blur(0)}}@keyframes vhsSplitBand{0%{opacity:0;height:0}12%{opacity:0.9;height:3px}26%{opacity:0.7;height:10px}42%{opacity:0.45;height:18px}60%{opacity:0.22;height:12px}78%{opacity:0.08;height:5px}100%{opacity:0;height:0}}@keyframes vhsBandRoll{0%{top:-50px;opacity:0}10%{opacity:0.85}40%{top:42%;opacity:1}72%{top:80%;opacity:0.7}100%{top:115%;opacity:0}}`}</style>
+    {vhsFlash&&<div style={{position:"fixed",left:0,right:0,top:"50%",zIndex:10003,background:"rgba(0,0,0,0.75)",transform:"translateY(-50%)",pointerEvents:"none",animation:"vhsSplitBand 0.55s steps(8,end) both"}}/>}
     {vhsFlash&&<div style={{position:"fixed",left:0,right:0,height:36,zIndex:10003,pointerEvents:"none",background:"linear-gradient(180deg,transparent 0%,rgba(255,255,255,0.22) 30%,rgba(255,255,255,0.35) 50%,rgba(255,255,255,0.22) 70%,transparent 100%)",mixBlendMode:"overlay",filter:"blur(2px)",animation:"vhsBandRoll 0.6s cubic-bezier(0.4,0,0.75,0.7) both"}}/>}
-    <style>{`@keyframes vhsBandRoll{0%{top:-50px;opacity:0}10%{opacity:0.85}40%{top:42%;opacity:1}72%{top:80%;opacity:0.7}100%{top:115%;opacity:0}}`}</style>
     {page!=="home"&&<Menu page={page} setPage={setPage} introRef={cardIntroRef}/>}
     {page==="home"&&<Home setPage={setPage} startBooting={startBooting}/>}
     {page==="list"&&<ListPage events={EVENTS} onOpenEvent={handleOpenEvent} idxRef={listIdxRef} searchRef={listSearchRef} yearRef={listYearRef} modeRef={listModeRef} scrollRef={listScrollRef}/>}
