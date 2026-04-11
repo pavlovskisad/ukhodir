@@ -1388,7 +1388,8 @@ export default function App(){
   const handleRollEvent=useCallback(()=>{const other=EVENTS.filter(e=>e.id!==openEvent?.id);const ev=other[Math.floor(Math.random()*other.length)];if(ev){setOpenEvent(ev);window.scrollTo(0,0);window.history.pushState({event:ev.id},"","/event/"+ev.id)}},[openEvent]);
   const globalBtnStyle=`button,a{transition:transform 0.12s ease!important;position:relative!important;overflow:hidden!important}button:hover,a:hover{transform:scale(0.95)!important}button:active,a:active{transform:scale(0.90)!important}button::after,a::after{content:'';position:absolute;inset:0;background:#4af626;opacity:0;pointer-events:none}button:hover::after,a:hover::after{opacity:0.1;transition:opacity 0.12s}#ukho-menu button,#ukho-menu a,.ukho-ev-tabs button{overflow:visible!important;flex-shrink:0!important}`;
   if(openEvent) return (<><style>{globalBtnStyle}</style><EventDetail ev={openEvent} onBack={handleBack}/><FloatingDice onRoll={handleRollEvent}/><AnalogOverlay/></>);
-  return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden",filter:screenGlitch?"url(#screenGlitchFilter) drop-shadow(0.6px 0 rgba(255,30,70,0.18)) drop-shadow(-0.6px 0 rgba(60,180,255,0.18))":undefined}}>
+  const rootFilter=bootingCard?(screenGlitch?"invert(1) url(#screenGlitchFilter) drop-shadow(0.6px 0 rgba(255,30,70,0.18)) drop-shadow(-0.6px 0 rgba(60,180,255,0.18))":"invert(1)"):undefined;
+  return (<div style={{minHeight:"100vh",background:page==="portals"?"#000":"white",overflow:"hidden",filter:rootFilter,transition:"filter 0.18s ease"}}>
     <style>{globalBtnStyle}</style>
     {screenGlitch&&<svg width="0" height="0" aria-hidden="true" style={{position:"absolute",pointerEvents:"none"}}>
       <filter id="screenGlitchFilter" x="-10%" y="-10%" width="120%" height="120%">
