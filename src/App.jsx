@@ -443,14 +443,15 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const swipeClearedRef=useRef(false);
   useEffect(()=>{if(!mountedRef.current){mountedRef.current=true;return;}
     if(swipeClearedRef.current){swipeClearedRef.current=false;return;}
-    // When clearing search, stay in current mode but restore position
+    // When clearing search, restore position to the event the user was viewing
     if(!search.trim()){
       syncCameFromEv(false);
       if(prevEvRef.current){
         const newList=yearFilter!=="all"?reversed.filter(e=>e.d.includes(yearFilter)):reversed;
         const newIdx=newList.findIndex(e=>e.id===prevEvRef.current.id);
-        if(newIdx>=0){setIdx(newIdx);setEnterDir("None");return;}
+        if(newIdx>=0){setIdx(newIdx);setEnterDir("None");setSelected(false);selBlink.stop();setExiting(null);return;}
       }
+      setIdx(0);setEnterDir("None");setSelected(false);selBlink.stop();setExiting(null);return;
     }
     setIdx(0);setSelected(false);selBlink.stop();setExiting(null);setEnterDir("None");navKey.current++},[search,yearFilter]);
   // Track current event for search-clear restore
