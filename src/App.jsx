@@ -372,7 +372,7 @@ function CardContent({ev,search,selected,showGreen,onClick}){
 function hlMatch(text,q){const i=text.toLowerCase().indexOf(q);if(i===-1)return text;return <span>{text.slice(0,i)}<span style={{background:"rgba(74,246,38,0.3)",padding:"0 1px"}}>{text.slice(i,i+q.length)}</span>{text.slice(i+q.length)}</span>}
 
 /* ── List Page — dual card transitions ── */
-function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef,progTermsRef}){
+function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef,progTermsRef,evScrollRef,evSecRef,cameFromEvRef}){
   const reversed=useMemo(()=>[...events].reverse(),[events]);
   const[search,_setSearch]=useState(searchRef?.current||"");const[idx,_setIdx]=useState(idxRef?.current||0);const[mode,_setMode]=useState(modeRef?.current||"list");
   const[progTerms,_setProgTerms]=useState(()=>progTermsRef?.current||null);
@@ -443,9 +443,9 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const swipeClearedRef=useRef(false);
   useEffect(()=>{if(!mountedRef.current){mountedRef.current=true;return;}
     if(swipeClearedRef.current){swipeClearedRef.current=false;return;}
-    // When clearing search, return to everything if came from there
+    // When clearing search, stay in current mode but restore position
     if(!search.trim()){
-      if(cameFromEv.current){cameFromEv.current=false;setMode("everything");return;}
+      syncCameFromEv(false);
       if(prevEvRef.current){
         const newList=yearFilter!=="all"?reversed.filter(e=>e.d.includes(yearFilter)):reversed;
         const newIdx=newList.findIndex(e=>e.id===prevEvRef.current.id);
@@ -459,7 +459,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const go=useCallback((ni,dir)=>{
     if(cameFromEv.current&&search.trim()&&filtered.length<=1){
       const curEv=filtered[idx];
-      cameFromEv.current=false;swipeClearedRef.current=true;
+      syncCameFromEv(false);swipeClearedRef.current=true;
       const fullList=yearFilter!=="all"?reversed.filter(e=>e.d.includes(yearFilter)):reversed;
       const newIdx=curEv?fullList.findIndex(e=>e.id===curEv.id):0;
       const target=dir==="Up"?Math.min(newIdx+1,fullList.length-1):Math.max(newIdx-1,0);
@@ -493,11 +493,14 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   };
 
   const everything=useMemo(()=>({names:reversed.map(e=>e.n).sort(),performers:PERFORMERS,pieces:PROGRAMS,places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.flatMap(e=>/let us stay here/i.test(e.t)?[e.t]:e.t.split(',').map(t=>t.trim())).filter(Boolean))].sort()}),[reversed]);
-  const[evSec,setEvSec]=useState("names");
-  const cameFromEv=useRef(false);
-  const setSearchSwitch=useCallback(v=>{setSearch(v);if(mode==="everything"&&v.trim().length>0){cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
-  const jumpFrom=useCallback(t=>{setYearFilter("all");setSearch(t);cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
-  const jumpFromProgram=useCallback(t=>{const dash=t.match(/\s[—–\-]\s/);let composer="",title="",names=[];if(dash){composer=t.slice(0,dash.index).trim();names=composer.split(/,\s*(?:with\s+)?|(?:^|\s)with\s+/).map(n=>n.trim().replace(/\s*\(.*?\)\s*/g,"")).filter(Boolean);const rest=t.slice(dash.index+dash[0].length);const ym=rest.match(/^(.+?)\s*[\(\[]/);title=ym?ym[1].trim():rest.split(/ for /)[0].trim();}else{title=t.split(/ for /)[0].trim();}setYearFilter("all");_setSearch(t);if(searchRef)searchRef.current=t;setProgTerms({composer:strip(composer),title:strip(title),names:names.map(n=>strip(n)),raw:t});cameFromEv.current=true;setMode("list");setIdx(0);setEnterDir("None")},[]);
+  const[evSec,_setEvSec]=useState(()=>evSecRef?.current||"names");
+  const setEvSec=v=>{_setEvSec(v);if(evSecRef)evSecRef.current=v};
+  const cameFromEv=useRef(cameFromEvRef?.current||false);
+  const syncCameFromEv=v=>{cameFromEv.current=v;if(cameFromEvRef)cameFromEvRef.current=v};
+  const saveEvScroll=()=>{if(evScrollRef){const el=document.querySelector('[data-scroll-container]');if(el)evScrollRef.current=el.scrollTop}};
+  const setSearchSwitch=useCallback(v=>{setSearch(v);if(mode==="everything"&&v.trim().length>0){saveEvScroll();syncCameFromEv(true);setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
+  const jumpFrom=useCallback(t=>{saveEvScroll();setYearFilter("all");setSearch(t);syncCameFromEv(true);setMode("list");setIdx(0);setEnterDir("None")},[]);
+  const jumpFromProgram=useCallback(t=>{const dash=t.match(/\s[—–\-]\s/);let composer="",title="",names=[];if(dash){composer=t.slice(0,dash.index).trim();names=composer.split(/,\s*(?:with\s+)?|(?:^|\s)with\s+/).map(n=>n.trim().replace(/\s*\(.*?\)\s*/g,"")).filter(Boolean);const rest=t.slice(dash.index+dash[0].length);const ym=rest.match(/^(.+?)\s*[\(\[]/);title=ym?ym[1].trim():rest.split(/ for /)[0].trim();}else{title=t.split(/ for /)[0].trim();}saveEvScroll();setYearFilter("all");_setSearch(t);if(searchRef)searchRef.current=t;setProgTerms({composer:strip(composer),title:strip(title),names:names.map(n=>strip(n)),raw:t});syncCameFromEv(true);setMode("list");setIdx(0);setEnterDir("None")},[]);
 
   const ev=filtered[idx];
   // Restore & save desktop scroll position
@@ -512,9 +515,9 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   // ── EVERYTHING mode ──
   const evBarBottom=useBarBottom(mode);
   const filterCounts=useMemo(()=>Object.fromEntries(Object.keys(everything).map(s=>[s,everything[s].length])),[everything]);
-  if(mode==="everything"){const topH=evBarBottom;const items=everything[evSec]||[];const evBase=skipBarIntro?150:500;return(<>
+  if(mode==="everything"){const topH=evBarBottom;const items=everything[evSec]||[];const evBase=skipBarIntro?150:500;const restoreScroll=evScrollRef?.current||0;return(<>
     <style>{`@keyframes evItemWave{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}`}</style>
-    <div data-scroll-container style={{position:"fixed",top:topH,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
+    <div data-scroll-container ref={el=>{if(el&&restoreScroll){requestAnimationFrame(()=>{el.scrollTop=restoreScroll;evScrollRef.current=0})}}} style={{position:"fixed",top:topH,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
       <div key={evSec} style={{padding:"14px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
         {items.map((item,i)=><div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer",textTransform:evSec==="tags"?"uppercase":"none",transition:"transform 0.12s ease,background 0.12s ease",transformOrigin:"left center",animation:`evItemWave 0.3s cubic-bezier(0.25,0.8,0.3,1) ${evBase+Math.min(i,70)*13}ms backwards`}} onMouseEnter={e=>{e.currentTarget.style.background="rgba(74,246,38,0.06)";e.currentTarget.style.transform="scale(0.985)"}} onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.transform="none"}}>{item}</div>)}
       </div></div>
@@ -1388,9 +1391,9 @@ export default function App(){
   const[bootingCard,setBootingCard]=useState(false);
   const startBooting=useCallback(()=>{setBootingCard(true)},[]);
   const finishBooting=useCallback(()=>{cardIntroRef.current=true;setBootingCard(false);setPage("cardindex")},[]);
-  const listIdxRef=useRef(0);const listSearchRef=useRef("");const listYearRef=useRef("all");const listModeRef=useRef("list");const listScrollRef=useRef(0);const listProgTermsRef=useRef(null);
+  const listIdxRef=useRef(0);const listSearchRef=useRef("");const listYearRef=useRef("all");const listModeRef=useRef("list");const listScrollRef=useRef(0);const listProgTermsRef=useRef(null);const listEvScrollRef=useRef(0);const listEvSecRef=useRef("names");const listCameFromEvRef=useRef(false);
   const handleOpenEvent=(ev)=>{setPrevPage(page);setOpenEvent(ev);window.history.pushState({event:ev.id},"","/event/"+ev.id);window.scrollTo(0,0)};
-  const handleBack=useCallback(()=>{setOpenEvent(null);if(prevPage)setPage(prevPage);window.history.pushState({},"","/")},[prevPage]);
+  const handleBack=useCallback(()=>{setOpenEvent(null);if(listCameFromEvRef.current){listCameFromEvRef.current=false;listModeRef.current="everything";listSearchRef.current="";listProgTermsRef.current=null}if(prevPage)setPage(prevPage);window.history.pushState({},"","/")},[prevPage]);
   // Browser back button support
   useEffect(()=>{const onPop=()=>{const m=window.location.pathname.match(/^\/event\/(\d+)$/);if(m){const ev=EVENTS.find(e=>e.id===+m[1]);if(ev){setOpenEvent(ev);return}}setOpenEvent(null);if(prevPage)setPage(prevPage)};window.addEventListener("popstate",onPop);return()=>window.removeEventListener("popstate",onPop)},[prevPage]);
   const handleRollEvent=useCallback(()=>{const other=EVENTS.filter(e=>e.id!==openEvent?.id);const ev=other[Math.floor(Math.random()*other.length)];if(ev){setOpenEvent(ev);window.scrollTo(0,0);window.history.pushState({event:ev.id},"","/event/"+ev.id)}},[openEvent]);
@@ -1401,7 +1404,7 @@ export default function App(){
     <style>{globalBtnStyle}</style>
     {page!=="home"&&<Menu page={page} setPage={setPage} introRef={cardIntroRef}/>}
     {page==="home"&&<Home setPage={setPage} startBooting={startBooting}/>}
-    {page==="list"&&<ListPage events={EVENTS} onOpenEvent={handleOpenEvent} idxRef={listIdxRef} searchRef={listSearchRef} yearRef={listYearRef} modeRef={listModeRef} scrollRef={listScrollRef} progTermsRef={listProgTermsRef}/>}
+    {page==="list"&&<ListPage events={EVENTS} onOpenEvent={handleOpenEvent} idxRef={listIdxRef} searchRef={listSearchRef} yearRef={listYearRef} modeRef={listModeRef} scrollRef={listScrollRef} progTermsRef={listProgTermsRef} evScrollRef={listEvScrollRef} evSecRef={listEvSecRef} cameFromEvRef={listCameFromEvRef}/>}
     {page==="cardindex"&&<CardIndexPage events={EVENTS} onOpenEvent={handleOpenEvent} scrollRef={cardScrollRef} introRef={cardIntroRef}/>}
     {page==="riddles"&&<RiddlesPage events={EVENTS} onOpenEvent={handleOpenEvent}/>}
     {page==="portals"&&<PortalsPage/>}
