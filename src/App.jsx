@@ -982,7 +982,7 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
   const cols=isMobile?1:4;
   const[topPad,setTopPad]=useState(isMobile?HEADER_H+32:140);
   const[intro]=useState(()=>{const v=!!(introRef&&introRef.current);if(introRef)introRef.current=false;return v});
-  const[built,setBuilt]=useState(!intro);
+  const[built,setBuilt]=useState(true);
   useEffect(()=>{const el=document.getElementById('ukho-bar')||document.getElementById('ukho-menu');if(el)setTopPad(el.offsetTop+el.offsetHeight+12)},[]);
 
   const scrollContRef=useRef(null);
@@ -1035,9 +1035,8 @@ function CardIndexPage({onOpenEvent,events,scrollRef,introRef}){
     if(ev)onOpenEvent(ev);
   };
 
-  const cardBase=intro?1100:380;
+  const cardBase=intro?400:380;
   return (<><style>{`@keyframes cardBuild{0%{opacity:0;transform:translateY(30px) scale(0.88)}60%{opacity:1;transform:translateY(-4px) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}`}</style>
-  {!built&&<HoloPreloader onDone={()=>setBuilt(true)}/>}
   <div ref={scrollContRef} data-scroll-container style={{
     position:"fixed",top:0,left:0,right:0,bottom:0,
     overflowY:"auto",WebkitOverflowScrolling:"touch",
@@ -1390,8 +1389,7 @@ export default function App(){
   const cardScrollRef=useRef(0);
   const cardIntroRef=useRef(false);
   const[bootingCard,setBootingCard]=useState(false);
-  const startBooting=useCallback(()=>{setBootingCard(true)},[]);
-  const finishBooting=useCallback(()=>{cardIntroRef.current=true;setBootingCard(false);setPage("cardindex")},[]);
+  const startBooting=useCallback(()=>{setBootingCard(true);setTimeout(()=>{cardIntroRef.current=true;setBootingCard(false);setPage("cardindex")},700)},[]);
   const listIdxRef=useRef(0);const listSearchRef=useRef("");const listYearRef=useRef("all");const listModeRef=useRef("list");const listScrollRef=useRef(0);const listProgTermsRef=useRef(null);const listEvScrollRef=useRef(0);const listEvSecRef=useRef("names");const listCameFromEvRef=useRef(false);
   const handleOpenEvent=(ev)=>{setPrevPage(page);setOpenEvent(ev);window.history.pushState({event:ev.id},"","/event/"+ev.id);window.scrollTo(0,0)};
   const handleBack=useCallback(()=>{setOpenEvent(null);if(listCameFromEvRef.current){listCameFromEvRef.current=false;listModeRef.current="everything";listSearchRef.current="";listProgTermsRef.current=null}if(prevPage)setPage(prevPage);window.history.pushState({},"","/")},[prevPage]);
@@ -1409,7 +1407,6 @@ export default function App(){
     {page==="cardindex"&&<CardIndexPage events={EVENTS} onOpenEvent={handleOpenEvent} scrollRef={cardScrollRef} introRef={cardIntroRef}/>}
     {page==="riddles"&&<RiddlesPage events={EVENTS} onOpenEvent={handleOpenEvent}/>}
     {page==="portals"&&<PortalsPage/>}
-    {bootingCard&&<TerminalBoot onDone={finishBooting}/>}
     <AnalogOverlay/>
     {bootingCard&&<div style={{position:"fixed",inset:0,zIndex:10100,pointerEvents:"none",animation:"bootGreen 0.35s ease-out forwards"}}/>}
     <style>{`@keyframes bootGreen{0%{background-color:rgba(181,9,217,0.55)}20%{background-color:rgba(181,9,217,0.32)}50%{background-color:rgba(181,9,217,0.16)}100%{background-color:rgba(181,9,217,0.09)}}`}</style>
