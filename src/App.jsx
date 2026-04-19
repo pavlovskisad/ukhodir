@@ -254,7 +254,7 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
 
 /* ── Dice ── */
 function FloatingDice({onRoll,introDelay=1100}){const[rolling,setRolling]=useState(false);const drag=useRef({active:false,moved:false,sx:0,sy:0,ex:0,ey:0});const[pos,setPos]=useState({x:null,y:null});
-  useEffect(()=>{if(pos.x===null){const dk=window.innerWidth>768;setPos({x:window.innerWidth-(dk?120:66),y:window.innerHeight-(dk?320:200)})}},[]);
+  useEffect(()=>{if(pos.x===null){const dk=window.innerWidth>768;setPos({x:window.innerWidth-(dk?120:66),y:window.innerHeight-(dk?224:200)})}},[]);
   const onDown=(cx,cy)=>{drag.current={active:true,moved:false,sx:cx,sy:cy,ex:pos.x,ey:pos.y}};const onMove=(cx,cy)=>{if(!drag.current.active)return;const dx=cx-drag.current.sx,dy=cy-drag.current.sy;if(Math.abs(dx)>3||Math.abs(dy)>3)drag.current.moved=true;if(drag.current.moved)setPos({x:drag.current.ex+dx,y:drag.current.ey+dy})};const onUp=()=>{if(!drag.current.active)return;const w=drag.current.moved;drag.current.active=false;if(!w&&!rolling){setRolling(true);setTimeout(()=>{setRolling(false);onRoll?.()},600)}};
   useEffect(()=>{const mm=e=>onMove(e.clientX,e.clientY),mu=()=>onUp(),tm=e=>onMove(e.touches[0].clientX,e.touches[0].clientY),tu=()=>onUp();window.addEventListener("mousemove",mm);window.addEventListener("mouseup",mu);window.addEventListener("touchmove",tm,{passive:true});window.addEventListener("touchend",tu);return()=>{window.removeEventListener("mousemove",mm);window.removeEventListener("mouseup",mu);window.removeEventListener("touchmove",tm);window.removeEventListener("touchend",tu)}});
   if(pos.x===null)return null;const deskDice=typeof window!=="undefined"&&window.innerWidth>768;const S=36,R=S/2;
@@ -835,7 +835,7 @@ function Home({setPage,startBooting}){
       {/* Enter archive */}
       <div style={{margin:"40px 0"}}>
         <style>{`@keyframes hCur{0%,100%{opacity:1}50%{opacity:0}}`}</style>
-        <TapButton onClick={()=>startBooting?.()} style={{fontFamily:ARCH,fontSize:"clamp(72px,18vw,120px)",fontWeight:700,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 16px",textDecoration:"none",letterSpacing:"-4px",display:"inline-block"}}>
+        <TapButton onClick={()=>startBooting?.()} style={{fontFamily:ARCH,fontSize:"clamp(72px,18vw,120px)",fontWeight:700,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 0",textDecoration:"none",letterSpacing:"-4px",display:"inline-block"}}>
           enter archive
         </TapButton>
       </div>
@@ -860,10 +860,10 @@ function Home({setPage,startBooting}){
       <div style={{position:"relative",margin:"60px 0",padding:"20px 0"}}>
         <div style={{fontFamily:ARCH,fontSize:"clamp(80px,20vw,160px)",fontWeight:400,color:"rgba(0,0,0,0.04)",lineHeight:1,letterSpacing:"-1px",position:"absolute",top:"50%",left:0,transform:"translateY(-50%)",pointerEvents:"none",whiteSpace:"nowrap"}}>UMBRELLA</div>
         <div style={{display:"flex",flexDirection:"column",gap:12,position:"relative"}}>
-          <TapButton href="https://kyivdispat.ch" style={{fontFamily:ARCH,fontSize:"clamp(38px,9vw,58px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.5px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
+          <TapButton href="https://kyivdispat.ch" style={{fontFamily:ARCH,fontSize:"clamp(38px,9vw,58px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.5px",display:"inline-block",padding:"6px 0",cursor:"pointer"}}>
             kyiv dispatch record label
           </TapButton>
-          <TapButton href="https://music.youtube.com/channel/UCOnv8gWUnKFFAC2So6EVS_Q" style={{fontFamily:ARCH,fontSize:"clamp(38px,9vw,58px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.5px",display:"inline-block",padding:"6px 12px",cursor:"pointer"}}>
+          <TapButton href="https://music.youtube.com/channel/UCOnv8gWUnKFFAC2So6EVS_Q" style={{fontFamily:ARCH,fontSize:"clamp(38px,9vw,58px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.5px",display:"inline-block",padding:"6px 0",cursor:"pointer"}}>
             ukho ensemble kyiv
           </TapButton>
         </div>
@@ -876,8 +876,8 @@ function Home({setPage,startBooting}){
 
       {/* Social links */}
       <div style={{display:"flex",gap:24,alignItems:"center",margin:"24px 0 40px"}}>
-        <TapButton href="https://www.instagram.com/ukho.music/" style={{fontFamily:ARCH,fontSize:"clamp(32px,8vw,48px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.2px",cursor:"pointer",padding:"4px 8px"}}>inst</TapButton>
-        <TapButton href="https://www.facebook.com/ukhomusic" style={{fontFamily:ARCH,fontSize:"clamp(32px,8vw,48px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.2px",cursor:"pointer",padding:"4px 8px"}}>fb</TapButton>
+        <TapButton href="https://www.instagram.com/ukho.music/" style={{fontFamily:ARCH,fontSize:"clamp(32px,8vw,48px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.2px",cursor:"pointer",padding:"4px 0"}}>inst</TapButton>
+        <TapButton href="https://www.facebook.com/ukhomusic" style={{fontFamily:ARCH,fontSize:"clamp(32px,8vw,48px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.2px",cursor:"pointer",padding:"4px 0"}}>fb</TapButton>
       </div>
 
     </div>
@@ -1270,9 +1270,9 @@ function RiddlesPage({onOpenEvent,events}){
   }
 
   const isDesk=typeof window!=="undefined"&&window.innerWidth>768;
-  const S=isDesk?48:36,R=S/2;
-  const ds=(t,l)=>({position:"absolute",width:isDesk?7:5,height:isDesk?7:5,borderRadius:"50%",background:"rgba(0,255,65,0.6)",boxShadow:`0 0 ${isDesk?6:4}px rgba(0,255,65,0.3)`,top:t,left:l,transform:"translate(-50%,-50%)"});
-  const fs=tr=>({position:"absolute",width:S,height:S,border:`${isDesk?2:1.5}px solid rgba(0,255,65,0.35)`,background:"rgba(0,255,65,0.05)",transform:tr});
+  const S=36,R=S/2;
+  const ds=(t,l)=>({position:"absolute",width:5,height:5,borderRadius:"50%",background:"rgba(0,255,65,0.6)",boxShadow:"0 0 4px rgba(0,255,65,0.3)",top:t,left:l,transform:"translate(-50%,-50%)"});
+  const fs=tr=>({position:"absolute",width:S,height:S,border:"1.5px solid rgba(0,255,65,0.35)",background:"rgba(0,255,65,0.05)",transform:tr});
 
   return (<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"white",display:"flex",flexDirection:"column"}}>
     {/* Riddle text — stretches from menu to buttons */}
@@ -1299,7 +1299,7 @@ function RiddlesPage({onOpenEvent,events}){
           @keyframes rGlitch{0%{opacity:0;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:inset(10% 0 40% 0)}8%{opacity:1;filter:hue-rotate(60deg) contrast(1.3) blur(1px);clip-path:inset(10% 0 40% 0)}16%{opacity:0.3;filter:hue-rotate(30deg) contrast(1.15);clip-path:inset(60% 0 5% 0)}24%{opacity:1;filter:hue-rotate(-40deg) contrast(1.3);clip-path:inset(25% 0 25% 0)}32%{opacity:0.6;filter:hue-rotate(20deg) contrast(1.1);clip-path:inset(0 0 70% 0)}42%{opacity:1;filter:hue-rotate(-20deg) contrast(1.2);clip-path:inset(45% 0 15% 0)}55%{opacity:0.4;filter:hue-rotate(55deg) contrast(1.15);clip-path:inset(0 40% 0 0)}68%{opacity:1;filter:hue-rotate(-10deg) contrast(1.08);clip-path:inset(0 0 0 30%)}82%{opacity:0.7;filter:hue-rotate(5deg) contrast(1.04);clip-path:none}100%{opacity:1;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:none}}
         `}</style>
         {/* Dice */}
-        <div onClick={nextRiddle} style={{cursor:"pointer",perspective:200,padding:4,animation:"rGlitch 0.5s steps(12,end) 520ms both"}}>
+        <div onClick={nextRiddle} style={{cursor:"pointer",perspective:200,padding:4,transform:isDesk?"scale(1.12)":"none",transformOrigin:"center",animation:"rGlitch 0.5s steps(12,end) 520ms both"}}>
           <div style={{width:S,height:S,position:"relative",transformStyle:"preserve-3d",animation:rolling?"rdRoll 0.5s ease-out":"rdFloat 8s ease-in-out infinite"}}>
             <div style={fs(`translateZ(${R}px)`)}><div style={ds("50%","50%")}/></div>
             <div style={fs(`rotateY(180deg) translateZ(${R}px)`)}><div style={ds("20%","20%")}/><div style={ds("80%","80%")}/></div>
