@@ -194,7 +194,7 @@ function YearCarousel({years,yearFilter,setYearFilter,dk}){
   useEffect(()=>{
     introStart.current=performance.now();
     let last=performance.now();
-    const base=dk?18:12;
+    const base=dk?10:7;
     const HOLD=320;const DECAY=1000;const MAX=24;
     const tick=()=>{const now=performance.now(),dt=(now-last)/1000;last=now;const el=now-introStart.current;let mul;if(el<=HOLD){mul=MAX}else{const t=Math.min(1,(el-HOLD)/DECAY);mul=t>=1?1:(1+(MAX-1)*Math.pow(1-t,4.2))}setOffset(o=>{let next=o-dt*base*mul;if(next<-loopW)next+=loopW;if(next>loopW)next-=loopW;return next});rafRef.current=requestAnimationFrame(tick)};
     rafRef.current=requestAnimationFrame(tick);
@@ -246,9 +246,9 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
       </div>
       {!hm&&<button style={bs} onClick={onTop}>▲</button>}{!hm&&<button style={bs} onClick={onBottom}>▼</button>}
       {hm&&<button style={bs} onClick={onPrev}>‹</button>}{hm&&<span style={{fontFamily:MONO,fontSize:dk?15:11,color:"rgba(0,0,0,0.35)",whiteSpace:"nowrap",letterSpacing:0,minWidth:dk?48:36,textAlign:"center"}}>{matchIdx+1}/{matchCount}</span>}{hm&&<button style={bs} onClick={onNext}>›</button>}
-      <button onClick={onToggleMode} style={{fontFamily:MONO,fontSize:dk?18:14,fontWeight:700,padding:dk?"8px 36px":"2px 16px",background:"none",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:0.3,whiteSpace:"nowrap",height:dk?46:34,flexShrink:0,position:"relative",overflow:"hidden",textTransform:"lowercase",display:"flex",alignItems:"center",justifyContent:"center"}}>{modeLabel}<div style={{position:"absolute",inset:0,background:GREEN,animation:"evBlink 1.2s step-end infinite 2s",pointerEvents:"none",opacity:0}}/></button>
+      <button onClick={onToggleMode} style={{fontFamily:MONO,fontSize:dk?18:14,fontWeight:700,padding:dk?"8px 36px":"2px 16px",background:"rgba(74,246,38,0.06)",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:0.3,whiteSpace:"nowrap",height:dk?46:34,flexShrink:0,position:"relative",overflow:"hidden",textTransform:"lowercase",display:"flex",alignItems:"center",justifyContent:"center"}}>{modeLabel}</button>
     </div>
-    {filters&&<div key="filters" style={{display:"flex",gap:dk?8:4,justifyContent:"space-between",alignItems:"flex-start",paddingTop:2,animation:bottomAnim}}>{filters.options.map((s,ti)=>{const tabDelay=(animateBottom?380:0)+ti*60;return(<div key={s} style={{display:"flex",flexDirection:"column",alignItems:"center",animation:`filterTabPop 0.38s cubic-bezier(0.34,1.56,0.64,1) ${tabDelay}ms both`}}><button onClick={()=>filters.setActive(s)} style={{fontFamily:MONO,fontSize:dk?18:12,fontWeight:filters.active===s?700:400,padding:dk?"7px 22px":"4px 6px",background:filters.active===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase",whiteSpace:"nowrap"}}>{s}</button><div style={{fontFamily:MONO,fontSize:dk?15:13,fontWeight:700,color:filters.active===s?"rgba(0,0,0,0.55)":"rgba(0,0,0,0.3)",marginTop:4,height:dk?19:15,lineHeight:1,textAlign:"center",letterSpacing:0.3}}><CountUp target={filters.counts[s]} delay={tabDelay+220}/></div></div>)})}</div>}
+    {filters&&<div key="filters" style={{display:"flex",gap:dk?8:4,justifyContent:"space-between",alignItems:"flex-start",paddingTop:2,animation:bottomAnim}}>{filters.options.map((s,ti)=>{const tabDelay=(animateBottom?380:0)+ti*60;return(<button key={s} onClick={()=>filters.setActive(s)} style={{fontFamily:MONO,fontSize:dk?18:12,fontWeight:filters.active===s?700:400,padding:dk?"7px 22px":"4px 6px",background:filters.active===s?"rgba(74,246,38,0.15)":"none",border:"1px solid rgba(0,0,0,0.06)",cursor:"pointer",color:"#000",letterSpacing:0.3,textTransform:"lowercase",whiteSpace:"nowrap",animation:`filterTabPop 0.38s cubic-bezier(0.34,1.56,0.64,1) ${tabDelay}ms both`}}>{s}</button>)})}</div>}
     {!filters&&years&&years.length>1&&<div key="years" style={{animation:bottomAnim}}><YearCarousel years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} dk={dk}/></div>}
   </div>);
 }
@@ -260,7 +260,7 @@ function FloatingDice({onRoll,introDelay=1100}){const[rolling,setRolling]=useSta
   useEffect(()=>{const mm=e=>onMove(e.clientX,e.clientY),mu=()=>onUp(),tm=e=>onMove(e.touches[0].clientX,e.touches[0].clientY),tu=()=>onUp();window.addEventListener("mousemove",mm);window.addEventListener("mouseup",mu);window.addEventListener("touchmove",tm,{passive:true});window.addEventListener("touchend",tu);return()=>{window.removeEventListener("mousemove",mm);window.removeEventListener("mouseup",mu);window.removeEventListener("touchmove",tm);window.removeEventListener("touchend",tu)}});
   if(pos.x===null)return null;const deskDice=typeof window!=="undefined"&&window.innerWidth>768;const S=36,R=S/2;
   const ds=(t,l)=>({position:"absolute",width:5,height:5,borderRadius:"50%",background:"rgba(0,255,65,0.6)",boxShadow:"0 0 4px rgba(0,255,65,0.3)",top:t,left:l,transform:"translate(-50%,-50%)"});const fs=tr=>({position:"absolute",width:S,height:S,border:"1.5px solid rgba(0,255,65,0.35)",background:"rgba(0,255,65,0.05)",transform:tr});
-  return(<div onMouseDown={e=>{e.preventDefault();onDown(e.clientX,e.clientY)}} onTouchStart={e=>onDown(e.touches[0].clientX,e.touches[0].clientY)} style={{position:"fixed",left:pos.x,top:pos.y,zIndex:99999,cursor:"grab",userSelect:"none",WebkitUserSelect:"none",touchAction:"none",padding:10,transform:deskDice?"scale(1.4)":"none",transformOrigin:"center",animation:`diceGlitch 0.5s steps(12,end) ${introDelay}ms both`}}>
+  return(<div onMouseDown={e=>{e.preventDefault();onDown(e.clientX,e.clientY)}} onTouchStart={e=>onDown(e.touches[0].clientX,e.touches[0].clientY)} style={{position:"fixed",left:pos.x,top:pos.y,zIndex:99999,cursor:"grab",userSelect:"none",WebkitUserSelect:"none",touchAction:"none",padding:10,transform:deskDice?"scale(1.12)":"none",transformOrigin:"center",animation:`diceGlitch 0.5s steps(12,end) ${introDelay}ms both`}}>
     <style>{`@keyframes dF{0%{transform:rotateX(15deg) rotateY(0) translateY(0)}25%{transform:rotateX(20deg) rotateY(90deg) translateY(-4px)}50%{transform:rotateX(10deg) rotateY(180deg) translateY(1px)}75%{transform:rotateX(18deg) rotateY(270deg) translateY(4px)}100%{transform:rotateX(15deg) rotateY(360deg) translateY(0)}}@keyframes dR{0%{transform:rotateX(0) rotateY(0) rotateZ(0)}100%{transform:rotateX(720deg) rotateY(540deg) rotateZ(360deg)}}@keyframes diceGlitch{0%{opacity:0;filter:hue-rotate(0deg) contrast(1) blur(0)}8%{opacity:1;filter:hue-rotate(60deg) contrast(1.3) blur(1px);clip-path:inset(10% 0 40% 0)}16%{opacity:0.3;filter:hue-rotate(30deg) contrast(1.15);clip-path:inset(60% 0 5% 0)}24%{opacity:1;filter:hue-rotate(-40deg) contrast(1.3);clip-path:inset(25% 0 25% 0)}32%{opacity:0.6;filter:hue-rotate(20deg) contrast(1.1);clip-path:inset(0 0 70% 0)}42%{opacity:1;filter:hue-rotate(-20deg) contrast(1.2);clip-path:inset(45% 0 15% 0)}55%{opacity:0.4;filter:hue-rotate(55deg) contrast(1.15);clip-path:inset(0 40% 0 0)}68%{opacity:1;filter:hue-rotate(-10deg) contrast(1.08);clip-path:inset(0 0 0 30%)}82%{opacity:0.7;filter:hue-rotate(5deg) contrast(1.04);clip-path:none}100%{opacity:1;filter:hue-rotate(0deg) contrast(1) blur(0);clip-path:none}}`}</style>
     <div style={{perspective:200}}><div style={{width:S,height:S,position:"relative",transformStyle:"preserve-3d",animation:rolling?"dR 0.6s ease-out":"dF 8s ease-in-out infinite"}}>
       <div style={fs(`translateZ(${R}px)`)}><div style={ds("50%","50%")}/></div><div style={fs(`rotateY(180deg) translateZ(${R}px)`)}><div style={ds("20%","20%")}/><div style={ds("80%","80%")}/></div><div style={fs(`rotateY(90deg) translateZ(${R}px)`)}><div style={ds("20%","20%")}/><div style={ds("50%","50%")}/><div style={ds("80%","80%")}/></div><div style={fs(`rotateY(-90deg) translateZ(${R}px)`)}><div style={ds("25%","25%")}/><div style={ds("25%","75%")}/><div style={ds("75%","25%")}/><div style={ds("75%","75%")}/></div><div style={fs(`rotateX(90deg) translateZ(${R}px)`)}><div style={ds("22%","22%")}/><div style={ds("22%","78%")}/><div style={ds("50%","50%")}/><div style={ds("78%","22%")}/><div style={ds("78%","78%")}/></div><div style={fs(`rotateX(-90deg) translateZ(${R}px)`)}><div style={ds("22%","28%")}/><div style={ds("22%","72%")}/><div style={ds("50%","28%")}/><div style={ds("50%","72%")}/><div style={ds("78%","28%")}/><div style={ds("78%","72%")}/></div>
@@ -379,11 +379,11 @@ const DeskRow=memo(function DeskRow({e,search,onOpen}){
       <div className="ukho-sel"/>
       <div style={{fontFamily:ARCH,fontSize:28,fontWeight:400,color:"rgba(0,0,0,0.1)",letterSpacing:"-0.5px"}}>{e.id}</div>
       <div style={{fontFamily:ARCH,fontSize:25,fontWeight:400,color:"#000",letterSpacing:"-0.3px",whiteSpace:"pre-line"}}>{q?hlMatch(e.n,q):e.n}</div>
-      <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pr.map((p,i)=><div key={i}>{q?hlMatch(p,q):p}</div>)}</div>
-      <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.map((p,i)=><div key={i}>{q?hlMatch(p,q):p}</div>)}</div>
-      <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pl}</div>
-      <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.t}</div>
-      <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.d}</div>
+      <div style={{fontFamily:FONT,fontSize:14,color:"#000",lineHeight:1.5}}>{e.pr.map((p,i)=><div key={i}>{q?hlMatch(p,q):p}</div>)}</div>
+      <div style={{fontFamily:FONT,fontSize:14,color:"#000",lineHeight:1.5}}>{e.pe.map((p,i)=><div key={i}>{q?hlMatch(p,q):p}</div>)}</div>
+      <div style={{fontFamily:FONT,fontSize:14,color:"#000",lineHeight:1.5}}>{e.pl}</div>
+      <div style={{fontFamily:FONT,fontSize:14,color:"#000",lineHeight:1.5}}>{e.t}</div>
+      <div style={{fontFamily:FONT,fontSize:14,color:"#000",lineHeight:1.5}}>{e.d}</div>
     </div>);
 });
 
@@ -1328,9 +1328,9 @@ function RiddlesPage({onOpenEvent,events}){
     <div style={{flex:1,padding:`${menuH}px clamp(16px,5vw,40px) 12px`,overflow:"hidden",minHeight:0}}>
       <div style={{width:"100%",maxWidth:600,margin:"0 auto",height:"100%",display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
         {/* Hidden measurer for full text height */}
-        <div ref={measureRef} style={{fontFamily:MONO,fontSize:"clamp(14px,3vw,17px)",lineHeight:1.6,letterSpacing:.3,position:"absolute",visibility:"hidden",width:"100%",maxWidth:600,padding:`0 clamp(16px,5vw,40px)`}}>{fullText}</div>
+        <div ref={measureRef} style={{fontFamily:MONO,fontSize:"clamp(11px,2.4vw,14px)",lineHeight:1.6,letterSpacing:.3,position:"absolute",visibility:"hidden",width:"100%",maxWidth:600,padding:`0 clamp(16px,5vw,40px)`}}>{fullText}</div>
         <div style={{minHeight:Math.max(textH||0,window.innerHeight*(isDesk?0.35:0.4)),maxHeight:"100%",overflow:"hidden"}}>
-          <div style={{fontFamily:MONO,fontSize:"clamp(14px,3vw,17px)",lineHeight:1.6,letterSpacing:.3,color:"rgba(0,0,0,0.9)"}}>
+          <div style={{fontFamily:MONO,fontSize:"clamp(11px,2.4vw,14px)",lineHeight:1.6,letterSpacing:.3,color:"rgba(0,0,0,0.9)"}}>
             {displayed}
             <span style={{display:"inline-block",width:6,height:13,background:"rgba(0,255,65,0.8)",verticalAlign:"middle",marginLeft:2,animation:"rcBlink 0.7s step-end infinite"}}/>
           </div>
@@ -1360,7 +1360,7 @@ function RiddlesPage({onOpenEvent,events}){
         </div>
         <div style={{width:1,height:14,background:"rgba(255,255,255,0.12)"}}/>
         {/* Door */}
-        <div onClick={enterEvent} style={{cursor:"pointer",perspective:200,padding:4,transform:isDesk?"scale(1.4)":"none",transformOrigin:"center",animation:"rGlitch 0.5s steps(12,end) 780ms both"}}>
+        <div onClick={enterEvent} style={{cursor:"pointer",perspective:200,padding:4,transform:isDesk?"scale(1.12)":"none",transformOrigin:"center",animation:"rGlitch 0.5s steps(12,end) 780ms both"}}>
           <div style={{width:36,height:42,position:"relative",transformStyle:"preserve-3d",animation:entering?"doorEnter 0.6s ease-out":"doorFloat 8s ease-in-out infinite",pointerEvents:"none"}}>
             <div style={{position:"absolute",width:32,height:40,top:1,left:2,border:"1.5px solid rgba(0,255,65,0.4)",background:"rgba(0,255,65,0.03)",transform:"translateZ(-5px)"}}/>
             <div style={{position:"absolute",width:18,height:38,top:2,right:0,transformOrigin:"right center",transform:"rotateY(-50deg) translateZ(3px)",background:"rgba(0,255,65,0.08)",border:"1.5px solid rgba(0,255,65,0.5)"}}>
