@@ -816,7 +816,7 @@ function HomeCanvas(){
     const DPR=Math.min(window.devicePixelRatio||1,2);
     function resize(){W=window.innerWidth;H=window.innerHeight;canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0);cx=W/2;cy=H/2;}
     resize();window.addEventListener('resize',resize);
-    const COLS=36,ROWS=22,grid=new Float32Array(COLS*ROWS),vel=new Float32Array(COLS*ROWS);
+    const COLS=24,ROWS=14,grid=new Float32Array(COLS*ROWS),vel=new Float32Array(COLS*ROWS);
     const $=(x,y)=>y*COLS+x;
     let pTick=0;
     function physics(){if(++pTick%2!==0)return;const d=0.994,c=0.30;for(let y=1;y<ROWS-1;y++)for(let x=1;x<COLS-1;x++){const i=$(x,y);const l=grid[$(x+1,y)]+grid[$(x-1,y)]+grid[$(x,y+1)]+grid[$(x,y-1)]-4*grid[i];vel[i]=(vel[i]+c*l)*d;grid[i]+=vel[i];}for(let x=0;x<COLS;x++){grid[$(x,0)]*=.4;grid[$(x,ROWS-1)]*=.4;}for(let y=0;y<ROWS;y++){grid[$(0,y)]*=.4;grid[$(COLS-1,y)]*=.4;}}
@@ -852,7 +852,7 @@ function HomeCanvas(){
       const cDx=(mSmooth.x-.5)*2,cDy=(mSmooth.y-.5)*2,cDist=Math.min(1,Math.sqrt(cDx*cDx+cDy*cDy)),cBias=1+(1-cDist)*.25,dPR=pullR*(1+(1-cDist)*.25);
       const pts=[];
       for(let y=0;y<ROWS;y++){pts[y]=[];const fy=y/(ROWS-1),baseY=Math.pow(fy,1.7)*H,ds=.25+fy*1.5;for(let x=0;x<COLS;x++){const v=grid[$(x,y)],px=x*cW,py=baseY+v*55*ds;const ddx=mX-px,ddy=mY-py,dist=Math.sqrt(ddx*ddx+ddy*ddy),ease=Math.max(0,1-dist/dPR),pull=ease*ease;pts[y][x]={px:px+ddx/Math.max(1,dist)*pull*18*cBias,py:py+ddy/Math.max(1,dist)*pull*18*cBias*.4};}}
-      for(let y=0;y<ROWS-1;y++){const fy=(y+.5)/(ROWS-1),dO=.25+fy*.75;for(let x=0;x<COLS-1;x++){const tl=pts[y][x],tr=pts[y][x+1],bl=pts[y+1][x],br=pts[y+1][x+1];const vA=(grid[$(x,y)]+grid[$(x+1,y)]+grid[$(x,y+1)]+grid[$(x+1,y+1)])*.25;const sh=Math.max(140,Math.min(255,Math.round(210+vA*150)));const fA=Math.min(.32,(.05+Math.abs(vA)*2.2)*dO*bf);if(fA<.007)continue;ctx.beginPath();ctx.moveTo(tl.px,tl.py);ctx.lineTo(tr.px,tr.py);ctx.lineTo(br.px,br.py);ctx.lineTo(bl.px,bl.py);ctx.closePath();ctx.fillStyle=`rgba(${sh},${sh},${sh},${fA.toFixed(3)})`;ctx.fill();}}
+      for(let y=0;y<ROWS-1;y++){const fy=(y+.5)/(ROWS-1),dO=.25+fy*.75;for(let x=0;x<COLS-1;x++){const tl=pts[y][x],tr=pts[y][x+1],bl=pts[y+1][x],br=pts[y+1][x+1];const vA=(grid[$(x,y)]+grid[$(x+1,y)]+grid[$(x,y+1)]+grid[$(x+1,y+1)])*.25;const sh=Math.max(140,Math.min(255,Math.round(210+vA*150)));const fA=Math.min(.32,(.05+Math.abs(vA)*2.2)*dO*bf);if(fA<.015)continue;ctx.beginPath();ctx.moveTo(tl.px,tl.py);ctx.lineTo(tr.px,tr.py);ctx.lineTo(br.px,br.py);ctx.lineTo(bl.px,bl.py);ctx.closePath();ctx.fillStyle=`rgba(${sh},${sh},${sh},${fA.toFixed(3)})`;ctx.fill();}}
       for(let y=0;y<ROWS;y++){const fy=y/(ROWS-1),dO=.3+fy*.7,dW=.4+fy;const mid=grid[$(Math.floor(COLS/2),y)],en=Math.min(1,Math.abs(mid)*4);ctx.beginPath();for(let x=0;x<COLS;x++){const p=pts[y][x];x===0?ctx.moveTo(p.px,p.py):ctx.lineTo(p.px,p.py);}const baseY=Math.pow(fy,1.7)*H,rD=Math.sqrt((mX-W*.5)**2+(baseY-mY)**2),mag=Math.max(0,1-rD/magR)*.72*cBias;const a=Math.min(.88,(.04+en*.75+mag*.6+fxEnergy*.2)*bf*dO);ctx.strokeStyle=Math.abs(mid)<.02?GRY(90,a):mid>0?GRN(a):BLU(a);ctx.lineWidth=(.18+en*1.2+mag*1.5)*dW;ctx.stroke();}
       bPhase+=.016;const bY=H*.5+Math.sin(t*.18)*H*.08,sEn=Math.min(1,Math.abs(G(.5,bY/H))*6+fxEnergy*.5);
       ctx.beginPath();for(let x=0;x<W;x+=4){const f=x/W,g=G(f,bY/H),bA=5*Math.sin(f*Math.PI),amp=bA*(1+Math.abs(g)*1.8)+sEn*4*Math.sin(f*Math.PI);const py=bY+Math.sin(x*.04-bPhase*(1+f*2))*amp;x===0?ctx.moveTo(x,py):ctx.lineTo(x,py);}ctx.strokeStyle=GRN((.16+sEn*.35)*bf);ctx.lineWidth=.6+sEn*1.6;ctx.stroke();
@@ -861,11 +861,11 @@ function HomeCanvas(){
       Object.values(FX).forEach(fx=>fx.draw());
     }
 
-    let last=performance.now();
-    function loop(){rafId=requestAnimationFrame(loop);const now=performance.now(),dt=Math.min(.05,(now-last)/1000);last=now;t+=dt;if(activated)bootFade=Math.min(1,bootFade+dt*.07);
+    let last=performance.now(),frameskip=0;
+    function loop(){rafId=requestAnimationFrame(loop);if(++frameskip&1)return;const now=performance.now(),dt=Math.min(.05,(now-last)/1000);last=now;t+=dt;if(activated)bootFade=Math.min(1,bootFade+dt*.07);
       mouseVel*=.78;mSmooth.x+=(mouse.x-mSmooth.x)*.14;mSmooth.y+=(mouse.y-mSmooth.y)*.14;
-      if(Math.random()<.09)poke(.15+Math.random()*.7,.15+Math.random()*.7,.55+Math.random()*.6,.07);
-      if(Math.random()<.65)poke(mouse.x,mouse.y,.25+mouseVel*.8,.03);
+      if(Math.random()<.05)poke(.15+Math.random()*.7,.15+Math.random()*.7,.55+Math.random()*.6,.07);
+      if(Math.random()<.35)poke(mouse.x,mouse.y,.25+mouseVel*.8,.03);
       physics();tickFX(dt);draw();}
     const vis=()=>{if(document.hidden){cancelAnimationFrame(rafId);rafId=null;}else{last=performance.now();loop();}};
     document.addEventListener('visibilitychange',vis);loop();
