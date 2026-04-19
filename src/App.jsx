@@ -387,20 +387,33 @@ const DeskRow=memo(function DeskRow({e,search,onOpen}){
     </div>);
 });
 
-function DeskTable({filtered,search,setSearch,onOpenEvent,years,yearFilter,setYearFilter,setMode,skipBarIntro,deskTopH,headerH,totalH,ROW_H,COLS}){
-  const scrollRef=useRef(0);
-  const[visRange,setVisRange]=useState([0,20]);
+function DeskTable({filtered,search,setSearch,onOpenEvent,years,yearFilter,setYearFilter,setMode,skipBarIntro,deskTopH,COLS}){
+  const heightCache=useRef(new Map());
+  const rowRefs=useRef(new Map());
+  const containerRef=useRef(null);
   const rafRef=useRef(null);
-  const OVERSCAN=10;
+  const OVERSCAN=25;
+  const EST_H=120;
+  const headerH=deskTopH+44;
+
+  const getH=useCallback(id=>heightCache.current.get(id)||EST_H,[]);
+
+  const[visRange,setVisRange]=useState([0,40]);
 
   useEffect(()=>{
     const calc=()=>{
       const sy=window.scrollY;
-      scrollRef.current=sy;
-      const viewTop=sy-headerH;
-      const viewBot=viewTop+window.innerHeight;
-      const first=Math.max(0,Math.floor(viewTop/ROW_H)-OVERSCAN);
-      const last=Math.min(filtered.length,Math.ceil(viewBot/ROW_H)+OVERSCAN);
+      const vpTop=sy-headerH;
+      const vpBot=vpTop+window.innerHeight;
+      let accum=0,first=0,last=filtered.length;
+      for(let i=0;i<filtered.length;i++){
+        const h=getH(filtered[i].id);
+        if(accum+h>vpTop&&first===0&&i>0)first=i;
+        if(accum>vpBot){last=i;break}
+        accum+=h;
+      }
+      first=Math.max(0,first-OVERSCAN);
+      last=Math.min(filtered.length,last+OVERSCAN);
       setVisRange(prev=>prev[0]===first&&prev[1]===last?prev:[first,last]);
       rafRef.current=null;
     };
@@ -408,7 +421,18 @@ function DeskTable({filtered,search,setSearch,onOpenEvent,years,yearFilter,setYe
     calc();
     window.addEventListener("scroll",onScroll,{passive:true});
     return()=>{window.removeEventListener("scroll",onScroll);if(rafRef.current)cancelAnimationFrame(rafRef.current)};
-  },[filtered.length,headerH,ROW_H]);
+  },[filtered,headerH,getH]);
+
+  useEffect(()=>{
+    rowRefs.current.forEach((el,id)=>{
+      if(el){const h=el.offsetHeight;if(h>0)heightCache.current.set(id,h)}
+    });
+  });
+
+  let topPad=0;
+  for(let i=0;i<visRange[0];i++)topPad+=getH(filtered[i]?.id);
+  let botPad=0;
+  for(let i=visRange[1];i<filtered.length;i++)botPad+=getH(filtered[i]?.id);
 
   const evById=useMemo(()=>{const m=new Map();filtered.forEach(e=>m.set(String(e.id),e));return m},[filtered]);
   const handleRowClick=useCallback(e=>{
@@ -420,19 +444,21 @@ function DeskTable({filtered,search,setSearch,onOpenEvent,years,yearFilter,setYe
     const rows=[];
     for(let i=visRange[0];i<visRange[1];i++){
       const e=filtered[i];if(!e)continue;
-      rows.push(<div key={e.id} style={{position:"absolute",top:headerH+i*ROW_H,left:0,right:0,minHeight:ROW_H}}>
+      rows.push(<div key={e.id} ref={el=>{if(el)rowRefs.current.set(e.id,el);else rowRefs.current.delete(e.id)}}>
         <DeskRow e={e} search={search}/>
       </div>);
     }
     return rows;
-  },[visRange,filtered,search,headerH,ROW_H]);
+  },[visRange,filtered,search]);
 
-  return(<div onClick={handleRowClick} style={{background:"white",minHeight:totalH,position:"relative"}}>
+  return(<div onClick={handleRowClick} style={{background:"white",minHeight:"100vh"}}>
     <style>{`@keyframes colHead{0%{opacity:0;transform:translateY(-8px)}100%{opacity:1;transform:translateY(0)}}`}</style>
     <div style={{position:"fixed",top:deskTopH,left:0,right:0,zIndex:940,background:"rgba(255,255,255,0.7)",backdropFilter:"blur(50px) saturate(180%)",WebkitBackdropFilter:"blur(50px) saturate(180%)",padding:"8px 16px",display:"grid",gridTemplateColumns:COLS,gap:8,boxShadow:"0 1px 8px rgba(0,0,0,0.04)",animation:"colHead 0.35s cubic-bezier(0.34,1.4,0.5,1) 450ms both"}}>
       {["#","name","program","performers","place","tags","date"].map(l=><div key={l} style={{fontFamily:FONT,fontSize:12,fontWeight:700,color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase"}}>{l}</div>)}
     </div>
-    <div>{visibleRows}</div>
+    <div ref={containerRef} style={{paddingTop:headerH+topPad,paddingBottom:Math.max(40,botPad)}}>
+      {visibleRows}
+    </div>
     <BottomBar search={search} setSearch={setSearch} onTop={()=>window.scrollTo({top:0,behavior:"smooth"})} onBottom={()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})} onToggleMode={()=>setMode("everything")} modeLabel="everything" onPrev={()=>{}} onNext={()=>{}} matchIdx={0} matchCount={0} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} introDelay={300} skipIntro={skipBarIntro}/>
     <FloatingDice onRoll={()=>{const e=filtered[Math.floor(Math.random()*filtered.length)];if(e)onOpenEvent?.(e)}} introDelay={2000}/>
   </div>);
@@ -599,11 +625,8 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   // ── DESKTOP: table rows (virtualized) ──
   if(isDesk){
     const COLS="40px 2fr 2fr 2fr 1.2fr 1fr 0.8fr";
-    const ROW_H=120;
     const barB2=document.getElementById('ukho-bar');const deskTopH=barB2?barB2.offsetTop+barB2.offsetHeight:menuH+BAR_H;
-    const headerH=deskTopH+44;
-    const totalH=headerH+filtered.length*ROW_H+40;
-    return (<DeskTable filtered={filtered} search={search} setSearch={setSearch} onOpenEvent={onOpenEvent} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} setMode={setMode} skipBarIntro={skipBarIntro} deskTopH={deskTopH} headerH={headerH} totalH={totalH} ROW_H={ROW_H} COLS={COLS}/>);
+    return (<DeskTable filtered={filtered} search={search} setSearch={setSearch} onOpenEvent={onOpenEvent} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} setMode={setMode} skipBarIntro={skipBarIntro} deskTopH={deskTopH} COLS={COLS}/>);
   }
 
   // ── MOBILE: card swipe ──

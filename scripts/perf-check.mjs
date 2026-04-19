@@ -7,7 +7,7 @@ const BASE = `http://localhost:${PORT}`;
 
 const BUDGETS = {
   bundleSizeKB: 1400,
-  domNodes: { Home: 80, CardIndex: 1500, List: 500, Everything: 350, Event: 150 },
+  domNodes: { Home: 80, CardIndex: 1500, List: 700, Everything: 350, Event: 150 },
   heapMB: 20,
 };
 
