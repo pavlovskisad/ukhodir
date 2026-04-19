@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, memo } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { USDLoader } from "three/addons/loaders/USDLoader.js";
@@ -8,7 +8,8 @@ import { PROGRAMS } from './programs.js';
 const FONT="'Satoshi',sans-serif";const MONO="'Commit Mono',monospace";const ARCH="'Archaism','Satoshi',sans-serif";
 const GREEN="#4af626";const BLUE="#0000ff";const HEADER_H=80;const BAR_H=48;
 const FIELD_KEYS=["name","program","performers","place","tags","date"];
-const norm=s=>s.toLowerCase().replace(/[\u00a0\u2002-\u200b]/g," ").replace(/[\u2018\u2019\u2032\u0060]/g,"'").replace(/[\u201c\u201d]/g,'"').normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const _normCache=new Map();
+const norm=s=>{let r=_normCache.get(s);if(r!==undefined)return r;r=s.toLowerCase().replace(/[\u00a0\u2002-\u200b]/g," ").replace(/[\u2018\u2019\u2032\u0060]/g,"'").replace(/[\u201c\u201d]/g,'"').normalize("NFD").replace(/[\u0300-\u036f]/g,"");_normCache.set(s,r);return r};
 const strip=s=>norm(s).replace(/[\u0400-\u04ff]/g,c=>{const m={"\u0430":"a","\u0435":"e","\u043e":"o","\u0440":"p","\u0441":"c","\u0443":"y","\u0445":"x","\u0456":"i","\u0457":"i"};return m[c]||""}).replace(/[^a-z0-9]/g,"");
 const PIECE_EV={["Alla Zagaykevych — \"Et dans un long tournoiement j'entrerai dedans l'étang céleste…\" (1996) for instrumental trio and electronics — on verses by Oleh Lysheha"]:56,["John Cage — Dream (1948, arr. Margaret Leng Tan) for toy piano and grand piano"]:3,["John Lennon / Paul McCartney (arr. Toby Twining) — Eleanor Rigby (1966/2002) for toy piano and toy instruments"]:3,["Marion Sinclair — Kookaburra sits in the old gum tree (1932)"]:3,["Johann Strauss II / arr. Alban Berg — Wein, Weib und Gesang, Op. 333 (1921) for string quartet and piano"]:5,["Johann Strauss II / arr. Arnold Schoenberg — Rosen aus dem Süden, Op. 388 (1921) for string quartet and piano"]:5,["Johann Strauss II / arr. Anton Webern — Schatz-Walzer, Op. 418 (1921) for string quartet and piano"]:5,["Nick Roth, Olesya Zdorovetska, Lauren Kinsella, Simon Roth, Mark Tokar — Happy New Ears (2012), a live improv"]:6,["Luciano Berio — Points on the Curve to Find… (1974) for piano and chamber orchestra"]:12,["Giya Kancheli — A little Daneliade (1996) for violin, piano and strings"]:14,["Giya Kancheli — Abii ne Viderem (1992) for string orchestra and viola"]:14,["Victoria Poleva — Gagaku: Tadashi Endo's solo butoh performance to the recording of the piece (2012)"]:14,["Anonymous — The Nightingale (13th–14th c.)"]:16,["Anonymous — Tu solus Dominus (10th–12th c.)"]:16,["Uliana Horbachevska, Mark Tokar, Petras Vyšniauskas, Klaus Kugel — Ultramarine (2012), live improvisation"]:19,["Guy Klucevsek — Selected works for accordion solo (2013)"]:21,["Arturs Maskats — Concerto Grosso (1996) for violin, cello, percussion, and string orchestra"]:27,["Svyatoslav Lunyov — Bad Tempered Songs (1994), mono-opera for voice and chamber orchestra, to texts by Lewis Carroll"]:30,["Antonio Correa — 5 Short pieces (2013) for piano"]:33,["Antonio Correa — Day 5 (2013) for piano"]:33,["Melaine Dalibert — Ballade (2014) for piano"]:33,["Melaine Dalibert — Cortège (2011) for piano"]:33,["John Psathas — Sleeper (2011) for piano"]:33,["Alexey Shmurak, Oleh Shpudeiko, with Dariia Kuzmych — The Glass Bead Game (2014), an audiovisual performance"]:35,["William Byrd — John, Come Kiss Me Now (late 16th–early 17th c.)"]:42,["Ghédalia Tazartès — Coda Lunga (2012) for voice and tape"]:44,["Nataliia Polovynka, Slovo i Holos (Word and Voice) — IRMOS. Rejoice: Chants to the Mother of God, the Chief of Chiefs (2014)"]:46,["Claudio Ambrosini — Incipit (2017) for ensemble"]:52,["Phil Minton, Audrey Chen — Site-responsive vocal improvisation (2015, Museum of Natural History, Kyiv)"]:55,["Šarūnas Nakas — Aporia (2001) for three instrumental groups"]:56,["Johannes Schöllhorn — Dias, koloriert (2010) for chamber ensemble (drei neue Anamorphosen nach der Kunst der Fuge von J.S. Bach)"]:58,["Boris Filanovsky — Scompositio (2014), mono-opera for voice, 13 instruments, and audio projection"]:62,["Montpellier Codex — Alle psallite cum luya (13th c.)"]:65,["Montpellier Codex — Amor potest conqueri (13th c.)"]:65,["Montpellier Codex — Huic ut placuit (13th c.)"]:65,["Nick Roth, Olesya Zdorovetska, Fulvio Sigurtà, Alex Roth, Jack McMahon — .AVI: I (2015), audiovisual improvisation with live drawing by Jenya Tchaikovska"]:68,["Dmytro Radzetsky, Ukrainian Improvisers Orchestra — .AVI II (2015), a live improv with contingent scenography by Katya Libkind and Olga Gaidash"]:69,["Audrey Chen, Henrik Munkeby Nørstebø — .AVI 3 (2015), an audiovisual improvisation with butoh dancers Flavia Ghisalberti and Valentin Tszin"]:70,["Baudouin de Jaer — Adolf Wölfli's Musical Cryptograms (2015), lecture-concert"]:74,["Mkhitar Ayrivanetsi — liturgical monody (c. 1235–1297/1300)"]:78,["Grigor Narekatsi — Liturgical monody (951–1003)"]:78,["Jaan Rääts — Sonata for Two Pianos, Op.82 (1990), for two pianos"]:79,["Monk of Salzburg — Martin, lieber Herre (14th c.)"]:80,["Igor Stravinsky — Symphonies of wind instruments (1920), transcribed for button accordion solo by Leonid Hrabovsky (2011–2012)"]:87,["Leonid Hrabovsky — Ornaments (1969/1987) for oboe, viola, and harp"]:88,["Valentyn Silvestrov — Maidan 2014, choral cantata"]:89,["Peter Cusack — Sounds from Dangerous Places (2012), audioinstallation"]:92,["Kazuki Tomokawa — The Voice of the Screaming Soul (2016), for voice and acoustic guitar, solo live"]:94,["Audrey Chen, Phil Minton, Henrik Munkeby Nørstebø, Thomas Rohrer, Michael Vorfeld — Medea (2016), an improvised butoh opera with Valentin Tszin, Flavia Ghisalberti, Poema Theatre, and thirty butoh dancers"]:96,["Thomas Ravenscroft — Come Drink to Me (1609)"]:96,["Kirill Chernegin — Untitled IX (2015), version for vocal ensemble"]:97,["Samuel Andreyev — Cosa arcana e stupenda (2017) for ensemble"]:110,["Luca Antignani — Cosa Arcana (2017) for ensemble"]:110,["Federico Costanza — Nel vortice così come nel nervo (2017) for ensemble"]:110,["François Couturier — The Man Who Saw The Angel (2008) for chamber orchestra"]:110,["François Couvreur — Cosa Arcana e stupenda (2017) for ensemble"]:110,["Gualtiero Dazzi — Cosa arcana (2017) for ensemble"]:110,["Konstantia Gourzi — Beauty (2017) for ensemble"]:110,["Daan Jansens — …qui me réduit au silence (2017) for ensemble"]:110,["Florian Mosch — Litanies nocturnes (2017) for ensemble"]:110,["Dmytro Pashinsky — Cosa Arcana e Stupenda (2017) for ensemble"]:110,["Antonio Politano — …del suono, i suoi sublimi inganni… (2017) for ensemble"]:110,["Filip Rathé — El agua y la muerte (2014), Avec diamants extrêmes (2009–2019) for ensemble"]:110,["Filip Rathé — La fiamma vitale (2017) for ensemble"]:110,["Mark-Andreas Schlingensiepen — Cosa arcana e stupenda (2017) for ensemble"]:110,["Ruth Wiesenfeld — Oscuro (2016) for large ensemble"]:110,["Ihor Zavhorodnii — Cosa arcana e stupenda (2017) for ensemble"]:110,["Alexey Shmurak, Oleh Shpudeiko — Orange Songs: Sound Theatre (2016) for voice, piano, electric guitar, toy instruments and computer"]:111,["Carmine Emanuele Cella — Pane, Sale, Sabbia (2017), an opera to the libretto by Rossano Baronciani"]:116,["Iannis Xenakis — Jalons (1986) for fifteen musicians"]:118,["Iannis Xenakis — Échange (1989) for bass clarinet and ensemble"]:118,["Alexey Shmurak, Oleh Shpudeiko, Mark Buloshnikov — Around Silvestrov (2017), live performance for voice, pianos and electronics"]:120,["Viktor Marushchenko — Valentyn Silvestrov: An adjacent frame (2017), documentary installation built from previously unseen footage"]:122,["Valentyn Silvestrov — Projections (1965) for harpsichord, vibraphone and tubular bells"]:122,["Jacopo Facchini, Michele Foresi — Site-responsive piece for Sasha Kutovyi's A Good Man Hard to Find (2017), for voice and electronics"]:126,["Jacopo Fachini — electroacoustic vocal intervention within Oleksandr Kutovyi's installation"]:126,["Oleh Shpudeiko (Heinali), Volodymyr Shpudeiko — Synthtap performance using modular synthesis (2017)"]:127,["Katya Libkind, Sasha Andrusyk — Bad Trips (Everyday) — A Collective Exhibition with Mothers (performative intervention)"]:128,["Katya Buchatska — Lethe (2018), audiovisual installation"]:135,["Dariia Kuzmych — Map of Exit from the Body of the City (2018), mixed-media exhibition"]:135,["Tomomi Adachi, Hannah Silva — Pluto is a planet! (2018), live performance for voice, electronics, sensor-based interaction and a participatory choir"]:137,["Natalia Pschenitschnikova — Voice of Zangezi (2018), mono-opera set to a text by Velimir Khlebnikov, for soprano and electronics"]:144,["Katya Libkind, Sasha Andrusyk, Mykhailo Bogachov, FORMA — Subsoil Assets (Korysni kopalyny): An exhibition of operas in the pavilion of memories (2021), based on recordings of operas by Salvatore Sciarrino, Carmine Emanuele Cella, and Stefano Gervasoni"]:149,["Stefano Gervasoni — Limbus Limbo (2012), apéro bouffe for four singers, ensemble, and electronics"]:153,["Salvatore Sciarrino — Vanitas. Natura morta in un atto (1981), mono-opera for mezzo-soprano, cello, and piano"]:158,["Ian Spektor, Max Werner, Alexey Gnedenko — Noisy Intro (2022), a live electroacoustic performance"]:160,["Alexey Shmurak — Liebestod (2024), quadraphonic audio installation developed from Liebestod album material"]:163,["ujif_notfound, Alisa Haspyd, Yevhen Ulianov — Lotto-cola, Mid-Devourers, and Other Stories in the Dark (2024), live electroacoustic performance based on texts by Halyna Tkachuk"]:165,["Alexey Shmurak — Four Quadrae (2023) for voice, piano, harpsichord, electronics"]:168,["Alexey Shmurak — Weightlessness (2023) for voice, piano, harpsichord, electronics"]:168,["BEAMSPLITTER (Audrey Chen and Henrik Munkeby Nørstebø) — Medea in the Gardens of the Hesperides, an improvised electroacoustic performance accompanied by a visual project of Lisa Biletska"]:170,["Lisa Biletska — Medea in the Gardens of the Hesperides (2023), digital diptych"]:170,["Ian Spektor — Death in June (2024), audio installation"]:173,["Alexey Shmurak, Oleh Shpudeiko, with Vira Marchenko — Solovey (2018), multimedia performance engaging voice, speech, song, sign, space, and meditation"]:174,["Oleh Shpudeiko (Heinali) — Kyiv Eternal (2023), audiovisual installation with visuals by Kachna Baraniewicz and Maryna Osnach"]:174,["Ying Wang — Illuminations (2022) for piano, voice, and electronics"]:176,["Elena Subach — LIMBO (2024), a pop-up exhibition"]:177,["Isaac de Judea, Olga Ostroverkh, Pavlo Kosenko, Oleksiy Khokhun — Cante Chico: cante de fiesta in dialogue with the teachings of Rabbi Nachman of Breslov"]:178,["Maxim Kolomiiets — Prolegomena to an Opera: Songs for Kyiv Mohyla Academy (2025) to the texts by Sasha Andrusyk, for three singers and ensemble"]:179,};
 const ANIM_MS=400;
@@ -371,6 +372,72 @@ function CardContent({ev,search,selected,showGreen,onClick}){
 
 function hlMatch(text,q){const i=text.toLowerCase().indexOf(q);if(i===-1)return text;return <span>{text.slice(0,i)}<span style={{background:"rgba(74,246,38,0.3)",padding:"0 1px"}}>{text.slice(i,i+q.length)}</span>{text.slice(i+q.length)}</span>}
 
+const DeskRow=memo(function DeskRow({e,search,onOpen}){
+  const q=search.trim()?search.toLowerCase():"";
+  return(
+    <div className="ukho-row" data-eid={e.id}>
+      <div className="ukho-sel"/>
+      <div style={{fontFamily:ARCH,fontSize:28,fontWeight:400,color:"rgba(0,0,0,0.1)",letterSpacing:"-0.5px"}}>{e.id}</div>
+      <div style={{fontFamily:ARCH,fontSize:25,fontWeight:400,color:"#000",letterSpacing:"-0.3px",whiteSpace:"pre-line"}}>{q?hlMatch(e.n,q):e.n}</div>
+      <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pr.map((p,i)=><div key={i}>{q?hlMatch(p,q):p}</div>)}</div>
+      <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.map((p,i)=><div key={i}>{q?hlMatch(p,q):p}</div>)}</div>
+      <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pl}</div>
+      <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.t}</div>
+      <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.d}</div>
+    </div>);
+});
+
+function DeskTable({filtered,search,setSearch,onOpenEvent,years,yearFilter,setYearFilter,setMode,skipBarIntro,deskTopH,headerH,totalH,ROW_H,COLS}){
+  const scrollRef=useRef(0);
+  const[visRange,setVisRange]=useState([0,20]);
+  const rafRef=useRef(null);
+  const OVERSCAN=10;
+
+  useEffect(()=>{
+    const calc=()=>{
+      const sy=window.scrollY;
+      scrollRef.current=sy;
+      const viewTop=sy-headerH;
+      const viewBot=viewTop+window.innerHeight;
+      const first=Math.max(0,Math.floor(viewTop/ROW_H)-OVERSCAN);
+      const last=Math.min(filtered.length,Math.ceil(viewBot/ROW_H)+OVERSCAN);
+      setVisRange(prev=>prev[0]===first&&prev[1]===last?prev:[first,last]);
+      rafRef.current=null;
+    };
+    const onScroll=()=>{if(!rafRef.current)rafRef.current=requestAnimationFrame(calc)};
+    calc();
+    window.addEventListener("scroll",onScroll,{passive:true});
+    return()=>{window.removeEventListener("scroll",onScroll);if(rafRef.current)cancelAnimationFrame(rafRef.current)};
+  },[filtered.length,headerH,ROW_H]);
+
+  const evById=useMemo(()=>{const m=new Map();filtered.forEach(e=>m.set(String(e.id),e));return m},[filtered]);
+  const handleRowClick=useCallback(e=>{
+    const row=e.target.closest('[data-eid]');
+    if(row){const ev=evById.get(row.dataset.eid);if(ev)onOpenEvent?.(ev)}
+  },[evById,onOpenEvent]);
+
+  const visibleRows=useMemo(()=>{
+    const rows=[];
+    for(let i=visRange[0];i<visRange[1];i++){
+      const e=filtered[i];if(!e)continue;
+      rows.push(<div key={e.id} style={{position:"absolute",top:headerH+i*ROW_H,left:0,right:0,minHeight:ROW_H}}>
+        <DeskRow e={e} search={search}/>
+      </div>);
+    }
+    return rows;
+  },[visRange,filtered,search,headerH,ROW_H]);
+
+  return(<div onClick={handleRowClick} style={{background:"white",minHeight:totalH,position:"relative"}}>
+    <style>{`@keyframes colHead{0%{opacity:0;transform:translateY(-8px)}100%{opacity:1;transform:translateY(0)}}`}</style>
+    <div style={{position:"fixed",top:deskTopH,left:0,right:0,zIndex:940,background:"rgba(255,255,255,0.7)",backdropFilter:"blur(50px) saturate(180%)",WebkitBackdropFilter:"blur(50px) saturate(180%)",padding:"8px 16px",display:"grid",gridTemplateColumns:COLS,gap:8,boxShadow:"0 1px 8px rgba(0,0,0,0.04)",animation:"colHead 0.35s cubic-bezier(0.34,1.4,0.5,1) 450ms both"}}>
+      {["#","name","program","performers","place","tags","date"].map(l=><div key={l} style={{fontFamily:FONT,fontSize:12,fontWeight:700,color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase"}}>{l}</div>)}
+    </div>
+    <div>{visibleRows}</div>
+    <BottomBar search={search} setSearch={setSearch} onTop={()=>window.scrollTo({top:0,behavior:"smooth"})} onBottom={()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})} onToggleMode={()=>setMode("everything")} modeLabel="everything" onPrev={()=>{}} onNext={()=>{}} matchIdx={0} matchCount={0} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} introDelay={300} skipIntro={skipBarIntro}/>
+    <FloatingDice onRoll={()=>{const e=filtered[Math.floor(Math.random()*filtered.length)];if(e)onOpenEvent?.(e)}} introDelay={2000}/>
+  </div>);
+}
+
 /* ── List Page — dual card transitions ── */
 function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef,progTermsRef,evScrollRef,evSecRef,cameFromEvRef}){
   const reversed=useMemo(()=>[...events].reverse(),[events]);
@@ -423,20 +490,24 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     return["all",...[...yrs].sort().reverse()];
   },[reversed]);
 
+  const[debouncedSearch,setDebouncedSearch]=useState(search);
+  const[debouncedProgTerms,setDebouncedProgTerms]=useState(progTerms);
+  useEffect(()=>{const t=setTimeout(()=>{setDebouncedSearch(search);setDebouncedProgTerms(progTerms)},80);return()=>clearTimeout(t)},[search,progTerms]);
+
   const filtered=useMemo(()=>{
     let list=reversed;
     if(yearFilter!=="all")list=list.filter(e=>e.d.includes(yearFilter));
-    if(search.trim()){
-      if(progTerms){
-        const hc=PIECE_EV[progTerms.raw];
+    if(debouncedSearch.trim()){
+      if(debouncedProgTerms){
+        const hc=PIECE_EV[debouncedProgTerms.raw];
         if(hc){list=list.filter(e=>e.id===hc)}
-        else{const q=norm(progTerms.raw);list=list.filter(e=>e.pr.some(p=>norm(p).includes(q)))}
+        else{const q=norm(debouncedProgTerms.raw);list=list.filter(e=>e.pr.some(p=>norm(p).includes(q)))}
       }else{
-        const q=norm(search);list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q));
+        const q=norm(debouncedSearch);list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q));
       }
     }
     return list;
-  },[reversed,search,yearFilter,progTerms]);
+  },[reversed,debouncedSearch,yearFilter,debouncedProgTerms]);
 
   const prevEvRef=useRef(null);
   const mountedRef=useRef(false);
@@ -525,35 +596,14 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     </div>
     <BottomBar search={search} setSearch={setSearchSwitch} onTop={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:0,behavior:"smooth"})}} onBottom={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:el.scrollHeight,behavior:"smooth"})}} onToggleMode={()=>{setEnterDir("Up");navKey.current++;setMode("list")}} modeLabel="cards" introDelay={300} skipIntro={skipBarIntro} filters={{options:Object.keys(everything),counts:filterCounts,active:evSec,setActive:setEvSec}}/></>)}
 
-  // ── DESKTOP: table rows ──
+  // ── DESKTOP: table rows (virtualized) ──
   if(isDesk){
     const COLS="40px 2fr 2fr 2fr 1.2fr 1fr 0.8fr";
-
+    const ROW_H=120;
     const barB2=document.getElementById('ukho-bar');const deskTopH=barB2?barB2.offsetTop+barB2.offsetHeight:menuH+BAR_H;
-    return (<div style={{background:"white",minHeight:"100vh"}}>
-      <style>{`@keyframes rowWave{0%{opacity:0;transform:translateY(18px)}100%{opacity:1;transform:translateY(0)}}@keyframes colHead{0%{opacity:0;transform:translateY(-8px)}100%{opacity:1;transform:translateY(0)}}`}</style>
-      {/* Column headers */}
-      <div style={{position:"fixed",top:deskTopH,left:0,right:0,zIndex:940,background:"rgba(255,255,255,0.7)",backdropFilter:"blur(50px) saturate(180%)",WebkitBackdropFilter:"blur(50px) saturate(180%)",padding:"8px 16px",display:"grid",gridTemplateColumns:COLS,gap:8,boxShadow:"0 1px 8px rgba(0,0,0,0.04)",animation:"colHead 0.35s cubic-bezier(0.34,1.4,0.5,1) 450ms both"}}>
-        {["#","name","program","performers","place","tags","date"].map(l=><div key={l} style={{fontFamily:FONT,fontSize:12,fontWeight:700,color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase"}}>{l}</div>)}
-      </div>
-      {/* Rows */}
-      <div style={{paddingTop:deskTopH+44,paddingBottom:40}}>
-        {filtered.map((e,rowIdx)=>(
-          <div key={e.id} className="ukho-row" onClick={()=>onOpenEvent?.(e)} style={{animation:`rowWave 0.35s cubic-bezier(0.25,0.8,0.3,1) ${580+Math.min(rowIdx,60)*16}ms backwards`}}>
-            <div className="ukho-sel"/>
-            <div style={{fontFamily:ARCH,fontSize:28,fontWeight:400,color:"rgba(0,0,0,0.1)",letterSpacing:"-0.5px"}}>{e.id}</div>
-            <div style={{fontFamily:ARCH,fontSize:25,fontWeight:400,color:"#000",letterSpacing:"-0.3px",whiteSpace:"pre-line"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
-            <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pr.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
-            <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
-            <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pl}</div>
-            <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.t}</div>
-            <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.d}</div>
-          </div>
-        ))}
-      </div>
-      <BottomBar search={search} setSearch={setSearch} onTop={()=>window.scrollTo({top:0,behavior:"smooth"})} onBottom={()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})} onToggleMode={()=>setMode("everything")} modeLabel="everything" onPrev={()=>{}} onNext={()=>{}} matchIdx={0} matchCount={0} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} introDelay={300} skipIntro={skipBarIntro}/>
-      <FloatingDice onRoll={()=>{const e=filtered[Math.floor(Math.random()*filtered.length)];if(e)onOpenEvent?.(e)}} introDelay={2000}/>
-    </div>);
+    const headerH=deskTopH+44;
+    const totalH=headerH+filtered.length*ROW_H+40;
+    return (<DeskTable filtered={filtered} search={search} setSearch={setSearch} onOpenEvent={onOpenEvent} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} setMode={setMode} skipBarIntro={skipBarIntro} deskTopH={deskTopH} headerH={headerH} totalH={totalH} ROW_H={ROW_H} COLS={COLS}/>);
   }
 
   // ── MOBILE: card swipe ──
@@ -1374,8 +1424,8 @@ function AnalogOverlay(){
     function buildTex(){const tw=400,th=400,tc=document.createElement('canvas');tc.width=tw;tc.height=th;const tx=tc.getContext('2d');tx.strokeStyle='rgba(0,0,0,1)';for(let i=-th;i<tw+th;i+=9){tx.beginPath();tx.moveTo(i,0);tx.lineTo(i+th,th);tx.lineWidth=0.4;tx.globalAlpha=0.06+Math.random()*0.08;tx.stroke();}texCache=tc;}
     setTimeout(buildTex,100);
     function drawParallax(dt){scrollVel*=0.88;const sp=Math.abs(scrollVel),to=Math.min(1,sp*0.012);parallaxOp+=(to-parallaxOp)*(dt*6);parallaxY+=scrollVel*dt*0.28;if(texCache)parallaxY=parallaxY%texCache.height;if(parallaxOp<0.004||!texCache)return;ctx.save();ctx.globalAlpha=parallaxOp*0.55;const tw=texCache.width,th=texCache.height,sy=((parallaxY%th)+th)%th-th;for(let y=sy;y<H+th;y+=th)for(let x=0;x<W+tw;x+=tw)ctx.drawImage(texCache,x,y);ctx.globalAlpha=parallaxOp*0.10;ctx.fillStyle='rgba(0,150,40,1)';ctx.fillRect(0,0,W,H);ctx.restore();}
-    let last=performance.now();
-    function loop(){rafId=requestAnimationFrame(loop);const now=performance.now(),dt=Math.min(0.05,(now-last)/1000);last=now;ctx.clearRect(0,0,W,H);if(!vignetteCache)buildVignette();ctx.drawImage(vignetteCache,0,0,W,H);updateSpec(dt);drawSpec();if(++grainTick>=3){grainTick=0;drawGrain();}drawScans(dt);drawGlitch(dt);}
+    let last=performance.now(),frameskip=0;
+    function loop(){rafId=requestAnimationFrame(loop);const now=performance.now(),dt=Math.min(0.05,(now-last)/1000);last=now;if(++frameskip&1)return;ctx.clearRect(0,0,W,H);if(!vignetteCache)buildVignette();ctx.drawImage(vignetteCache,0,0,W,H);updateSpec(dt*2);drawSpec();if(++grainTick>=3){grainTick=0;drawGrain();}drawScans(dt*2);drawGlitch(dt*2);}
     const vis=()=>{if(document.hidden){cancelAnimationFrame(rafId);rafId=null;}else{last=performance.now();loop();}};
     document.addEventListener('visibilitychange',vis);loop();
     return ()=>{cancelAnimationFrame(rafId);window.removeEventListener('resize',resize);window.removeEventListener('scroll',onScroll);document.removeEventListener('scroll',onScroll);document.removeEventListener('visibilitychange',vis);};
