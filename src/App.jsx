@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo, memo } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { USDLoader } from "three/addons/loaders/USDLoader.js";
@@ -371,6 +371,19 @@ function CardContent({ev,search,selected,showGreen,onClick}){
 
 function hlMatch(text,q){const i=text.toLowerCase().indexOf(q);if(i===-1)return text;return <span>{text.slice(0,i)}<span style={{background:"rgba(74,246,38,0.3)",padding:"0 1px"}}>{text.slice(i,i+q.length)}</span>{text.slice(i+q.length)}</span>}
 
+const DeskRow=memo(function DeskRow({e,q,anim,ri}){
+  return(<div className="ukho-row" data-eid={e.id} style={anim?{animation:`rowWave 0.35s cubic-bezier(0.25,0.8,0.3,1) ${580+Math.min(ri,60)*16}ms backwards`}:undefined}>
+    <div className="ukho-sel"/>
+    <div style={{fontFamily:ARCH,fontSize:28,fontWeight:400,color:"rgba(0,0,0,0.1)",letterSpacing:"-0.5px"}}>{e.id}</div>
+    <div style={{fontFamily:ARCH,fontSize:25,fontWeight:400,color:"#000",letterSpacing:"-0.3px",whiteSpace:"pre-line"}}>{q?hlMatch(e.n,q):e.n}</div>
+    <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pr.map((p,i)=><div key={i}>{q?hlMatch(p,q):p}</div>)}</div>
+    <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.map((p,i)=><div key={i}>{q?hlMatch(p,q):p}</div>)}</div>
+    <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pl}</div>
+    <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.t}</div>
+    <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.d}</div>
+  </div>);
+});
+
 /* ── List Page — dual card transitions ── */
 function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef,progTermsRef,evScrollRef,evSecRef,cameFromEvRef}){
   const reversed=useMemo(()=>[...events].reverse(),[events]);
@@ -513,6 +526,23 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     return()=>window.removeEventListener("scroll",onScroll);
   },[isDesk,mode]);
 
+  // Desktop virtualization
+  const _hc=useRef(new Map());const _rcRef=useRef(null);const _animDone=useRef(false);
+  const[_vsy,_setVsy]=useState(0);const _vraf=useRef(null);const[,_vTick]=useState(0);
+  useEffect(()=>{
+    if(!isDesk)return;
+    const t=setTimeout(()=>{_animDone.current=true},1800);
+    const h=()=>{if(_vraf.current)return;_vraf.current=requestAnimationFrame(()=>{_vraf.current=null;_setVsy(window.scrollY)})};
+    window.addEventListener('scroll',h,{passive:true});
+    return()=>{clearTimeout(t);window.removeEventListener('scroll',h);if(_vraf.current)cancelAnimationFrame(_vraf.current)};
+  },[isDesk]);
+  useLayoutEffect(()=>{
+    if(!isDesk||!_rcRef.current)return;let ch=false;
+    _rcRef.current.querySelectorAll('.ukho-row').forEach(r=>{const id=parseInt(r.dataset.eid),h=r.offsetHeight;
+      if(h>0&&_hc.current.get(id)!==h){_hc.current.set(id,h);ch=true}});
+    if(ch)_vTick(t=>t+1);
+  });
+
   // ── EVERYTHING mode ──
   const evBarBottom=useBarBottom(mode);
   const filterCounts=useMemo(()=>Object.fromEntries(Object.keys(everything).map(s=>[s,everything[s].length])),[everything]);
@@ -525,33 +555,34 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     </div>
     <BottomBar search={search} setSearch={setSearchSwitch} onTop={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:0,behavior:"smooth"})}} onBottom={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:el.scrollHeight,behavior:"smooth"})}} onToggleMode={()=>{setEnterDir("Up");navKey.current++;setMode("list")}} modeLabel="cards" introDelay={300} skipIntro={skipBarIntro} filters={{options:Object.keys(everything),counts:filterCounts,active:evSec,setActive:setEvSec}}/></>)}
 
-  // ── DESKTOP: table rows ──
+  // ── DESKTOP: virtualized table rows ──
   if(isDesk){
     const COLS="40px 2fr 2fr 2fr 1.2fr 1fr 0.8fr";
-
     const barB2=document.getElementById('ukho-bar');const deskTopH=barB2?barB2.offsetTop+barB2.offsetHeight:menuH+BAR_H;
+    const EST_H=100,OVER=1200;
+    const gH=id=>_hc.current.get(id)||EST_H;
+    const hdrOff=deskTopH+44;
+    const vTop=_vsy-hdrOff,vBot=vTop+window.innerHeight;
+    let si=0,ei=filtered.length,cum=0;
+    for(let i=0;i<filtered.length;i++){const h=gH(filtered[i].id);if(cum+h<vTop-OVER)si=i+1;if(cum>vBot+OVER){ei=i;break;}cum+=h}
+    let tPad=0;for(let i=0;i<si;i++)tPad+=gH(filtered[i].id);
+    let bPad=0;for(let i=ei;i<filtered.length;i++)bPad+=gH(filtered[i].id);
+    const q=search.trim()?search.toLowerCase():"";
+    const ia=!_animDone.current;
+    const onRowClick=ev=>{const r=ev.target.closest('.ukho-row');if(!r)return;const eid=parseInt(r.dataset.eid);const e=filtered.find(x=>x.id===eid);if(e)onOpenEvent?.(e)};
     return (<div style={{background:"white",minHeight:"100vh"}}>
       <style>{`@keyframes rowWave{0%{opacity:0;transform:translateY(18px)}100%{opacity:1;transform:translateY(0)}}@keyframes colHead{0%{opacity:0;transform:translateY(-8px)}100%{opacity:1;transform:translateY(0)}}`}</style>
       {/* Column headers */}
       <div style={{position:"fixed",top:deskTopH,left:0,right:0,zIndex:940,background:"rgba(255,255,255,0.7)",backdropFilter:"blur(50px) saturate(180%)",WebkitBackdropFilter:"blur(50px) saturate(180%)",padding:"8px 16px",display:"grid",gridTemplateColumns:COLS,gap:8,boxShadow:"0 1px 8px rgba(0,0,0,0.04)",animation:"colHead 0.35s cubic-bezier(0.34,1.4,0.5,1) 450ms both"}}>
         {["#","name","program","performers","place","tags","date"].map(l=><div key={l} style={{fontFamily:FONT,fontSize:12,fontWeight:700,color:"rgba(0,0,0,0.14)",letterSpacing:0.3,textTransform:"uppercase"}}>{l}</div>)}
       </div>
-      {/* Rows */}
-      <div style={{paddingTop:deskTopH+44,paddingBottom:40}}>
-        {filtered.map((e,rowIdx)=>(
-          <div key={e.id} className="ukho-row" onClick={()=>onOpenEvent?.(e)} style={{animation:`rowWave 0.35s cubic-bezier(0.25,0.8,0.3,1) ${580+Math.min(rowIdx,60)*16}ms backwards`}}>
-            <div className="ukho-sel"/>
-            <div style={{fontFamily:ARCH,fontSize:28,fontWeight:400,color:"rgba(0,0,0,0.1)",letterSpacing:"-0.5px"}}>{e.id}</div>
-            <div style={{fontFamily:ARCH,fontSize:25,fontWeight:400,color:"#000",letterSpacing:"-0.3px",whiteSpace:"pre-line"}}>{search.trim()?hlMatch(e.n,search.toLowerCase()):e.n}</div>
-            <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pr.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
-            <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pe.map((p,i)=><div key={i}>{search.trim()?hlMatch(p,search.toLowerCase()):p}</div>)}</div>
-            <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.pl}</div>
-            <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.t}</div>
-            <div style={{fontFamily:FONT,fontSize:14,color:"rgba(0,0,0,0.4)",lineHeight:1.5}}>{e.d}</div>
-          </div>
-        ))}
+      {/* Virtualized rows */}
+      <div ref={_rcRef} onClick={onRowClick} style={{paddingTop:hdrOff,paddingBottom:40}}>
+        {tPad>0&&<div style={{height:tPad}}/>}
+        {filtered.slice(si,ei).map((e,i)=><DeskRow key={e.id} e={e} q={q} anim={ia} ri={si+i}/>)}
+        {bPad>0&&<div style={{height:bPad}}/>}
       </div>
-      <BottomBar search={search} setSearch={setSearch} onTop={()=>window.scrollTo({top:0,behavior:"smooth"})} onBottom={()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})} onToggleMode={()=>setMode("everything")} modeLabel="everything" onPrev={()=>{}} onNext={()=>{}} matchIdx={0} matchCount={0} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} introDelay={300} skipIntro={skipBarIntro}/>
+      <BottomBar search={search} setSearch={setSearch} onTop={()=>window.scrollTo({top:0,behavior:"smooth"})} onBottom={()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})} onToggleMode={()=>setMode("everything")} modeLabel="everything" onPrev={()=>{}} onNext={()=>{}} matchIdx={search.trim()?filtered.length:0} matchCount={search.trim()?filtered.length:0} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} introDelay={300} skipIntro={skipBarIntro}/>
       <FloatingDice onRoll={()=>{const e=filtered[Math.floor(Math.random()*filtered.length)];if(e)onOpenEvent?.(e)}} introDelay={2000}/>
     </div>);
   }
