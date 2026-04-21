@@ -852,7 +852,7 @@ function useTypewriter(text,speed=30,startDelay=0){
 
 function Home({setPage,startBooting}){
   const stagesText="stage 1 — catalogue and essential library (live now)\nstage 2 — full library (jun 2026)\nstage 3 — wiki (dec 2026)\n\n✳ archive created with support from";
-  const upcomingText="Cherven vinyl release Kyiv dispatch\nValentin Silvestrov digital + vinyl release Kyiv dispatch\nUkho @ Iskra\nFestival of new music @ Pavilion of culture";
+  const upcomingText="Cherven, vinyl release on Kyiv Dispatch\nUkho @ Iсkрa\nValentin Silvestrov: Moments of Silvertones, digital & vinyl release on Kyiv Dispatch\nFestival of New Music @ Pavilion of Culture\nUkho @ Baltic Triennale";
   const tw1=useTypewriter(stagesText,25,2000);
   const tw2=useTypewriter(upcomingText,22,4500);
   const LS={letterSpacing:"-0.5px"};
@@ -863,14 +863,14 @@ function Home({setPage,startBooting}){
 
       {/* Description */}
       <p style={{fontFamily:FONT,fontSize:"clamp(14px,2.5vw,18px)",fontWeight:400,color:"rgba(0,0,0,0.4)",lineHeight:1.7,...LS,marginBottom:40}}>
-        Ukho is a 13-year, founder-led curatorial practice that has functioned as a full contemporary music and performance institution, building a body of work across concerts, opera, ensemble production, exhibitions, and international programming, largely outside formal institutional frameworks.
+        Ukho is a 14-year, founder-led curatorial practice that has functioned as a full contemporary music and performance institution, building a body of work across concerts, opera, ensemble production, exhibitions, and international programming, largely outside formal institutional frameworks.
         <br/><br/>Ukho is based in Kyiv.
       </p>
 
       {/* Enter archive */}
       <div style={{margin:"40px 0"}}>
         <style>{`@keyframes hCur{0%,100%{opacity:1}50%{opacity:0}}`}</style>
-        <TapButton onClick={()=>startBooting?.()} style={{fontFamily:ARCH,fontSize:"clamp(72px,18vw,120px)",fontWeight:700,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 0",textDecoration:"none",letterSpacing:"-4px",display:"inline-block"}}>
+        <TapButton onClick={()=>startBooting?.()} style={{fontFamily:ARCH,fontSize:"clamp(72px,18vw,120px)",fontWeight:700,color:BLUE,background:"none",border:"none",cursor:"pointer",padding:"8px 4px 8px 0",textDecoration:"none",letterSpacing:"-4px",display:"inline-block"}}>
           enter archive
         </TapButton>
       </div>
