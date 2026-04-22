@@ -1310,7 +1310,7 @@ function RiddlesPage({onOpenEvent,events}){
 
   return (<div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"white",display:"flex",flexDirection:"column"}}>
     {/* Riddle text — stretches from menu to buttons */}
-    <div style={{flex:1,padding:`${menuH}px clamp(32px,10vw,40px) 12px`,overflow:"hidden",minHeight:0}}>
+    <div style={{flex:1,padding:`${menuH+16}px clamp(32px,10vw,40px) 12px`,overflow:"hidden",minHeight:0}}>
       <div style={{width:"100%",maxWidth:600,margin:"0 auto",height:"100%",display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
         {/* Hidden measurer for full text height */}
         <div ref={measureRef} style={{fontFamily:MONO,fontSize:"clamp(14px,3.2vw,14px)",lineHeight:1.6,letterSpacing:.3,position:"absolute",visibility:"hidden",width:"100%",maxWidth:600,padding:`0 clamp(32px,10vw,40px)`}}>{fullText}</div>
@@ -1323,7 +1323,7 @@ function RiddlesPage({onOpenEvent,events}){
       </div>
     </div>
     {/* Bottom buttons */}
-    <div style={{flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-evenly",maxWidth:600,margin:"0 auto",width:"100%",padding:`20px clamp(16px,5vw,40px) ${isDesk?60:120}px`}}>
+    <div style={{flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-evenly",maxWidth:600,margin:"0 auto",width:"100%",padding:`12px clamp(16px,5vw,40px) ${isDesk?60:150}px`}}>
         <style>{`
           @keyframes rcBlink{0%,100%{opacity:1}50%{opacity:0}}
           @keyframes rdFloat{0%{transform:rotateX(15deg) rotateY(0) translateY(0)}25%{transform:rotateX(20deg) rotateY(90deg) translateY(-4px)}50%{transform:rotateX(10deg) rotateY(180deg) translateY(1px)}75%{transform:rotateX(18deg) rotateY(270deg) translateY(4px)}100%{transform:rotateX(15deg) rotateY(360deg) translateY(0)}}
