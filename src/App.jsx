@@ -883,8 +883,8 @@ function Home({setPage,startBooting}){
       </div>
 
       {/* Upcoming — watermark behind typewriter */}
-      <div style={{position:"relative",margin:"60px 0",padding:"20px 0"}}>
-        <div style={{fontFamily:ARCH,fontSize:"clamp(100px,25vw,200px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:1,letterSpacing:"-1px",position:"absolute",top:0,left:0,pointerEvents:"none",whiteSpace:"nowrap"}}>UPCOMING</div>
+      <div style={{position:"relative",margin:"60px 0",padding:"20px 0",overflow:"hidden"}}>
+        <div style={{fontFamily:ARCH,fontSize:"clamp(100px,25vw,200px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:.8,letterSpacing:"-1px",position:"absolute",top:20,left:0,pointerEvents:"none",whiteSpace:"nowrap"}}>UPCOMING</div>
         <div style={{position:"relative",fontFamily:MONO,fontSize:"clamp(11px,2vw,14px)",color:"rgba(0,0,0,0.55)",lineHeight:1.9,letterSpacing:"0px",whiteSpace:"pre-wrap"}}>
           {tw2.displayed}
           {!tw2.done&&<span style={{display:"inline-block",width:6,height:13,background:GREEN,animation:"hCur 0.7s step-end infinite",verticalAlign:"middle",marginLeft:2}}/>}
@@ -892,8 +892,8 @@ function Home({setPage,startBooting}){
       </div>
 
       {/* Umbrella */}
-      <div style={{position:"relative",margin:"60px 0",padding:"20px 0"}}>
-        <div style={{fontFamily:ARCH,fontSize:"clamp(100px,25vw,200px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:1,letterSpacing:"-1px",position:"absolute",top:0,left:0,pointerEvents:"none",whiteSpace:"nowrap"}}>UMBRELLA</div>
+      <div style={{position:"relative",margin:"60px 0",padding:"20px 0",overflow:"hidden"}}>
+        <div style={{fontFamily:ARCH,fontSize:"clamp(100px,25vw,200px)",fontWeight:400,color:"rgba(0,0,0,0.06)",lineHeight:.8,letterSpacing:"-1px",position:"absolute",top:20,left:0,pointerEvents:"none",whiteSpace:"nowrap"}}>UMBRELLA</div>
         <div style={{display:"flex",flexDirection:"column",gap:12,position:"relative"}}>
           <TapButton href="https://kyivdispat.ch" style={{fontFamily:ARCH,fontSize:"clamp(38px,9vw,58px)",fontWeight:400,color:BLUE,background:"none",border:"none",textDecoration:"none",letterSpacing:"-1.5px",display:"inline-block",padding:"6px 0",cursor:"pointer"}}>
             kyiv dispatch record label
