@@ -360,7 +360,7 @@ function CardContent({ev,search,selected,showGreen,onClick}){
       width:`${100/shrink}%`,
       transition:"transform 0.2s ease",
     }}>
-      <div><div data-field="name" style={{fontFamily:ARCH,fontSize:"clamp(40px,10vw,70px)",color:"rgba(0,0,0,0.08)",letterSpacing:"-0.5px",lineHeight:0.85,marginBottom:"-0.3em"}}>{ev.id}</div><div style={{fontFamily:ARCH,fontSize:"clamp(36px,8vw,56px)",fontWeight:400,color:"#000",lineHeight:1.15,letterSpacing:"-0.5px",zIndex:1,position:"relative",whiteSpace:"pre-line"}}>{hl(ev.n)}</div></div>
+      <div><div data-field="name" style={{fontFamily:ARCH,fontSize:"clamp(40px,10vw,70px)",color:"rgba(0,0,0,0.08)",letterSpacing:"-0.5px",lineHeight:0.85,marginBottom:"0.1em"}}>{ev.id}</div><div style={{fontFamily:ARCH,fontSize:"clamp(36px,8vw,56px)",fontWeight:400,color:"#000",lineHeight:1.15,letterSpacing:"-0.5px",zIndex:1,position:"relative",whiteSpace:"pre-line"}}>{hl(ev.n)}</div></div>
       <div data-field="program" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"#000",lineHeight:1.35,...(ev.id===33?{maxHeight:"6em",overflow:"hidden",WebkitMaskImage:"linear-gradient(180deg,#000 35%,transparent 100%)",maskImage:"linear-gradient(180deg,#000 35%,transparent 100%)"}:{})}}>{ev.pr.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
       <div data-field="performers" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"#000",lineHeight:1.35}}>{ev.pe.map((p,i)=><div key={i}>{hl(p)}</div>)}</div>
       <div data-field="place" style={{fontFamily:FONT,fontSize:"clamp(12px,2vw,14px)",color:"#000",lineHeight:1.35}}>{hl(ev.pl)}</div>
@@ -510,8 +510,8 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     setTimeout(()=>{setTapped(false);onOpenEvent?.(ev)},400);
   };
 
-  const everything=useMemo(()=>({names:reversed.map(e=>e.n).sort(),performers:PERFORMERS,pieces:PROGRAMS,places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.flatMap(e=>/let us stay here/i.test(e.t)?[e.t]:e.t.split(',').map(t=>t.trim())).filter(Boolean))].sort()}),[reversed]);
-  const[evSec,_setEvSec]=useState(()=>evSecRef?.current||"names");
+  const everything=useMemo(()=>({events:reversed.map(e=>e.n).sort(),performers:PERFORMERS,pieces:PROGRAMS,places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.flatMap(e=>/let us stay here/i.test(e.t)?[e.t]:e.t.split(',').map(t=>t.trim())).filter(Boolean))].sort()}),[reversed]);
+  const[evSec,_setEvSec]=useState(()=>evSecRef?.current||"events");
   const setEvSec=v=>{_setEvSec(v);if(evSecRef)evSecRef.current=v};
   const cameFromEv=useRef(cameFromEvRef?.current||false);
   const syncCameFromEv=v=>{cameFromEv.current=v;if(cameFromEvRef)cameFromEvRef.current=v};
@@ -554,7 +554,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     <style>{`@keyframes evItemWave{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}`}</style>
     <div data-scroll-container ref={el=>{if(el&&restoreScroll){requestAnimationFrame(()=>{el.scrollTop=restoreScroll;evScrollRef.current=0})}}} style={{position:"fixed",top:topH,left:0,right:0,bottom:0,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"white",zIndex:1}}>
       <div key={evSec} style={{padding:isDesk?"14px 20px 40px":"14px 14px 40px"}}><div style={{fontFamily:FONT,fontSize:"clamp(13px,2.3vw,16px)",lineHeight:2,color:"#000"}}>
-        {items.map((item,i)=><div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer",textTransform:evSec==="tags"?"uppercase":"none",transition:"transform 0.12s ease,background 0.12s ease",transformOrigin:"left center",animation:`evItemWave 0.3s cubic-bezier(0.25,0.8,0.3,1) ${evBase+Math.min(i,70)*13}ms backwards`}} onMouseEnter={e=>{e.currentTarget.style.background="rgba(74,246,38,0.06)";e.currentTarget.style.transform="scale(0.985)"}} onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.transform="none"}}>{item}</div>)}
+        {items.map((item,i)=>{const letter=(item[0]||"").toUpperCase();const prev=i>0?(items[i-1][0]||"").toUpperCase():"";const newGroup=letter!==prev;return<div key={i} onClick={()=>evSec==="pieces"?jumpFromProgram(item):jumpFrom(item)} style={{padding:"2px 0",borderBottom:"1px solid rgba(0,0,0,0.025)",cursor:"pointer",textTransform:evSec==="tags"?"uppercase":"none",transition:"transform 0.12s ease,background 0.12s ease",transformOrigin:"left center",marginTop:newGroup&&i>0?12:0,animation:`evItemWave 0.3s cubic-bezier(0.25,0.8,0.3,1) ${evBase+Math.min(i,70)*13}ms backwards`}} onMouseEnter={e=>{e.currentTarget.style.background="rgba(74,246,38,0.06)";e.currentTarget.style.transform="scale(0.985)"}} onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.transform="none"}}><span style={{fontWeight:newGroup?700:400}}>{item[0]}</span>{item.slice(1)}</div>})}
       </div></div>
     </div>
     <BottomBar search={search} setSearch={setSearchSwitch} onTop={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:0,behavior:"smooth"})}} onBottom={()=>{const el=document.querySelector('[data-scroll-container]');if(el)el.scrollTo({top:el.scrollHeight,behavior:"smooth"})}} onToggleMode={()=>{setEnterDir("Up");navKey.current++;setMode("list")}} modeLabel="cards" introDelay={300} skipIntro={skipBarIntro} filters={{options:Object.keys(everything),counts:filterCounts,active:evSec,setActive:setEvSec}}/></>)}
@@ -1425,7 +1425,7 @@ export default function App(){
   const cardIntroRef=useRef(false);
   const[bootingCard,setBootingCard]=useState(false);
   const startBooting=useCallback(()=>{setBootingCard(true);setTimeout(()=>{cardIntroRef.current=true;setBootingCard(false);setPage("cardindex")},700)},[]);
-  const listIdxRef=useRef(0);const listSearchRef=useRef("");const listYearRef=useRef("all");const listModeRef=useRef("list");const listScrollRef=useRef(0);const listProgTermsRef=useRef(null);const listEvScrollRef=useRef(0);const listEvSecRef=useRef("names");const listCameFromEvRef=useRef(false);
+  const listIdxRef=useRef(0);const listSearchRef=useRef("");const listYearRef=useRef("all");const listModeRef=useRef("list");const listScrollRef=useRef(0);const listProgTermsRef=useRef(null);const listEvScrollRef=useRef(0);const listEvSecRef=useRef("events");const listCameFromEvRef=useRef(false);
   const handleOpenEvent=(ev)=>{setPrevPage(page);setOpenEvent(ev);window.history.pushState({event:ev.id},"","/event/"+ev.id);window.scrollTo(0,0)};
   const handleBack=useCallback(()=>{setOpenEvent(null);if(listCameFromEvRef.current){listCameFromEvRef.current=false;listModeRef.current="everything";listSearchRef.current="";listProgTermsRef.current=null}if(prevPage)setPage(prevPage);window.history.pushState({},"","/")},[prevPage]);
   // Browser back button support
