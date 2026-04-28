@@ -751,6 +751,7 @@ function EventDetail({ev,onBack}){
         <div style={{fontFamily:MONO,fontSize:9,fontWeight:400,color:"rgba(0,0,0,0.18)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:3}}>media</div>
       </div>
       {imgs.map((src,i)=><PhotoSlideIn key={i} src={src} delay={i===0?1.8:1.2} index={i} onOpen={()=>setViewerIdx(i)}/>)}
+      {slide?.phc&&<div style={{fontFamily:FONT,fontSize:"clamp(11px,2vw,13px)",color:"rgba(0,0,0,0.4)",marginTop:8}}>photos by {slide.phc}</div>}
     </div>);
   })()}
   {viewerIdx!==null&&(()=>{const imgs=(MEDIA.find(s=>s.id===ev.id)?.imgs)||[];return <PhotoViewer imgs={imgs} startIdx={viewerIdx} onClose={()=>setViewerIdx(null)}/>;})()}
