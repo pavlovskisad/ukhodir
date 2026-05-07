@@ -449,7 +449,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
         if(hc){list=list.filter(e=>e.id===hc)}
         else{const q=norm(debouncedProgTerms.raw);list=list.filter(e=>e.pr.some(p=>norm(p).includes(q)))}
       }else{
-        const q=norm(debouncedSearch);list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q));
+        const q=norm(debouncedSearch);if(cameFromEv.current){list=list.filter(e=>norm(e.n)===q||e.pe.some(p=>norm(p)===q)||e.pr.some(p=>norm(p).includes(q))||norm(e.pl)===q||e.t.split(',').some(t=>norm(t.trim())===q)||e.d===debouncedSearch||String(e.id)===debouncedSearch)}else{list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q))}
       }
     }
     return list;
@@ -586,7 +586,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
         {filtered.slice(si,ei).map((e,i)=><DeskRow key={e.id} e={e} q={q} anim={ia} ri={si+i}/>)}
         {bPad>0&&<div style={{height:bPad}}/>}
       </div>
-      <BottomBar search={search} setSearch={setSearch} onTop={()=>window.scrollTo({top:0,behavior:"smooth"})} onBottom={()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})} onToggleMode={()=>setMode("everything")} modeLabel="everything" onPrev={()=>{}} onNext={()=>{}} matchIdx={search.trim()?filtered.length:0} matchCount={search.trim()?filtered.length:0} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} introDelay={300} skipIntro={skipBarIntro}/>
+      <BottomBar search={search} setSearch={setSearch} onTop={()=>window.scrollTo({top:0,behavior:"smooth"})} onBottom={()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})} onToggleMode={()=>setMode("everything")} modeLabel="everything" matchIdx={0} matchCount={0} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} introDelay={300} skipIntro={skipBarIntro}/>
       <FloatingDice onRoll={()=>{const e=filtered[Math.floor(Math.random()*filtered.length)];if(e)onOpenEvent?.(e)}} introDelay={2000}/>
     </div>);
   }
