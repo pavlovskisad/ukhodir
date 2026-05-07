@@ -245,7 +245,7 @@ function BottomBar({search,setSearch,onTop,onBottom,onToggleMode,modeLabel,onPre
         {search&&<div onClick={()=>setSearch("")} style={{position:"absolute",right:dk?6:4,top:"50%",transform:"translateY(-50%)",width:dk?28:22,height:dk?28:22,border:"none",background:"rgba(255,0,0,0.55)",color:"#fff",fontSize:dk?16:13,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"50%",padding:0,lineHeight:1,zIndex:2}}>×</div>}
       </div>
       {!hm&&<button style={bs} onClick={onTop}>▲</button>}{!hm&&<button style={bs} onClick={onBottom}>▼</button>}
-      {hm&&onPrev&&<button style={bs} onClick={onPrev}>‹</button>}{hm&&<span style={{fontFamily:MONO,fontSize:dk?15:11,color:"rgba(0,0,0,0.35)",whiteSpace:"nowrap",letterSpacing:0,minWidth:dk?48:36,textAlign:"center"}}>{onPrev?`${matchIdx+1}/`:""}{matchCount}</span>}{hm&&onNext&&<button style={bs} onClick={onNext}>›</button>}
+      {hm&&<button style={bs} onClick={onPrev}>‹</button>}{hm&&<span style={{fontFamily:MONO,fontSize:dk?15:11,color:"rgba(0,0,0,0.35)",whiteSpace:"nowrap",letterSpacing:0,minWidth:dk?48:36,textAlign:"center"}}>{matchIdx+1}/{matchCount}</span>}{hm&&<button style={bs} onClick={onNext}>›</button>}
       <button onClick={onToggleMode} style={{fontFamily:MONO,fontSize:dk?18:14,fontWeight:700,padding:dk?"8px 36px":"2px 16px",background:"rgba(74,246,38,0.06)",border:`1.5px solid ${GREEN}`,cursor:"pointer",color:"#000",letterSpacing:0.3,whiteSpace:"nowrap",height:dk?46:34,flexShrink:0,position:"relative",overflow:"hidden",textTransform:"lowercase",display:"flex",alignItems:"center",justifyContent:"center"}}>{modeLabel}</button>
     </div>
     {filters&&<div key="filters" style={{display:"flex",gap:dk?14:6,justifyContent:"space-between",alignItems:"baseline",paddingTop:2,animation:bottomAnim}}>{filters.options.map((s,ti)=>{const tabDelay=(animateBottom?380:0)+ti*60;const active=filters.active===s;return(<span key={s} onClick={()=>filters.setActive(s)} style={{fontFamily:ARCH,fontSize:dk?34:19,fontWeight:400,padding:0,background:"none",border:"none",cursor:"pointer",color:active?BLUE:"rgba(0,0,0,0.12)",letterSpacing:dk?"-0.5px":"0px",textTransform:"lowercase",whiteSpace:"nowrap",transition:"color 0.15s ease",animation:`filterTabPop 0.38s cubic-bezier(0.34,1.56,0.64,1) ${tabDelay}ms both`}}>{s}</span>)})}</div>}
@@ -533,6 +533,8 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   // Desktop virtualization
   const _hc=useRef(new Map());const _rcRef=useRef(null);const _animDone=useRef(false);
   const[_vsy,_setVsy]=useState(0);const _vraf=useRef(null);const[,_vTick]=useState(0);
+  const[deskIdx,setDeskIdx]=useState(0);
+  useEffect(()=>{setDeskIdx(0)},[filtered]);
   useEffect(()=>{
     if(!isDesk)return;
     const t=setTimeout(()=>{_animDone.current=true},1800);
@@ -573,7 +575,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     let bPad=0;for(let i=ei;i<filtered.length;i++)bPad+=gH(filtered[i].id);
     const q=search.trim()?search.toLowerCase():"";
     const ia=!_animDone.current;
-    const onRowClick=ev=>{const r=ev.target.closest('.ukho-row');if(!r)return;const eid=parseInt(r.dataset.eid);const e=filtered.find(x=>x.id===eid);if(e)onOpenEvent?.(e)};
+    const onRowClick=ev=>{const r=ev.target.closest('.ukho-row');if(!r)return;const eid=parseInt(r.dataset.eid);const fi=filtered.findIndex(x=>x.id===eid);if(fi>=0){setDeskIdx(fi);onOpenEvent?.(filtered[fi])}};
     return (<div style={{background:"white",minHeight:"100vh"}}>
       <style>{`@keyframes rowWave{0%{opacity:0;transform:translateY(18px)}100%{opacity:1;transform:translateY(0)}}@keyframes colHead{0%{opacity:0;transform:translateY(-8px)}100%{opacity:1;transform:translateY(0)}}`}</style>
       {/* Column headers */}
@@ -586,7 +588,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
         {filtered.slice(si,ei).map((e,i)=><DeskRow key={e.id} e={e} q={q} anim={ia} ri={si+i}/>)}
         {bPad>0&&<div style={{height:bPad}}/>}
       </div>
-      <BottomBar search={search} setSearch={setSearch} onTop={()=>window.scrollTo({top:0,behavior:"smooth"})} onBottom={()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})} onToggleMode={()=>setMode("everything")} modeLabel="everything" matchCount={search.trim()?filtered.length:0} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} introDelay={300} skipIntro={skipBarIntro}/>
+      <BottomBar search={search} setSearch={setSearch} onTop={()=>window.scrollTo({top:0,behavior:"smooth"})} onBottom={()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})} onToggleMode={()=>setMode("everything")} modeLabel="everything" onPrev={()=>{const n=deskIdx<=0?filtered.length-1:deskIdx-1;setDeskIdx(n);let y=hdrOff;for(let i=0;i<n;i++)y+=gH(filtered[i].id);window.scrollTo({top:Math.max(0,y-window.innerHeight/3),behavior:"smooth"})}} onNext={()=>{const n=deskIdx>=filtered.length-1?0:deskIdx+1;setDeskIdx(n);let y=hdrOff;for(let i=0;i<n;i++)y+=gH(filtered[i].id);window.scrollTo({top:Math.max(0,y-window.innerHeight/3),behavior:"smooth"})}} matchIdx={deskIdx} matchCount={search.trim()?filtered.length:0} years={years} yearFilter={yearFilter} setYearFilter={setYearFilter} introDelay={300} skipIntro={skipBarIntro}/>
       <FloatingDice onRoll={()=>{const e=filtered[Math.floor(Math.random()*filtered.length)];if(e)onOpenEvent?.(e)}} introDelay={2000}/>
     </div>);
   }
