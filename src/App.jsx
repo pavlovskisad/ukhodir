@@ -449,7 +449,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
         if(hc){list=list.filter(e=>e.id===hc)}
         else{const q=norm(debouncedProgTerms.raw);list=list.filter(e=>e.pr.some(p=>norm(p).includes(q)))}
       }else{
-        const q=norm(debouncedSearch);if(cameFromEv.current){const wb=(s,w)=>{const i=s.indexOf(w);if(i<0)return false;const before=i===0||/\W/.test(s[i-1]);const after=i+w.length>=s.length||/\W/.test(s[i+w.length]);return before&&after};list=list.filter(e=>wb(norm(e.n),q)||e.pe.some(p=>wb(norm(p),q))||wb(norm(e.pl),q)||e.t.split(',').some(t=>wb(norm(t.trim()),q))||e.d.includes(q)||String(e.id)===debouncedSearch)}else{list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q))}
+        const q=norm(debouncedSearch);if(cameFromEv.current){list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q))}else{list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q))}
       }
     }
     return list;
