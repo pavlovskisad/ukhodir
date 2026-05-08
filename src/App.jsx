@@ -449,7 +449,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
         if(hc){list=list.filter(e=>e.id===hc)}
         else{const q=norm(debouncedProgTerms.raw);list=list.filter(e=>e.pr.some(p=>norm(p).includes(q)))}
       }else{
-        const q=norm(debouncedSearch);if(cameFromEv.current){list=list.filter(e=>norm(e.n)===q||e.pe.some(p=>norm(p)===q)||e.pr.some(p=>norm(p).includes(q))||norm(e.pl)===q||e.t.split(',').some(t=>norm(t.trim())===q)||e.d===debouncedSearch||String(e.id)===debouncedSearch)}else{list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q))}
+        const q=norm(debouncedSearch);if(cameFromEv.current){const qe=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const peRe=new RegExp('^'+qe+'($|,| \\(|:)');list=list.filter(e=>norm(e.n)===q||e.pe.some(p=>peRe.test(norm(p)))||norm(e.pl)===q||e.t.split(',').some(t=>norm(t.trim())===q)||e.d===debouncedSearch||String(e.id)===debouncedSearch)}else{list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q))}
       }
     }
     return list;
