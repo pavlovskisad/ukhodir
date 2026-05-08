@@ -440,6 +440,9 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const[debouncedProgTerms,setDebouncedProgTerms]=useState(progTerms);
   useEffect(()=>{const t=setTimeout(()=>{setDebouncedSearch(search);setDebouncedProgTerms(progTerms)},80);return()=>clearTimeout(t)},[search,progTerms]);
 
+  const cameFromEv=useRef(cameFromEvRef?.current||false);
+  const syncCameFromEv=v=>{cameFromEv.current=v;if(cameFromEvRef)cameFromEvRef.current=v};
+
   const filtered=useMemo(()=>{
     let list=reversed;
     if(yearFilter!=="all")list=list.filter(e=>e.d.includes(yearFilter));
@@ -449,7 +452,7 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
         if(hc){list=list.filter(e=>e.id===hc)}
         else{const q=norm(debouncedProgTerms.raw);list=list.filter(e=>e.pr.some(p=>norm(p).includes(q)))}
       }else{
-        const q=norm(debouncedSearch);if(cameFromEv.current){list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q))}else{list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q))}
+        const q=norm(debouncedSearch);if(cameFromEv.current){const wb=(s,w)=>{const i=s.indexOf(w);if(i<0)return false;const before=i===0||/\W/.test(s[i-1]);const after=i+w.length>=s.length||/\W/.test(s[i+w.length]);return before&&after};list=list.filter(e=>wb(norm(e.n),q)||e.pe.some(p=>wb(norm(p),q))||wb(norm(e.pl),q)||e.t.split(',').some(t=>wb(norm(t.trim()),q))||e.d.includes(q)||String(e.id)===debouncedSearch)}else{list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q))}
       }
     }
     return list;
@@ -513,8 +516,6 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
   const everything=useMemo(()=>({events:reversed.map(e=>e.n).sort(),performers:PERFORMERS,pieces:PROGRAMS,places:[...new Set(reversed.map(e=>e.pl))].sort(),tags:[...new Set(reversed.flatMap(e=>/let us stay here/i.test(e.t)?[e.t]:e.t.split(',').map(t=>t.trim())).filter(Boolean))].sort()}),[reversed]);
   const[evSec,_setEvSec]=useState(()=>evSecRef?.current||"events");
   const setEvSec=v=>{_setEvSec(v);if(evSecRef)evSecRef.current=v};
-  const cameFromEv=useRef(cameFromEvRef?.current||false);
-  const syncCameFromEv=v=>{cameFromEv.current=v;if(cameFromEvRef)cameFromEvRef.current=v};
   const saveEvScroll=()=>{if(evScrollRef){const el=document.querySelector('[data-scroll-container]');if(el)evScrollRef.current=el.scrollTop}};
   const setSearchSwitch=useCallback(v=>{setSearch(v);if(mode==="everything"&&v.trim().length>0){saveEvScroll();syncCameFromEv(true);setMode("list");setIdx(0);setEnterDir("None")}},[mode]);
   const jumpFrom=useCallback(t=>{saveEvScroll();setYearFilter("all");setSearch(t);syncCameFromEv(true);setMode("list");setIdx(0);setEnterDir("None")},[]);
