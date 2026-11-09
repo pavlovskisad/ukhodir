@@ -440,12 +440,17 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
     return["all",...[...yrs].sort().reverse()];
   },[reversed]);
 
+  // Which Everything section a tap came from. The ref is for synchronous reads; the state copy
+  // feeds the filter, so tapping the same word from another section (e.g. Plivka the place,
+  // then Plivka the tag) re-filters even though the search text itself doesn't change.
+  const cameFromEv=useRef(cameFromEvRef?.current||false);
+  const[evScope,setEvScope]=useState(cameFromEv.current);
+  const syncCameFromEv=v=>{cameFromEv.current=v;if(cameFromEvRef)cameFromEvRef.current=v;setEvScope(v)};
+
   const[debouncedSearch,setDebouncedSearch]=useState(search);
   const[debouncedProgTerms,setDebouncedProgTerms]=useState(progTerms);
-  useEffect(()=>{const t=setTimeout(()=>{setDebouncedSearch(search);setDebouncedProgTerms(progTerms)},80);return()=>clearTimeout(t)},[search,progTerms]);
-
-  const cameFromEv=useRef(cameFromEvRef?.current||false);
-  const syncCameFromEv=v=>{cameFromEv.current=v;if(cameFromEvRef)cameFromEvRef.current=v};
+  const[debouncedScope,setDebouncedScope]=useState(evScope);
+  useEffect(()=>{const t=setTimeout(()=>{setDebouncedSearch(search);setDebouncedProgTerms(progTerms);setDebouncedScope(evScope)},80);return()=>clearTimeout(t)},[search,progTerms,evScope]);
 
   const filtered=useMemo(()=>{
     let list=reversed;
@@ -456,11 +461,11 @@ function ListPage({events,onOpenEvent,idxRef,searchRef,yearRef,modeRef,scrollRef
         if(hc){list=list.filter(e=>e.id===hc)}
         else{const q=norm(debouncedProgTerms.raw);list=list.filter(e=>e.pr.some(p=>norm(p).includes(q)))}
       }else{
-        const q=norm(debouncedSearch);const evSrc=cameFromEv.current;if(evSrc){const wb=(s,w)=>{const i=s.indexOf(w);if(i<0)return false;const before=i===0||/\W/.test(s[i-1]);const after=i+w.length>=s.length||/\W/.test(s[i+w.length]);return before&&after};const mPe=e=>e.pe.some(p=>wb(norm(p),q)),mPl=e=>wb(norm(e.pl),q),mTag=e=>evTags(e).some(t=>wb(norm(t),q));const scoped=evSrc==="performers"?mPe:evSrc==="places"?mPl:evSrc==="tags"?mTag:null;list=list.filter(scoped||(e=>wb(norm(e.n),q)||mPe(e)||mPl(e)||mTag(e)||e.d.includes(q)||String(e.id)===debouncedSearch))}else{list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q))}
+        const q=norm(debouncedSearch);const evSrc=debouncedScope;if(evSrc){const wb=(s,w)=>{const i=s.indexOf(w);if(i<0)return false;const before=i===0||/\W/.test(s[i-1]);const after=i+w.length>=s.length||/\W/.test(s[i+w.length]);return before&&after};const mPe=e=>e.pe.some(p=>wb(norm(p),q)),mPl=e=>wb(norm(e.pl),q),mTag=e=>evTags(e).some(t=>wb(norm(t),q));const scoped=evSrc==="performers"?mPe:evSrc==="places"?mPl:evSrc==="tags"?mTag:null;list=list.filter(scoped||(e=>wb(norm(e.n),q)||mPe(e)||mPl(e)||mTag(e)||e.d.includes(q)||String(e.id)===debouncedSearch))}else{list=list.filter(e=>norm(e.n).includes(q)||e.pe.some(p=>norm(p).includes(q))||e.pr.some(p=>norm(p).includes(q))||norm(e.pl).includes(q)||norm(e.t).includes(q)||e.d.includes(q)||String(e.id).includes(q))}
       }
     }
     return list;
-  },[reversed,debouncedSearch,yearFilter,debouncedProgTerms]);
+  },[reversed,debouncedSearch,yearFilter,debouncedProgTerms,debouncedScope]);
 
   const prevEvRef=useRef(null);
   const mountedRef=useRef(false);
